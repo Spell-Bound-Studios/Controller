@@ -1,0 +1,16 @@
+{
+  "name": "com.spellboundstudios.charactercontroller",
+  "version": "1.0.0",
+  "displayName": "Character Controller",
+  "description": "Character Controller for Corsair's Isle",
+  "unity": "6000.0",
+  "unityRelease": "40f1",
+  "dependencies": {
+  },
+
+  "author": {
+    "name": "Judsin",
+    "email": "Judsin1349@gmail.com",
+    "url": "https://github.com/Spell-Bound-Studios/CharacterController"
+  }
+}
