@@ -16,8 +16,11 @@ namespace SpellBound.CharacterController {
         protected CharacterInputHandler InputHandler;
         
         // State Machine
-        protected LocoStateHandler LocoStateHandler;
-        protected ActionStateHandler ActionStateHandler;
+        protected StateContext StateCtx;
+        
+        // Ground Checking
+        [SerializeField] protected LayerMask groundLayer;
+        protected float GroundCheckDistance;
         
         // Debugging Only
         [SerializeField] private bool debugging;
@@ -26,23 +29,21 @@ namespace SpellBound.CharacterController {
         
         private void Awake() {
             // Debugging
-            OnDebugging(enable: true);
+            OnStateDebugging(awake: true);
             
             // Rigidbody
             Rigidbody = GetComponent<Rigidbody>();
             RbHandler = new RigidbodyHandler();
-            RbHandler.InitializeRigidbody(Rigidbody);
+            Rigidbody = RbHandler.InitializeRigidbody(Rigidbody);
             
             // Inputs
             InputHandler = new CharacterInputHandler(this);
             
-            // State Machine: Create state handlers so that you can inject them into the BaseStates.
-            LocoStateHandler = new LocoStateHandler(this);
-            ActionStateHandler = new ActionStateHandler(this);
+            // Create state context to inject into the state handlers.
+            StateCtx = new StateContext();
             
-            // Now that each SO and base state exists we need to kick off the handlers with some default state entries.
-            LocoStateHandler.Initialize(null);
-            ActionStateHandler.Initialize(null);
+            // Ground Checks
+            GroundCheckDistance = GetDefaultGroundCheckDistance();
         }
 
         private void OnEnable() {
@@ -51,17 +52,18 @@ namespace SpellBound.CharacterController {
 
         private void OnDisable() {
             InputHandler.Disable();
-            OnDebugging(enable: false);
+            OnStateDebugging(awake: false);
         }
 
         private void Update() {
-            LocoStateHandler.CurrentLocoState.UpdateState();
-            ActionStateHandler.CurrentActionState.UpdateState();
+            StateCtx.LocoStateHandler.CurrentLocoState.UpdateState();
+            StateCtx.ActionStateHandler.CurrentActionState.UpdateState();
         }
 
         private void FixedUpdate() {
-            LocoStateHandler.CurrentLocoState.FixedUpdateState();
-            ActionStateHandler.CurrentActionState.FixedUpdateState();
+            StateCtx.LocoStateHandler.CurrentLocoState.FixedUpdateState();
+            StateCtx.ActionStateHandler.CurrentActionState.FixedUpdateState();
+            DoGroundCheck();
         }
 
         private void LateUpdate() {
@@ -69,11 +71,11 @@ namespace SpellBound.CharacterController {
         }
 
         /// <summary>
-        /// Debugging
+        /// Subscribing debugging methods to state change events.
         /// </summary>
-        private void OnDebugging(bool enable) {
+        private void OnStateDebugging(bool awake) {
             if (!debugging) return;
-            if (enable) {
+            if (awake) {
                 StateHelper.OnLocoStateChange += HandleLocoStateChanged;
                 StateHelper.OnActionStateChange += HandleActionStateChanged;
             }
@@ -83,14 +85,36 @@ namespace SpellBound.CharacterController {
             }
         }
         
+        /// <summary>
+        /// Debugging States to SerializedField.
+        /// </summary>
         private void HandleLocoStateChanged(BaseStateSO newState) {
             baseLocoStateSO = newState;
             Debug.Log($"Loco State SO changed to: {newState.GetType().Name}");
         }
         
+        /// <summary>
+        /// Debugging States to SerializedField.
+        /// </summary>
         private void HandleActionStateChanged(BaseStateSO newState) {
             baseActionStateSO = newState;
             Debug.Log($"Action State SO changed to: {newState.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Ground Check Gizmo.
+        /// </summary>
+        private void OnDrawGizmosSelected() {
+            if (!debugging) return;
+            
+            Debug.Log("Gizmo is running.");
+            
+            var origin = Rigidbody.transform.position + Vector3.up * 0.1f;
+            var direction = Vector3.down * GroundCheckDistance;
+            
+            // Green if grounded, red if not.
+            Gizmos.color = StateCtx.IsGrounded ? Color.green : Color.red;
+            Gizmos.DrawRay(origin, direction);
         }
         
         /// <summary>
@@ -98,6 +122,28 @@ namespace SpellBound.CharacterController {
         /// </summary>
         public virtual void OnMove(Vector2 moveVector) {
             Debug.Log($"[BaseCharacterController] OnMove received: {moveVector}");
+        }
+
+        /// <summary>
+        /// Checks to see if the player is grounded and then updates the context accordingly.
+        /// </summary>
+        protected virtual void DoGroundCheck() {
+            StateCtx.SetGroundedStatus(RbHandler.GroundCheck(null, GroundCheckDistance, groundLayer));
+        }
+        
+        /// <summary>
+        /// Checks the sizing of the collider to determine a length for a ground check raycast.
+        /// </summary>
+        private float GetDefaultGroundCheckDistance() {
+            const float buffer = 0.15f;
+
+            if (Rigidbody.TryGetComponent(out CapsuleCollider capsule))
+                return capsule.height / 2f + buffer;
+            if (Rigidbody.TryGetComponent(out BoxCollider box))
+                return box.bounds.extents.y + buffer;
+
+            // Failsafe
+            return 0.3f + buffer;
         }
     }
 }
