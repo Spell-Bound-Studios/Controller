@@ -16,8 +16,8 @@ namespace SpellBound.CharacterController {
         public void Enable() {
             _inputActions.Enable();
             
-            _inputActions.PlayerInput.Movement.performed += c => _controller.OnMove(c.ReadValue<Vector2>());
-            _inputActions.PlayerInput.Movement.canceled += _ => _controller.OnMove(Vector2.zero);
+            _inputActions.PlayerInput.Movement.performed += c => _controller.OnMoveInput(c.ReadValue<Vector2>());
+            _inputActions.PlayerInput.Movement.canceled += _ => _controller.OnMoveInput(Vector2.zero);
         }
 
         public void Disable() {

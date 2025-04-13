@@ -2,7 +2,13 @@
 
 namespace SpellBound.CharacterController {
     public class RigidbodyHandler {
+        // Innate
         private Rigidbody _rigidbody;
+        
+        // Attributes
+        private readonly float _speed;
+        private Vector3 _cameraInputDir;
+        private Vector3 _compositeDir;
         
         /// <summary>
         /// Initialize your custom or default Rigidbody.
@@ -27,6 +33,20 @@ namespace SpellBound.CharacterController {
         }
         
         /// <summary>
+        /// Injects Camera.
+        /// </summary>
+        public void InjectCameraTransform() {
+            
+        }
+        
+        /// <summary>
+        /// Injects Stats.
+        /// </summary>
+        public void InjectAttributes() {
+            
+        }
+        
+        /// <summary>
         /// Performs a ground check using a downward raycast.
         /// </summary>
         public bool GroundCheck(
@@ -46,6 +66,27 @@ namespace SpellBound.CharacterController {
             var hit = UnityEngine.Physics.Raycast(origin, Vector3.down, checkDistance, groundLayerMask);
 
             return hit;
+        }
+        
+        /// <summary>
+        /// Rigidbody Movement.
+        /// </summary>
+        public void HandleMoveInput(Vector2 inputVector, Transform camTransform, float deltaTime) {
+            var input = new Vector3(inputVector.x, 0f, inputVector.y);
+
+            // Camera orientation/initialization.
+            var camForward = camTransform.forward;
+            var camRight = camTransform.right;
+            camForward.y = 0f;
+            camRight.y = 0f;
+            camForward.Normalize();
+            camRight.Normalize();
+
+            // Inputs x Camera.
+            _cameraInputDir = camForward * input.z + camRight * input.x;
+            _compositeDir = _cameraInputDir * (_speed * deltaTime);
+            
+            _rigidbody.MovePosition(_rigidbody.position + _compositeDir);
         }
     }
 }

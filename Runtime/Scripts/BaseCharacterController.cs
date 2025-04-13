@@ -10,6 +10,7 @@ namespace SpellBound.CharacterController {
     public class BaseCharacterController : MonoBehaviour {
         // Components
         protected Rigidbody Rigidbody;
+        protected Transform CameraTransform;
         
         // Handlers
         protected RigidbodyHandler RbHandler;
@@ -38,6 +39,7 @@ namespace SpellBound.CharacterController {
             
             // Inputs
             InputHandler = new CharacterInputHandler(this);
+            FindCamera();
             
             // Create state context to inject into the state handlers.
             StateCtx = new StateContext();
@@ -48,6 +50,8 @@ namespace SpellBound.CharacterController {
 
         private void OnEnable() {
             InputHandler.Enable();
+            RbHandler.InjectCameraTransform();
+            RbHandler.InjectAttributes();
         }
 
         private void OnDisable() {
@@ -64,6 +68,7 @@ namespace SpellBound.CharacterController {
             StateCtx.LocoStateHandler.CurrentLocoState.FixedUpdateState();
             StateCtx.ActionStateHandler.CurrentActionState.FixedUpdateState();
             DoGroundCheck();
+            RbHandler.HandleMoveInput(StateCtx.MoveVector, CameraTransform, Time.deltaTime);
         }
 
         private void LateUpdate() {
@@ -107,8 +112,6 @@ namespace SpellBound.CharacterController {
         private void OnDrawGizmosSelected() {
             if (!debugging) return;
             
-            Debug.Log("Gizmo is running.");
-            
             var origin = Rigidbody.transform.position + Vector3.up * 0.1f;
             var direction = Vector3.down * GroundCheckDistance;
             
@@ -120,8 +123,8 @@ namespace SpellBound.CharacterController {
         /// <summary>
         /// Called whenever movement input is received.
         /// </summary>
-        public virtual void OnMove(Vector2 moveVector) {
-            Debug.Log($"[BaseCharacterController] OnMove received: {moveVector}");
+        public virtual void OnMoveInput(Vector2 moveVector) {
+            StateCtx.MoveVector = moveVector;
         }
 
         /// <summary>
@@ -144,6 +147,11 @@ namespace SpellBound.CharacterController {
 
             // Failsafe
             return 0.3f + buffer;
+        }
+
+        protected virtual void FindCamera() {
+            var cameraComponent = gameObject.AddComponent<CameraComponent>();
+            CameraTransform = cameraComponent.Camera.transform;
         }
     }
 }
