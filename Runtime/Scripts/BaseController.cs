@@ -17,6 +17,9 @@ namespace SpellBound.Controller {
         // State Machine
         protected StateContext StateCtx;
         
+        // Animation Controller
+        protected AnimationController AnimationController;
+        
         // Ground Checking
         [SerializeField] protected LayerMask groundLayer;
         protected float GroundCheckDistance;
@@ -37,7 +40,10 @@ namespace SpellBound.Controller {
             InputHandler = new CharacterInputHandler(this);
             
             // Create state context to inject into the state handlers.
-            StateCtx = new StateContext(Rigidbody, FindCameraTransform());
+            CreateStateContext();
+            
+            // Create the animation controller
+            CreateAnimationController();
             
             // Ground Checks
             GroundCheckDistance = GetDefaultGroundCheckDistance();
@@ -49,14 +55,15 @@ namespace SpellBound.Controller {
 
         protected void OnDisable() {
             InputHandler.Disable();
+            AnimationController.DisposeEvents();
             OnStateDebugging(awake: false);
         }
-
-        protected void Update() {
+        
+        private void Update() {
             StateCtx.LocoStateHandler.CurrentLocoState.UpdateState();
             StateCtx.ActionStateHandler.CurrentActionState.UpdateState();
         }
-
+        
         protected void FixedUpdate() {
             StateCtx.LocoStateHandler.CurrentLocoState.FixedUpdateState();
             StateCtx.ActionStateHandler.CurrentActionState.FixedUpdateState();
@@ -166,6 +173,16 @@ namespace SpellBound.Controller {
         protected virtual Transform FindCameraTransform() {
             var cameraComponent = gameObject.AddComponent<CameraComponent>();
             return cameraComponent.Camera.transform;
+        }
+
+        protected virtual void CreateStateContext() {
+            StateCtx = new StateContext(Rigidbody, FindCameraTransform());
+        }
+
+        protected virtual void CreateAnimationController() {
+            var animator = GetComponentInChildren<Animator>();
+            AnimationController = new AnimationController(animator, StateCtx);
+            StateCtx.OnStateChanged?.Invoke(StateContext.DefaultState);
         }
     }
 }
