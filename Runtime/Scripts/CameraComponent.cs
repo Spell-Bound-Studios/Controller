@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.CharacterController {
+namespace SpellBound.Controller {
     public class CameraComponent : MonoBehaviour {
         public Camera Camera { get; private set; }
 

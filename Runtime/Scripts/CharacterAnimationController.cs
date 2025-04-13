@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.CharacterController {
-    [RequireComponent(typeof(BaseCharacterController))]
+namespace SpellBound.Controller {
+    [RequireComponent(typeof(BaseController))]
     public class CharacterAnimationController : MonoBehaviour {
         
     }

@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.CharacterController {
+namespace SpellBound.Controller {
     /// <summary>
     /// Handles all player input.
     /// </summary>
     public class CharacterInputHandler {
-        private readonly BaseCharacterController _controller;
+        private readonly BaseController _controller;
         private readonly InputActions _inputActions = new();
         
         // Constructor
-        public CharacterInputHandler(BaseCharacterController controller) {
+        public CharacterInputHandler(BaseController controller) {
             _controller = controller;
         }
         

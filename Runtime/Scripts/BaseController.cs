@@ -1,19 +1,17 @@
 ﻿using SpellBound.PlayerStateMachine;
 using UnityEngine;
 
-namespace SpellBound.CharacterController {
+namespace SpellBound.Controller {
     /// <summary>
-    /// Base Character Controller class to be inherited by a component class. This will do a lot of behind the scenes
+    /// Base Controller class to be inherited by a component class. This will do a lot of behind the scenes
     /// for the user. Alternatively, they will be given full control for every function if they want to change it.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
-    public class BaseCharacterController : MonoBehaviour {
+    public class BaseController : MonoBehaviour {
         // Components
         protected Rigidbody Rigidbody;
-        protected Transform CameraTransform;
         
         // Handlers
-        protected RigidbodyHandler RbHandler;
         protected CharacterInputHandler InputHandler;
         
         // State Machine
@@ -28,51 +26,41 @@ namespace SpellBound.CharacterController {
         [SerializeField] private BaseStateSO baseActionStateSO;
         [SerializeField] private BaseStateSO baseLocoStateSO;
         
-        private void Awake() {
+        protected void Awake() {
             // Debugging
             OnStateDebugging(awake: true);
             
             // Rigidbody
             Rigidbody = GetComponent<Rigidbody>();
-            RbHandler = new RigidbodyHandler();
-            Rigidbody = RbHandler.InitializeRigidbody(Rigidbody);
             
             // Inputs
             InputHandler = new CharacterInputHandler(this);
-            FindCamera();
             
             // Create state context to inject into the state handlers.
-            StateCtx = new StateContext();
+            StateCtx = new StateContext(Rigidbody, FindCameraTransform());
             
             // Ground Checks
             GroundCheckDistance = GetDefaultGroundCheckDistance();
         }
 
-        private void OnEnable() {
+        protected void OnEnable() {
             InputHandler.Enable();
-            RbHandler.InjectCameraTransform();
-            RbHandler.InjectAttributes();
         }
 
-        private void OnDisable() {
+        protected void OnDisable() {
             InputHandler.Disable();
             OnStateDebugging(awake: false);
         }
 
-        private void Update() {
+        protected void Update() {
             StateCtx.LocoStateHandler.CurrentLocoState.UpdateState();
             StateCtx.ActionStateHandler.CurrentActionState.UpdateState();
         }
 
-        private void FixedUpdate() {
+        protected void FixedUpdate() {
             StateCtx.LocoStateHandler.CurrentLocoState.FixedUpdateState();
             StateCtx.ActionStateHandler.CurrentActionState.FixedUpdateState();
             DoGroundCheck();
-            RbHandler.HandleMoveInput(StateCtx.MoveVector, CameraTransform, Time.deltaTime);
-        }
-
-        private void LateUpdate() {
-            
         }
 
         /// <summary>
@@ -124,14 +112,7 @@ namespace SpellBound.CharacterController {
         /// Called whenever movement input is received.
         /// </summary>
         public virtual void OnMoveInput(Vector2 moveVector) {
-            StateCtx.MoveVector = moveVector;
-        }
-
-        /// <summary>
-        /// Checks to see if the player is grounded and then updates the context accordingly.
-        /// </summary>
-        protected virtual void DoGroundCheck() {
-            StateCtx.SetGroundedStatus(RbHandler.GroundCheck(null, GroundCheckDistance, groundLayer));
+            StateCtx.InputVector = moveVector;
         }
         
         /// <summary>
@@ -148,10 +129,43 @@ namespace SpellBound.CharacterController {
             // Failsafe
             return 0.3f + buffer;
         }
+        
+        /// <summary>
+        /// Checks to see if the player is grounded and then updates the context accordingly.
+        /// </summary>
+        protected virtual void DoGroundCheck() {
+            StateCtx.IsGrounded = GroundCheck(null, GroundCheckDistance, groundLayer);
+        }
+        
+        /// <summary>
+        /// Performs a ground check using a downward raycast.
+        /// </summary>
+        protected bool GroundCheck(
+            Transform groundCheckTransform,
+            float checkDistance = 1.5f,
+            LayerMask groundLayerMask = default,
+            float originYOffset = 0.1f
+        ) {
+            var trans = groundCheckTransform ?? Rigidbody.transform;
+            
+            if (trans == null) {
+                Debug.LogWarning("[RigidbodyHandler]: Requires a rigidbody or transform. Both were null.");
+                return false;
+            }
 
-        protected virtual void FindCamera() {
+            var origin = trans.position + Vector3.up * originYOffset;
+            var hit = UnityEngine.Physics.Raycast(origin, Vector3.down, checkDistance, groundLayerMask);
+
+            return hit;
+        }
+        
+        /// <summary>
+        /// Creates a CameraComponent and adds it to this gameobject and gets its transform for tracking.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Transform FindCameraTransform() {
             var cameraComponent = gameObject.AddComponent<CameraComponent>();
-            CameraTransform = cameraComponent.Camera.transform;
+            return cameraComponent.Camera.transform;
         }
     }
 }
