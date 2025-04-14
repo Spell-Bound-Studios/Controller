@@ -161,7 +161,7 @@ namespace SpellBound.Controller {
             }
 
             var origin = trans.position + Vector3.up * originYOffset;
-            var hit = UnityEngine.Physics.Raycast(origin, Vector3.down, checkDistance, groundLayerMask);
+            var hit = Physics.Raycast(origin, Vector3.down, checkDistance, groundLayerMask);
 
             return hit;
         }
@@ -169,16 +169,22 @@ namespace SpellBound.Controller {
         /// <summary>
         /// Creates a CameraComponent and adds it to this gameobject and gets its transform for tracking.
         /// </summary>
-        /// <returns></returns>
         protected virtual Transform FindCameraTransform() {
             var cameraComponent = gameObject.AddComponent<CameraComponent>();
             return cameraComponent.Camera.transform;
         }
-
+        
+        /// <summary>
+        /// Responsible for creating the StateContext which in turn kicks off the State Machine logic.
+        /// </summary>
         protected virtual void CreateStateContext() {
             StateCtx = new StateContext(Rigidbody, FindCameraTransform());
         }
 
+        /// <summary>
+        /// Responsible for creating the animation controller which hooks up directly to the animator and subscribes
+        /// to StateContext events.
+        /// </summary>
         protected virtual void CreateAnimationController() {
             var animator = GetComponentInChildren<Animator>();
             AnimationController = new AnimationController(animator, StateCtx);

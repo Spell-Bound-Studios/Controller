@@ -71,7 +71,7 @@ namespace SpellBound.Controller {
             var direction = Camera.transform.position - cameraFollowTransform.position;
             direction.Normalize();
 
-            if (!UnityEngine.Physics.SphereCast(
+            if (!Physics.SphereCast(
                     cameraFollowTransform.position,
                     cameraCollisionRadius,
                     direction,

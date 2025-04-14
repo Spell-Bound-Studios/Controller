@@ -34,7 +34,6 @@ namespace SpellBound.Controller {
 
         private void HandleAnimationSpeedChanged(float blendValue) {
             _animator.SetFloat(Speed, blendValue);
-            Debug.Log($"Speed is : {blendValue}");
         }
     }
 }
