@@ -5,8 +5,6 @@ namespace SpellBound.Controller {
         public Camera Camera { get; private set; }
 
         [Header("Camera Settings")] 
-        [SerializeField] private Vector3 cameraFollowOffset = new (0.25f, 1.5f, 0f);
-
         [SerializeField] private Vector3 camTarget;
         [SerializeField] private float mouseSensitivity = 2f;
         [SerializeField] private float cameraDistance = 5f;
@@ -32,7 +30,7 @@ namespace SpellBound.Controller {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        private void LateUpdate() {
+        private void FixedUpdate() {
             HandleCameraTarget();
             HandleCameraRotation();
             HandleCameraCollision();
@@ -68,13 +66,13 @@ namespace SpellBound.Controller {
         /// BUG: Forces the camera down and has odd jittery behavior.
         /// </summary>
         private void HandleCameraCollision() {
-            targetCameraZPosition = Vector3.Distance(cameraFollowOffset, Camera.transform.position);
+            targetCameraZPosition = Vector3.Distance(camTarget, Camera.transform.position);
             
-            var direction = Camera.transform.position - cameraFollowOffset;
+            var direction = Camera.transform.position - camTarget;
             direction.Normalize();
 
             if (!Physics.SphereCast(
-                    cameraFollowOffset,
+                    camTarget,
                     cameraCollisionRadius,
                     direction,
                     out var hit,
@@ -82,7 +80,7 @@ namespace SpellBound.Controller {
                     collisionLayerMask
                 )) return;
 
-            var distanceFromHitObject = Vector3.Distance(cameraFollowOffset, hit.point);
+            var distanceFromHitObject = Vector3.Distance(camTarget, hit.point);
             targetCameraZPosition = -(distanceFromHitObject - cameraCollisionRadius);
 
             if (Mathf.Abs(targetCameraZPosition) < cameraCollisionRadius) {
@@ -111,7 +109,7 @@ namespace SpellBound.Controller {
         /// Handles the camera target and ensures it stays at the same point in space.
         /// </summary>
         private void HandleCameraTarget() {
-            camTarget = transform.position + (Camera.transform.rotation * cameraFollowOffset);
+            camTarget = transform.position;
         }
         
         /// <summary>
@@ -121,7 +119,7 @@ namespace SpellBound.Controller {
             if (!drawCollisionDebugGizmos) return;
             if (Camera == null) return;
 
-            var start = cameraFollowOffset;
+            var start = camTarget;
             var direction = Camera.transform.position - start;
             var distance = direction.magnitude;
 
