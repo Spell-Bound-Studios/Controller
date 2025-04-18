@@ -1,15 +1,16 @@
-﻿using SpellBound.PlayerStateMachine;
+﻿using PurrNet;
+using SpellBound.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller {
     public class AnimationController {
         private readonly StateContext _ctx;
-        private readonly Animator _animator;
+        private readonly NetworkAnimator _animator;
         private readonly Rigidbody _rigidbody;
         
         private static readonly int Speed = Animator.StringToHash("speed");
         
-        public AnimationController(Animator animator, StateContext ctx) {
+        public AnimationController(NetworkAnimator animator, StateContext ctx) {
             _animator = animator;
             _ctx = ctx;
             
