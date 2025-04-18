@@ -76,7 +76,7 @@ namespace SpellBound.Controller {
         protected virtual void CreateStateContext() {
             StateCtx = gameObject.AddComponent<StateContext>();
             StateCtx.cameraTransform = FindCameraTransform();
-            Debug.Log("Setting StateCtx.cameraTransform");
+            Debug.Log($"Setting StateCtx.cameraTransform for client: {owner}");
         }
 
         /// <summary>
