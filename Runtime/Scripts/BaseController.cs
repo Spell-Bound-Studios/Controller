@@ -17,23 +17,33 @@ namespace SpellBound.Controller {
         
         // Animation Controller
         protected AnimationController AnimationController;
-        
-        protected void Awake() {
-            // Inputs
+
+        protected override void OnSpawned() {
+            base.OnSpawned();
+            
+            // If we are not the client then exit. This ensures that each client runs a base implementation of BaseController.
+            if (!isOwner) {
+                return;
+            }
+            
+            enabled = isOwner;
+            
+            // Creates and subscribes the input actions mapping to methods in this script.
             InputHandler = new CharacterInputHandler(this);
             
-            // Create State Context
+            // Creates a Monobehaviour component responsible for managing character state. Also creates a camera component.
             CreateStateContext();
             
-            // Create the animation controller
+            // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
-        }
-
-        protected void OnEnable() {
+            
             InputHandler.Enable();
         }
 
-        protected void OnDisable() {
+        protected override void OnDespawned() {
+            base.OnDespawned();
+            if (!isOwner) return;
+            
             InputHandler.Disable();
             AnimationController.DisposeEvents();
         }
@@ -74,8 +84,8 @@ namespace SpellBound.Controller {
         /// to StateContext events.
         /// </summary>
         protected virtual void CreateAnimationController() {
-            var animator = GetComponentInChildren<Animator>();
-            AnimationController = new AnimationController(animator, StateCtx);
+            var networkAnimator = GetComponentInChildren<NetworkAnimator>();
+            AnimationController = new AnimationController(networkAnimator, StateCtx);
             StateCtx.OnStateChanged?.Invoke(StateContext.DefaultState);
         }
     }
