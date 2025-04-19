@@ -21,13 +21,18 @@ namespace SpellBound.Controller {
         protected override void OnSpawned() {
             base.OnSpawned();
             
-            Debug.Log($"[BaseController]: Client {owner} connected.");
+            Debug.Log("#################################################");
+            Debug.Log($"[BaseController] Hello, I am the host: {isHost}");
+            Debug.Log($"[BaseController] Hello, I am the server: {isServer}");
+            Debug.Log($"[BaseController] Hello, I am the client: {isClient}");
+            Debug.Log($"[BaseController] Hello, I am the owner: {isOwner}");
+            Debug.Log("##################################################");
             
             // If we are not the client then exit. This ensures that each client runs a base implementation of BaseController.
             if (!isOwner) {
                 return;
             }
-            
+
             // Redundancy to ensure this script is enabled.
             enabled = isOwner;
             
