@@ -1,8 +1,8 @@
 {
-  "name": "com.spellboundstudios.charactercontroller",
-  "version": "1.0.1",
-  "displayName": "Character Controller",
-  "description": "Character Controller for Corsair's Isle",
+  "name": "com.spellboundstudios.controller",
+  "version": "1.0.2",
+  "displayName": "Controller",
+  "description": "Controller for Corsair's Isle",
   "unity": "6000.0",
   "unityRelease": "40f1",
   "dependencies": {
