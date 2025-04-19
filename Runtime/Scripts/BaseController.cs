@@ -26,6 +26,7 @@ namespace SpellBound.Controller {
                 return;
             }
             
+            // Redundancy to ensure this script is enabled.
             enabled = isOwner;
             
             // Creates and subscribes the input actions mapping to methods in this script.
@@ -33,6 +34,13 @@ namespace SpellBound.Controller {
             
             // Creates a Monobehaviour component responsible for managing character state. Also creates a camera component.
             CreateStateContext();
+            
+            // Set the camera of the StateCtx so that states can use it.
+            var camTran = FindCameraTransform();
+            if (camTran != null) {
+                StateCtx.cameraTransform = camTran;
+            } else Debug.LogWarning("No camera found! ITS NULL");
+            Debug.Log($"Setting StateCtx.cameraTransform for client: {owner}");
             
             // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
@@ -75,8 +83,6 @@ namespace SpellBound.Controller {
         /// </summary>
         protected virtual void CreateStateContext() {
             StateCtx = gameObject.AddComponent<StateContext>();
-            StateCtx.cameraTransform = FindCameraTransform();
-            Debug.Log($"Setting StateCtx.cameraTransform for client: {owner}");
         }
 
         /// <summary>
