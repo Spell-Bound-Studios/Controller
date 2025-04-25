@@ -78,6 +78,55 @@ namespace SpellBound.Controller {
         }
         
         /// <summary>
+        /// Called on Right Click.
+        /// </summary>
+        public virtual void OnRightMouseClick(bool clicked) {
+            
+        }
+
+        /// <summary>
+        /// Called on Left Click.
+        /// </summary>
+        public virtual void OnLeftMouseClick(bool clicked) {
+            
+        }
+
+        /// <summary>
+        /// Called on shift held.
+        /// </summary>
+        public virtual void OnSprintHeld(bool held) {
+            
+        }
+
+        /// <summary>
+        /// Called when the left most hotkey bind is pressed.
+        /// </summary>
+        public virtual void OnHotkeyOnePressed(string hotkey) {
+            Debug.Log(hotkey);
+        }
+        
+        /// <summary>
+        /// Called when the left most hotkey bind + one is pressed.
+        /// </summary>
+        public virtual void OnHotkeyTwoPressed(string hotkey) {
+            Debug.Log(hotkey);
+        }
+        
+        /// <summary>
+        /// Called when the left most hotkey bind + two is pressed.
+        /// </summary>
+        public virtual void OnHotkeyThreePressed(string hotkey) {
+            Debug.Log(hotkey);
+        }
+        
+        /// <summary>
+        /// Called when the left most hotkey bind + three is pressed.
+        /// </summary>
+        public virtual void OnHotkeyFourPressed(string hotkey) {
+            Debug.Log(hotkey);
+        }
+        
+        /// <summary>
         /// Creates a CameraComponent and adds it to this gameobject and gets its transform for tracking.
         /// </summary>
         protected virtual Transform FindCameraTransform() {

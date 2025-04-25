@@ -135,6 +135,42 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HotkeyOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""875400a9-0b38-4d2c-a30b-9fff25cba8be"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HotkeyTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""b09f6b94-b0ff-4254-87b6-2201b4588cf9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HotkeyThree"",
+                    ""type"": ""Button"",
+                    ""id"": ""7a1cb91e-a2ca-4871-af85-5fa473acb97a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HotkeyFour"",
+                    ""type"": ""Button"",
+                    ""id"": ""3c919fed-02ab-4a42-bdc4-3c3b12cacb14"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -291,6 +327,50 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e3798b19-5783-489d-ba1a-08698f894b57"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HotkeyOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""308283d1-3584-41de-b794-f2ffde5f578a"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HotkeyTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""01533439-81a5-44b2-8553-d71ac87ced9a"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HotkeyThree"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8cffdafd-9209-453b-aca3-f950113cf744"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HotkeyFour"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -304,6 +384,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_RightClick = m_PlayerInput.FindAction("RightClick", throwIfNotFound: true);
         m_PlayerInput_LeftClick = m_PlayerInput.FindAction("LeftClick", throwIfNotFound: true);
         m_PlayerInput_Sprint = m_PlayerInput.FindAction("Sprint", throwIfNotFound: true);
+        m_PlayerInput_HotkeyOne = m_PlayerInput.FindAction("HotkeyOne", throwIfNotFound: true);
+        m_PlayerInput_HotkeyTwo = m_PlayerInput.FindAction("HotkeyTwo", throwIfNotFound: true);
+        m_PlayerInput_HotkeyThree = m_PlayerInput.FindAction("HotkeyThree", throwIfNotFound: true);
+        m_PlayerInput_HotkeyFour = m_PlayerInput.FindAction("HotkeyFour", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -389,6 +473,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_RightClick;
     private readonly InputAction m_PlayerInput_LeftClick;
     private readonly InputAction m_PlayerInput_Sprint;
+    private readonly InputAction m_PlayerInput_HotkeyOne;
+    private readonly InputAction m_PlayerInput_HotkeyTwo;
+    private readonly InputAction m_PlayerInput_HotkeyThree;
+    private readonly InputAction m_PlayerInput_HotkeyFour;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -420,6 +508,22 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_PlayerInput_Sprint;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/HotkeyOne".
+        /// </summary>
+        public InputAction @HotkeyOne => m_Wrapper.m_PlayerInput_HotkeyOne;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/HotkeyTwo".
+        /// </summary>
+        public InputAction @HotkeyTwo => m_Wrapper.m_PlayerInput_HotkeyTwo;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/HotkeyThree".
+        /// </summary>
+        public InputAction @HotkeyThree => m_Wrapper.m_PlayerInput_HotkeyThree;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/HotkeyFour".
+        /// </summary>
+        public InputAction @HotkeyFour => m_Wrapper.m_PlayerInput_HotkeyFour;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -461,6 +565,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @HotkeyOne.started += instance.OnHotkeyOne;
+            @HotkeyOne.performed += instance.OnHotkeyOne;
+            @HotkeyOne.canceled += instance.OnHotkeyOne;
+            @HotkeyTwo.started += instance.OnHotkeyTwo;
+            @HotkeyTwo.performed += instance.OnHotkeyTwo;
+            @HotkeyTwo.canceled += instance.OnHotkeyTwo;
+            @HotkeyThree.started += instance.OnHotkeyThree;
+            @HotkeyThree.performed += instance.OnHotkeyThree;
+            @HotkeyThree.canceled += instance.OnHotkeyThree;
+            @HotkeyFour.started += instance.OnHotkeyFour;
+            @HotkeyFour.performed += instance.OnHotkeyFour;
+            @HotkeyFour.canceled += instance.OnHotkeyFour;
         }
 
         /// <summary>
@@ -487,6 +603,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @HotkeyOne.started -= instance.OnHotkeyOne;
+            @HotkeyOne.performed -= instance.OnHotkeyOne;
+            @HotkeyOne.canceled -= instance.OnHotkeyOne;
+            @HotkeyTwo.started -= instance.OnHotkeyTwo;
+            @HotkeyTwo.performed -= instance.OnHotkeyTwo;
+            @HotkeyTwo.canceled -= instance.OnHotkeyTwo;
+            @HotkeyThree.started -= instance.OnHotkeyThree;
+            @HotkeyThree.performed -= instance.OnHotkeyThree;
+            @HotkeyThree.canceled -= instance.OnHotkeyThree;
+            @HotkeyFour.started -= instance.OnHotkeyFour;
+            @HotkeyFour.performed -= instance.OnHotkeyFour;
+            @HotkeyFour.canceled -= instance.OnHotkeyFour;
         }
 
         /// <summary>
@@ -562,5 +690,33 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotkeyOne" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotkeyOne(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotkeyTwo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotkeyTwo(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotkeyThree" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotkeyThree(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotkeyFour" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotkeyFour(InputAction.CallbackContext context);
     }
 }
