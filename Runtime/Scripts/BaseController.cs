@@ -1,4 +1,5 @@
-﻿using PurrNet;
+﻿using System.Collections.Generic;
+using PurrNet;
 using SpellBound.PlayerStateMachine;
 using UnityEngine;
 
@@ -102,28 +103,28 @@ namespace SpellBound.Controller {
         /// Called when the left most hotkey bind is pressed.
         /// </summary>
         public virtual void OnHotkeyOnePressed(string hotkey) {
-            Debug.Log(hotkey);
+            StateCtx.OnHotkeyAction?.Invoke(hotkey);
         }
         
         /// <summary>
         /// Called when the left most hotkey bind + one is pressed.
         /// </summary>
         public virtual void OnHotkeyTwoPressed(string hotkey) {
-            Debug.Log(hotkey);
+            StateCtx.OnHotkeyAction?.Invoke(hotkey);
         }
         
         /// <summary>
         /// Called when the left most hotkey bind + two is pressed.
         /// </summary>
         public virtual void OnHotkeyThreePressed(string hotkey) {
-            Debug.Log(hotkey);
+            StateCtx.OnHotkeyAction?.Invoke(hotkey);
         }
         
         /// <summary>
         /// Called when the left most hotkey bind + three is pressed.
         /// </summary>
         public virtual void OnHotkeyFourPressed(string hotkey) {
-            Debug.Log(hotkey);
+            StateCtx.OnHotkeyAction?.Invoke(hotkey);
         }
         
         /// <summary>
