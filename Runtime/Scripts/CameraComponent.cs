@@ -5,7 +5,9 @@ namespace SpellBound.Controller {
         public Camera Camera { get; private set; }
 
         [Header("Camera Settings")] 
-        [SerializeField] private Vector3 camTarget;
+        [SerializeField] private float camTargetHeight = 1.5f;
+        [SerializeField] private float camCollisionPullForwardDistance = 1;
+        private Vector3 camTarget;
         [SerializeField] private float mouseSensitivity = 2f;
         [SerializeField] private float cameraDistance = 5f;
         private Vector3 _cameraVelocity;
@@ -17,11 +19,7 @@ namespace SpellBound.Controller {
         private Vector3 _cameraShovedPosition;
         
         [Header("Camera Collision Values")]
-        [SerializeField] private LayerMask collisionLayerMask;
-        [SerializeField] private float targetCameraZPosition;
-        [SerializeField] private float cameraCollisionRadius = 0.2f;
-        [SerializeField] private float cameraShoveVelocity = 0.2f;
-        
+        [SerializeField] private LayerMask collisionLayerMask = ~0;
         [Header("Debugging")]
         [SerializeField] private bool drawCollisionDebugGizmos;
         
@@ -32,15 +30,13 @@ namespace SpellBound.Controller {
         }
 
         private void FixedUpdate() {
-            HandleCameraTarget();
-            HandleCameraRotation();
-            HandleCameraCollision();
+            HandleCameraTransform();
         }
         
         /// <summary>
         /// Late Update method that polls how the camera should rotate with the mouse about a target transform and follow it.
         /// </summary>
-        private void HandleCameraRotation() {
+        private void HandleCameraTransform() {
             var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
             var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
@@ -49,9 +45,14 @@ namespace SpellBound.Controller {
             _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
 
             var rotation = Quaternion.Euler(_pitch, _yaw, 0f);
-            var rotatedOffset = rotation * new Vector3(0, 0, -cameraDistance);
-            var targetPosition = camTarget + rotatedOffset;
-
+            camTarget = transform.position + Vector3.up * camTargetHeight;
+            Vector3 targetPosition;
+            
+            if (Physics.Raycast(camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
+                targetPosition = hit.point + rotation * Vector3.forward * camCollisionPullForwardDistance;
+            }
+            else targetPosition = camTarget + rotation * new Vector3(0, 0, -cameraDistance);
+            
             Camera.transform.position = Vector3.SmoothDamp(
                 Camera.transform.position,
                 targetPosition,
@@ -63,54 +64,15 @@ namespace SpellBound.Controller {
         }
         
         /// <summary>
-        /// Late Update method that polls how the camera should handle collisions in the game world.
-        /// BUG: Forces the camera down and has odd jittery behavior.
-        /// </summary>
-        private void HandleCameraCollision() {
-            targetCameraZPosition = Vector3.Distance(camTarget, Camera.transform.position);
-            
-            var direction = Camera.transform.position - camTarget;
-            direction.Normalize();
-
-            if (!Physics.SphereCast(
-                    camTarget,
-                    cameraCollisionRadius,
-                    direction,
-                    out var hit,
-                    Mathf.Abs(targetCameraZPosition),
-                    collisionLayerMask
-                )) return;
-
-            var distanceFromHitObject = Vector3.Distance(camTarget, hit.point);
-            targetCameraZPosition = -(distanceFromHitObject - cameraCollisionRadius);
-
-            if (Mathf.Abs(targetCameraZPosition) < cameraCollisionRadius) {
-                targetCameraZPosition = -cameraCollisionRadius;
-            }
-            
-            _cameraShovedPosition.z = Mathf.Lerp(Camera.transform.localPosition.z, targetCameraZPosition, cameraShoveVelocity);
-            Camera.transform.localPosition = _cameraShovedPosition;
-        }
-        
-        /// <summary>
         /// Helper function for getting the camera component or creating it.
         /// </summary>
         private void GetCamera() {
             if (Camera != null) return;
             Camera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
-            
             if (Camera != null) return;
-            
             var cameraGameObject = new GameObject("Main Camera");
             Camera = cameraGameObject.AddComponent<Camera>();
             Camera.tag = "MainCamera";
-        }
-        
-        /// <summary>
-        /// Handles the camera target and ensures it stays at the same point in space.
-        /// </summary>
-        private void HandleCameraTarget() {
-            camTarget = transform.position;
         }
         
         /// <summary>
@@ -130,7 +92,6 @@ namespace SpellBound.Controller {
             Gizmos.DrawRay(start, direction * distance);
 
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(start + direction * distance, cameraCollisionRadius);
         }
     }
 }
