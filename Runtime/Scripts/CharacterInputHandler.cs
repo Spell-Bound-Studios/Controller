@@ -40,6 +40,9 @@ namespace SpellBound.Controller {
             _inputActions.PlayerInput.HotkeyTwo.performed += c => _controller.OnHotkeyTwoPressed(c.control.displayName);
             _inputActions.PlayerInput.HotkeyThree.performed += c => _controller.OnHotkeyThreePressed(c.control.displayName);
             _inputActions.PlayerInput.HotkeyFour.performed += c => _controller.OnHotkeyFourPressed(c.control.displayName);
+            
+            // UI
+            _inputActions.PlayerInput.CharacterMenu.performed += _ => _controller.OnMenuPressed?.Invoke();
         }
 
         public void Disable() {
