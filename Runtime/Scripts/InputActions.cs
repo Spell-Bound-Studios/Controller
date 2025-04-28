@@ -171,6 +171,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CharacterMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""3928b977-3bb3-4515-bc5b-c67be0944dd1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -371,6 +380,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""HotkeyFour"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""165f9a12-9947-4c4a-af59-fa8d6bede4e1"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CharacterMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -388,6 +408,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_HotkeyTwo = m_PlayerInput.FindAction("HotkeyTwo", throwIfNotFound: true);
         m_PlayerInput_HotkeyThree = m_PlayerInput.FindAction("HotkeyThree", throwIfNotFound: true);
         m_PlayerInput_HotkeyFour = m_PlayerInput.FindAction("HotkeyFour", throwIfNotFound: true);
+        m_PlayerInput_CharacterMenu = m_PlayerInput.FindAction("CharacterMenu", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -477,6 +498,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_HotkeyTwo;
     private readonly InputAction m_PlayerInput_HotkeyThree;
     private readonly InputAction m_PlayerInput_HotkeyFour;
+    private readonly InputAction m_PlayerInput_CharacterMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -524,6 +546,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/HotkeyFour".
         /// </summary>
         public InputAction @HotkeyFour => m_Wrapper.m_PlayerInput_HotkeyFour;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/CharacterMenu".
+        /// </summary>
+        public InputAction @CharacterMenu => m_Wrapper.m_PlayerInput_CharacterMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -577,6 +603,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @HotkeyFour.started += instance.OnHotkeyFour;
             @HotkeyFour.performed += instance.OnHotkeyFour;
             @HotkeyFour.canceled += instance.OnHotkeyFour;
+            @CharacterMenu.started += instance.OnCharacterMenu;
+            @CharacterMenu.performed += instance.OnCharacterMenu;
+            @CharacterMenu.canceled += instance.OnCharacterMenu;
         }
 
         /// <summary>
@@ -615,6 +644,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @HotkeyFour.started -= instance.OnHotkeyFour;
             @HotkeyFour.performed -= instance.OnHotkeyFour;
             @HotkeyFour.canceled -= instance.OnHotkeyFour;
+            @CharacterMenu.started -= instance.OnCharacterMenu;
+            @CharacterMenu.performed -= instance.OnCharacterMenu;
+            @CharacterMenu.canceled -= instance.OnCharacterMenu;
         }
 
         /// <summary>
@@ -718,5 +750,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHotkeyFour(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CharacterMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCharacterMenu(InputAction.CallbackContext context);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using PurrNet;
 using SpellBound.PlayerStateMachine;
 using UnityEngine;
@@ -18,6 +18,9 @@ namespace SpellBound.Controller {
         
         // Animation Controller
         protected AnimationController AnimationController;
+
+        // UI Invoked directly from InputHandler.
+        public Action OnMenuPressed;
 
         protected override void OnSpawned() {
             base.OnSpawned();
