@@ -22,6 +22,8 @@ namespace SpellBound.Controller {
         // UI Invoked directly from InputHandler.
         public Action OnMenuPressed;
 
+        public Action OnMouseButtonClicked;
+
         protected override void OnSpawned() {
             base.OnSpawned();
             
@@ -51,7 +53,6 @@ namespace SpellBound.Controller {
             if (camTran != null) {
                 StateCtx.cameraTransform = camTran;
             } else Debug.LogWarning("No camera found! ITS NULL");
-            Debug.Log($"Setting StateCtx.cameraTransform for client: {owner}");
             
             // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
@@ -92,7 +93,7 @@ namespace SpellBound.Controller {
         /// Called on Left Click.
         /// </summary>
         public virtual void OnLeftMouseClick(bool clicked) {
-            
+            OnMouseButtonClicked?.Invoke();
         }
 
         /// <summary>
