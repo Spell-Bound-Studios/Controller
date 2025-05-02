@@ -7,8 +7,8 @@ namespace SpellBound.Controller {
         [Header("Camera Settings")] 
         [SerializeField] private float camTargetHeight = 1.5f;
         [SerializeField] private float camCollisionPullForwardDistance = 1;
-        private Vector3 camTarget;
-        [SerializeField] private float mouseSensitivity = 2f;
+        private Vector3 _camTarget;
+        [SerializeField] public float mouseSensitivity = 5f;
         [SerializeField] private float cameraDistance = 5f;
         private Vector3 _cameraVelocity;
         private const float CameraSmoothSpeed = 1f;
@@ -22,36 +22,39 @@ namespace SpellBound.Controller {
         [SerializeField] private LayerMask collisionLayerMask = ~0;
         [Header("Debugging")]
         [SerializeField] private bool drawCollisionDebugGizmos;
+
+        // Allows outward methods to turn on or off if the camera follows the mouse.
+        public bool lookAt = true;
         
         private void Awake() {
-            Debug.Log("Camera Component is Awake!");
             GetCamera();
-            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void FixedUpdate() {
-            HandleCameraTransform();
+            HandleCameraTransform(lookAt);
         }
         
         /// <summary>
         /// Late Update method that polls how the camera should rotate with the mouse about a target transform and follow it.
         /// </summary>
-        private void HandleCameraTransform() {
-            var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-            var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        private void HandleCameraTransform(bool followMouse) {
+            if (followMouse) {
+                var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+                var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-            _yaw += mouseX;
-            _pitch -= mouseY;
-            _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
+                _yaw += mouseX;
+                _pitch -= mouseY;
+                _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
+            }
 
             var rotation = Quaternion.Euler(_pitch, _yaw, 0f);
-            camTarget = transform.position + Vector3.up * camTargetHeight;
+            _camTarget = transform.position + Vector3.up * camTargetHeight;
             Vector3 targetPosition;
             
-            if (Physics.Raycast(camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
+            if (Physics.Raycast(_camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
                 targetPosition = hit.point + rotation * Vector3.forward * camCollisionPullForwardDistance;
             }
-            else targetPosition = camTarget + rotation * new Vector3(0, 0, -cameraDistance);
+            else targetPosition = _camTarget + rotation * new Vector3(0, 0, -cameraDistance);
             
             Camera.transform.position = Vector3.SmoothDamp(
                 Camera.transform.position,
@@ -60,7 +63,7 @@ namespace SpellBound.Controller {
                 CameraSmoothSpeed * Time.deltaTime
             );
 
-            Camera.transform.LookAt(camTarget);
+            Camera.transform.LookAt(_camTarget);
         }
         
         /// <summary>
@@ -82,7 +85,7 @@ namespace SpellBound.Controller {
             if (!drawCollisionDebugGizmos) return;
             if (Camera == null) return;
 
-            var start = camTarget;
+            var start = _camTarget;
             var direction = Camera.transform.position - start;
             var distance = direction.magnitude;
 

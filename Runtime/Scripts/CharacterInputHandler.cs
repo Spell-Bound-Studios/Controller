@@ -43,6 +43,7 @@ namespace SpellBound.Controller {
             
             // UI
             _inputActions.PlayerInput.CharacterMenu.performed += _ => _controller.OnMenuPressed?.Invoke();
+            _inputActions.PlayerInput.SettingsMenu.performed += _ => _controller.OnSettingsPressed?.Invoke();
         }
 
         public void Disable() {

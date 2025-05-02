@@ -18,9 +18,17 @@ namespace SpellBound.Controller {
         
         // Animation Controller
         protected AnimationController AnimationController;
+        
+        // Camera Component
+        public CameraComponent cameraComponent;
 
-        // UI Invoked directly from InputHandler.
+        /// <summary>
+        /// InputHandler invokes OnMenuPressed because it's a POCO - so it reaches into this script.
+        /// Currently subscribed to in CharacterPanel.cs
+        /// </summary>
         public Action OnMenuPressed;
+
+        public Action OnSettingsPressed;
 
         public Action OnMouseButtonClicked;
 
@@ -135,7 +143,7 @@ namespace SpellBound.Controller {
         /// Creates a CameraComponent and adds it to this gameobject and gets its transform for tracking.
         /// </summary>
         protected virtual Transform FindCameraTransform() {
-            var cameraComponent = gameObject.AddComponent<CameraComponent>();
+            cameraComponent = gameObject.AddComponent<CameraComponent>();
             return cameraComponent.Camera.transform;
         }
         
