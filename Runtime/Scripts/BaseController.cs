@@ -32,6 +32,8 @@ namespace SpellBound.Controller {
 
         public Action OnMouseButtonClicked;
 
+        public Action<bool> OnSprintPressed;
+
         protected override void OnSpawned() {
             base.OnSpawned();
             
@@ -102,13 +104,6 @@ namespace SpellBound.Controller {
         /// </summary>
         public virtual void OnLeftMouseClick(bool clicked) {
             OnMouseButtonClicked?.Invoke();
-        }
-
-        /// <summary>
-        /// Called on shift held.
-        /// </summary>
-        public virtual void OnSprintHeld(bool held) {
-            
         }
 
         /// <summary>

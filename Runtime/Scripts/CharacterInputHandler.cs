@@ -32,8 +32,8 @@ namespace SpellBound.Controller {
             _inputActions.PlayerInput.LeftClick.canceled += _ => _controller.OnLeftMouseClick(false);
 
             // Sprint (shift)
-            _inputActions.PlayerInput.Sprint.performed += _ => _controller.OnSprintHeld(true);
-            _inputActions.PlayerInput.Sprint.canceled += _ => _controller.OnSprintHeld(false);
+            _inputActions.PlayerInput.Sprint.performed += _ => _controller.OnSprintPressed(true);
+            _inputActions.PlayerInput.Sprint.canceled += _ => _controller.OnSprintPressed(false);
             
             // Hotkeys
             _inputActions.PlayerInput.HotkeyOne.performed += c => _controller.OnHotkeyOnePressed(c.control.displayName);
