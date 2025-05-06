@@ -180,6 +180,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SettingsMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""bf9cde4c-a4fe-42fb-88ef-bceedfebef8a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -391,6 +400,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""CharacterMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""00d0433a-ff52-4ae6-b9b5-33610012f7da"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SettingsMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -409,6 +429,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_HotkeyThree = m_PlayerInput.FindAction("HotkeyThree", throwIfNotFound: true);
         m_PlayerInput_HotkeyFour = m_PlayerInput.FindAction("HotkeyFour", throwIfNotFound: true);
         m_PlayerInput_CharacterMenu = m_PlayerInput.FindAction("CharacterMenu", throwIfNotFound: true);
+        m_PlayerInput_SettingsMenu = m_PlayerInput.FindAction("SettingsMenu", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -499,6 +520,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_HotkeyThree;
     private readonly InputAction m_PlayerInput_HotkeyFour;
     private readonly InputAction m_PlayerInput_CharacterMenu;
+    private readonly InputAction m_PlayerInput_SettingsMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -550,6 +572,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/CharacterMenu".
         /// </summary>
         public InputAction @CharacterMenu => m_Wrapper.m_PlayerInput_CharacterMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/SettingsMenu".
+        /// </summary>
+        public InputAction @SettingsMenu => m_Wrapper.m_PlayerInput_SettingsMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -606,6 +632,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @CharacterMenu.started += instance.OnCharacterMenu;
             @CharacterMenu.performed += instance.OnCharacterMenu;
             @CharacterMenu.canceled += instance.OnCharacterMenu;
+            @SettingsMenu.started += instance.OnSettingsMenu;
+            @SettingsMenu.performed += instance.OnSettingsMenu;
+            @SettingsMenu.canceled += instance.OnSettingsMenu;
         }
 
         /// <summary>
@@ -647,6 +676,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @CharacterMenu.started -= instance.OnCharacterMenu;
             @CharacterMenu.performed -= instance.OnCharacterMenu;
             @CharacterMenu.canceled -= instance.OnCharacterMenu;
+            @SettingsMenu.started -= instance.OnSettingsMenu;
+            @SettingsMenu.performed -= instance.OnSettingsMenu;
+            @SettingsMenu.canceled -= instance.OnSettingsMenu;
         }
 
         /// <summary>
@@ -757,5 +789,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCharacterMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SettingsMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSettingsMenu(InputAction.CallbackContext context);
     }
 }

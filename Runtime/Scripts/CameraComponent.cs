@@ -8,7 +8,7 @@ namespace SpellBound.Controller {
         [SerializeField] private float camTargetHeight = 1.5f;
         [SerializeField] private float camTargetOffset = 0.3f;
         [SerializeField] private float camCollisionPullForwardDistance = 1;
-        private Vector3 camTarget;
+        private Vector3 _camTarget;
         [SerializeField] private float mouseSensitivity = 2f;
         [SerializeField] private float cameraDistance = 5f;
         private Vector3 _cameraVelocity;
@@ -46,13 +46,13 @@ namespace SpellBound.Controller {
             _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
 
             var rotation = Quaternion.Euler(_pitch, _yaw, 0f);
-            camTarget = transform.position + Vector3.up * camTargetHeight + rotation * (Vector3.right + Vector3.up) * camTargetOffset;
+            _camTarget = transform.position + Vector3.up * camTargetHeight + rotation * (Vector3.right + Vector3.up) * camTargetOffset;
             Vector3 targetPosition;
             
-            if (Physics.Raycast(camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
+            if (Physics.Raycast(_camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
                 targetPosition = hit.point + rotation * Vector3.forward * camCollisionPullForwardDistance;
             }
-            else targetPosition = camTarget + rotation * new Vector3(0, 0, -cameraDistance);
+            else targetPosition = _camTarget + rotation * new Vector3(0, 0, -cameraDistance);
             
             Camera.transform.position = Vector3.SmoothDamp(
                 Camera.transform.position,
@@ -61,7 +61,7 @@ namespace SpellBound.Controller {
                 CameraSmoothSpeed * Time.deltaTime
             );
 
-            Camera.transform.LookAt(camTarget);
+            Camera.transform.LookAt(_camTarget);
         }
         
         /// <summary>
@@ -84,7 +84,7 @@ namespace SpellBound.Controller {
             if (!drawCollisionDebugGizmos) return;
             if (Camera == null) return;
 
-            var start = camTarget;
+            var start = _camTarget;
             var direction = Camera.transform.position - start;
             var distance = direction.magnitude;
 
