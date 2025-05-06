@@ -19,6 +19,9 @@ namespace SpellBound.Controller {
         private const float MaximumPivot = 89f;
         private Vector3 _cameraShovedPosition;
         
+        // Allows outward methods to turn on or off if the camera follows the mouse.
+        public bool lookAt = true;
+        
         [Header("Camera Collision Values")]
         [SerializeField] private LayerMask collisionLayerMask = ~0;
         [Header("Debugging")]
@@ -31,20 +34,21 @@ namespace SpellBound.Controller {
         }
 
         private void FixedUpdate() {
-            HandleCameraTransform();
+            HandleCameraTransform(lookAt);
         }
         
         /// <summary>
         /// Late Update method that polls how the camera should rotate with the mouse about a target transform and follow it.
         /// </summary>
-        private void HandleCameraTransform() {
-            var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-            var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
-
-            _yaw += mouseX;
-            _pitch -= mouseY;
-            _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
-
+        private void HandleCameraTransform(bool followMouse) {
+            if (followMouse) {
+                var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+                var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+                _yaw += mouseX;
+                _pitch -= mouseY;
+                _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
+            }
+            
             var rotation = Quaternion.Euler(_pitch, _yaw, 0f);
             _camTarget = transform.position + Vector3.up * camTargetHeight + rotation * (Vector3.right + Vector3.up) * camTargetOffset;
             Vector3 targetPosition;
@@ -75,6 +79,14 @@ namespace SpellBound.Controller {
             Camera = cameraGameObject.AddComponent<Camera>();
             Camera.tag = "MainCamera";
             Camera.rect = new Rect(0.8f, 0.8f, 0.2f, 0.2f);
+        }
+        
+        public void AdjustMouseSensitivity(float newValue) {
+            mouseSensitivity = newValue;
+        }
+
+        public float GetMouseSensitivity() {
+            return mouseSensitivity;
         }
         
         /// <summary>
