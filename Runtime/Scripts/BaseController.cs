@@ -18,11 +18,21 @@ namespace SpellBound.Controller {
         
         // Animation Controller
         protected AnimationController AnimationController;
+        
+        // Camera Component
+        public CameraComponent cameraComponent;
 
-        // UI Invoked directly from InputHandler.
+        /// <summary>
+        /// InputHandler invokes OnMenuPressed because it's a POCO - so it reaches into this script.
+        /// Currently subscribed to in CharacterPanel.cs
+        /// </summary>
         public Action OnMenuPressed;
 
+        public Action OnSettingsPressed;
+
         public Action OnMouseButtonClicked;
+
+        public Action<bool> OnSprintPressed;
 
         protected override void OnSpawned() {
             base.OnSpawned();
@@ -97,13 +107,6 @@ namespace SpellBound.Controller {
         }
 
         /// <summary>
-        /// Called on shift held.
-        /// </summary>
-        public virtual void OnSprintHeld(bool held) {
-            
-        }
-
-        /// <summary>
         /// Called when the left most hotkey bind is pressed.
         /// </summary>
         public virtual void OnHotkeyOnePressed(string hotkey) {
@@ -135,7 +138,7 @@ namespace SpellBound.Controller {
         /// Creates a CameraComponent and adds it to this gameobject and gets its transform for tracking.
         /// </summary>
         protected virtual Transform FindCameraTransform() {
-            var cameraComponent = gameObject.AddComponent<CameraComponent>();
+            cameraComponent = gameObject.AddComponent<CameraComponent>();
             return cameraComponent.Camera.transform;
         }
         
