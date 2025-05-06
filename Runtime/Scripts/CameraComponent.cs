@@ -6,6 +6,7 @@ namespace SpellBound.Controller {
 
         [Header("Camera Settings")] 
         [SerializeField] private float camTargetHeight = 1.5f;
+        [SerializeField] private float camTargetOffset = 0.3f;
         [SerializeField] private float camCollisionPullForwardDistance = 1;
         private Vector3 camTarget;
         [SerializeField] private float mouseSensitivity = 2f;
@@ -15,7 +16,7 @@ namespace SpellBound.Controller {
         private float _yaw;
         private float _pitch;
         private const float MinimumPivot = -30f;
-        private const float MaximumPivot = 60f;
+        private const float MaximumPivot = 89f;
         private Vector3 _cameraShovedPosition;
         
         [Header("Camera Collision Values")]
@@ -45,7 +46,7 @@ namespace SpellBound.Controller {
             _pitch = Mathf.Clamp(_pitch, MinimumPivot, MaximumPivot);
 
             var rotation = Quaternion.Euler(_pitch, _yaw, 0f);
-            camTarget = transform.position + Vector3.up * camTargetHeight;
+            camTarget = transform.position + Vector3.up * camTargetHeight + rotation * (Vector3.right + Vector3.up) * camTargetOffset;
             Vector3 targetPosition;
             
             if (Physics.Raycast(camTarget, rotation * Vector3.back, out RaycastHit hit, cameraDistance, collisionLayerMask)) {
@@ -73,6 +74,7 @@ namespace SpellBound.Controller {
             var cameraGameObject = new GameObject("Main Camera");
             Camera = cameraGameObject.AddComponent<Camera>();
             Camera.tag = "MainCamera";
+            Camera.rect = new Rect(0.8f, 0.8f, 0.2f, 0.2f);
         }
         
         /// <summary>
