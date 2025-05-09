@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SpellBound.Controller {
     public class CameraComponent : MonoBehaviour {
@@ -9,7 +10,7 @@ namespace SpellBound.Controller {
         [SerializeField] private float camTargetOffset = 0.3f;
         [SerializeField] private float camCollisionPullForwardDistance = 1;
         private Vector3 _camTarget;
-        [SerializeField] private float mouseSensitivity = 2f;
+        [SerializeField] private float mouseSensitivity = 7f;
         [SerializeField] private float cameraDistance = 5f;
         private Vector3 _cameraVelocity;
         private const float CameraSmoothSpeed = 1f;
@@ -20,7 +21,7 @@ namespace SpellBound.Controller {
         private Vector3 _cameraShovedPosition;
         
         // Allows outward methods to turn on or off if the camera follows the mouse.
-        public bool lookAt = true;
+        public bool camFollowMouse = true;
         
         [Header("Camera Collision Values")]
         [SerializeField] private LayerMask collisionLayerMask = ~0;
@@ -34,7 +35,7 @@ namespace SpellBound.Controller {
         }
 
         private void FixedUpdate() {
-            HandleCameraTransform(lookAt);
+            HandleCameraTransform(camFollowMouse);
         }
         
         /// <summary>
