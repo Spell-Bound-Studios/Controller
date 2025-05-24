@@ -33,9 +33,10 @@ namespace SpellBound.Controller {
         public Action OnMouseButtonClicked;
 
         public Action<bool> OnSprintPressed;
-
+        
         protected override void OnSpawned() {
             base.OnSpawned();
+            Debug.Log("[BaseController] OnSpawned");
             
             Debug.Log("#################################################");
             Debug.Log($"[BaseController] Hello, I am the host: {isHost}");
