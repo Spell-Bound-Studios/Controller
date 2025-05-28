@@ -74,11 +74,13 @@ namespace SpellBound.Controller {
         /// </summary>
         private void GetCamera() {
             if (Camera != null) return;
-            Camera = GameObject.FindWithTag("MainCamera")?.GetComponent<Camera>();
+            // TODO: Maybe come up with a better solution than a tag. Low priority.
+            Camera = GameObject.FindWithTag("Player")?.GetComponent<Camera>();
+            Debug.Log(Camera.name);
             if (Camera != null) return;
             var cameraGameObject = new GameObject("Main Camera");
             Camera = cameraGameObject.AddComponent<Camera>();
-            Camera.tag = "MainCamera";
+            Camera.tag = "Player";
             Camera.rect = new Rect(0.8f, 0.8f, 0.2f, 0.2f);
         }
         
