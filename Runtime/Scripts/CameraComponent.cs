@@ -29,7 +29,6 @@ namespace SpellBound.Controller {
         [SerializeField] private bool drawCollisionDebugGizmos;
         
         private void Awake() {
-            Debug.Log("Camera Component is Awake!");
             GetCamera();
             Cursor.lockState = CursorLockMode.Locked;
         }
