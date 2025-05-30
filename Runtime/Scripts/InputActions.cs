@@ -189,6 +189,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Inventory"",
+                    ""type"": ""Button"",
+                    ""id"": ""c8f10673-a756-4e85-827d-a72dc7f32856"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -411,6 +420,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""SettingsMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d5e0192b-7c58-42ce-9032-287719fd7432"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Inventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -430,6 +450,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_HotkeyFour = m_PlayerInput.FindAction("HotkeyFour", throwIfNotFound: true);
         m_PlayerInput_CharacterMenu = m_PlayerInput.FindAction("CharacterMenu", throwIfNotFound: true);
         m_PlayerInput_SettingsMenu = m_PlayerInput.FindAction("SettingsMenu", throwIfNotFound: true);
+        m_PlayerInput_Inventory = m_PlayerInput.FindAction("Inventory", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -521,6 +542,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_HotkeyFour;
     private readonly InputAction m_PlayerInput_CharacterMenu;
     private readonly InputAction m_PlayerInput_SettingsMenu;
+    private readonly InputAction m_PlayerInput_Inventory;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -576,6 +598,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/SettingsMenu".
         /// </summary>
         public InputAction @SettingsMenu => m_Wrapper.m_PlayerInput_SettingsMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/Inventory".
+        /// </summary>
+        public InputAction @Inventory => m_Wrapper.m_PlayerInput_Inventory;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -635,6 +661,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @SettingsMenu.started += instance.OnSettingsMenu;
             @SettingsMenu.performed += instance.OnSettingsMenu;
             @SettingsMenu.canceled += instance.OnSettingsMenu;
+            @Inventory.started += instance.OnInventory;
+            @Inventory.performed += instance.OnInventory;
+            @Inventory.canceled += instance.OnInventory;
         }
 
         /// <summary>
@@ -679,6 +708,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @SettingsMenu.started -= instance.OnSettingsMenu;
             @SettingsMenu.performed -= instance.OnSettingsMenu;
             @SettingsMenu.canceled -= instance.OnSettingsMenu;
+            @Inventory.started -= instance.OnInventory;
+            @Inventory.performed -= instance.OnInventory;
+            @Inventory.canceled -= instance.OnInventory;
         }
 
         /// <summary>
@@ -796,5 +828,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSettingsMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Inventory" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInventory(InputAction.CallbackContext context);
     }
 }

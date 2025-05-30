@@ -29,6 +29,8 @@ namespace SpellBound.Controller {
         public Action OnMenuPressed;
 
         public Action OnSettingsPressed;
+        
+        public Action OnInventoryPressed;
 
         public Action OnMouseButtonClicked;
 
@@ -41,13 +43,6 @@ namespace SpellBound.Controller {
             if (!isOwner) {
                 return;
             }
-            
-            Debug.Log("#################################################");
-            Debug.Log($"[BaseController] Hello, I am the host: {isHost}");
-            Debug.Log($"[BaseController] Hello, I am the server: {isServer}");
-            Debug.Log($"[BaseController] Hello, I am the client: {isClient}");
-            Debug.Log($"[BaseController] Hello, I am the owner: {isOwner}");
-            Debug.Log("##################################################");
 
             // Redundancy to ensure this script is enabled.
             enabled = isOwner;
