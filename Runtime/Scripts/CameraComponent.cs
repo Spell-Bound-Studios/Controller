@@ -75,7 +75,6 @@ namespace SpellBound.Controller {
             if (Camera != null) return;
             // TODO: Maybe come up with a better solution than a tag. Low priority.
             Camera = GameObject.FindWithTag("Player")?.GetComponent<Camera>();
-            Debug.Log(Camera.name);
             if (Camera != null) return;
             var cameraGameObject = new GameObject("Main Camera");
             Camera = cameraGameObject.AddComponent<Camera>();
