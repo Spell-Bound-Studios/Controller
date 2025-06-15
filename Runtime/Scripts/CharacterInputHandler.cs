@@ -20,6 +20,9 @@ namespace SpellBound.Controller {
             _inputActions.PlayerInput.Movement.performed += c => _controller.OnMoveInput(c.ReadValue<Vector2>());
             _inputActions.PlayerInput.Movement.canceled += _ => _controller.OnMoveInput(Vector2.zero);
             
+            // Interact (E)
+            _inputActions.PlayerInput.Interact.performed += _ => _controller.OnInteractPressed();
+            
             // Jump (space bar)
             _inputActions.PlayerInput.Jump.performed += _ => _controller.OnJumpInput();
 

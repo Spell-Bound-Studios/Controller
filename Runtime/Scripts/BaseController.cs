@@ -94,6 +94,10 @@ namespace SpellBound.Controller {
             
         }
 
+        public virtual void OnInteractPressed() {
+            StateCtx.OnInteractPressed?.Invoke();
+        }
+
         /// <summary>
         /// Called on Left Click.
         /// </summary>
