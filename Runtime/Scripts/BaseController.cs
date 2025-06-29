@@ -32,7 +32,9 @@ namespace SpellBound.Controller {
         
         public Action OnInventoryPressed;
 
-        public Action OnMouseButtonClicked;
+        public Action OnLeftMouseClicked;
+
+        public Action OnRightMouseClicked;
 
         public Action<bool> OnSprintPressed;
         
@@ -40,9 +42,8 @@ namespace SpellBound.Controller {
             base.OnSpawned();
             
             // If we are not the client then exit. This ensures that each client runs a base implementation of BaseController.
-            if (!isOwner) {
+            if (!isOwner)
                 return;
-            }
 
             // Redundancy to ensure this script is enabled.
             enabled = isOwner;
@@ -55,9 +56,9 @@ namespace SpellBound.Controller {
             
             // Set the camera of the StateCtx so that states can use it.
             var camTran = FindCameraTransform();
-            if (camTran != null) {
+            if (camTran != null)
                 StateCtx.cameraTransform = camTran;
-            } else Debug.LogWarning("No camera found! ITS NULL");
+            else Debug.LogWarning("No camera found! ITS NULL");
             
             // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
@@ -67,7 +68,8 @@ namespace SpellBound.Controller {
 
         protected override void OnDespawned() {
             base.OnDespawned();
-            if (!isOwner) return;
+            if (!isOwner) 
+                return;
             
             InputHandler.Disable();
             AnimationController.DisposeEvents();
@@ -91,20 +93,20 @@ namespace SpellBound.Controller {
         /// Called on Right Click.
         /// </summary>
         public virtual void OnRightMouseClick(bool clicked) {
-            
+            OnRightMouseClicked?.Invoke();
+        }
+        
+        /// <summary>
+        /// Called on Left Click.
+        /// </summary>
+        public virtual void OnLeftMouseClick(bool clicked) {
+            OnLeftMouseClicked?.Invoke();
         }
 
         public virtual void OnInteractPressed() {
             StateCtx.OnInteractPressed?.Invoke();
         }
-
-        /// <summary>
-        /// Called on Left Click.
-        /// </summary>
-        public virtual void OnLeftMouseClick(bool clicked) {
-            OnMouseButtonClicked?.Invoke();
-        }
-
+        
         /// <summary>
         /// Called when the left most hotkey bind is pressed.
         /// </summary>
