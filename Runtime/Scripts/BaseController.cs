@@ -22,6 +22,8 @@ namespace SpellBound.Controller {
         // Camera Component
         public CameraComponent cameraComponent;
 
+        [SerializeField] private GameObject[] hotkeys;
+
         /// <summary>
         /// InputHandler invokes OnMenuPressed because it's a POCO - so it reaches into this script.
         /// Currently subscribed to in CharacterPanel.cs
@@ -37,6 +39,12 @@ namespace SpellBound.Controller {
         public Action OnRightMouseClicked;
 
         public Action<bool> OnSprintPressed;
+
+        private void Awake() {
+            if (hotkeys.Length == 0) {
+                Debug.Log("No hotkeys are assigned.");
+            }
+        }
         
         protected override void OnSpawned() {
             base.OnSpawned();
