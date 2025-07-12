@@ -39,12 +39,6 @@ namespace SpellBound.Controller {
         public Action OnRightMouseClicked;
 
         public Action<bool> OnSprintPressed;
-
-        private void Awake() {
-            if (hotkeys.Length == 0) {
-                Debug.Log("No hotkeys are assigned.");
-            }
-        }
         
         protected override void OnSpawned() {
             base.OnSpawned();
