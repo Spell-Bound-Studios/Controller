@@ -60,7 +60,8 @@ namespace SpellBound.Controller {
             var camTran = FindCameraTransform();
             if (camTran != null)
                 StateCtx.cameraTransform = camTran;
-            else Debug.LogWarning("No camera found! ITS NULL");
+            else 
+                Debug.LogWarning("No camera found! ITS NULL");
             
             // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
@@ -150,6 +151,7 @@ namespace SpellBound.Controller {
         /// </summary>
         protected virtual void CreateStateContext() {
             StateCtx = gameObject.AddComponent<StateContext>();
+            //StateCtx.inputActions
         }
 
         /// <summary>
