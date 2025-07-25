@@ -44,7 +44,7 @@ namespace SpellBound.Controller {
         protected override void OnSpawned() {
             base.OnSpawned();
             
-            // If we are not the client then exit. This ensures that each client runs a base implementation of BaseController.
+            // If we are not the client, then exit. This ensures that each client runs a base implementation of BaseController.
             if (!isOwner)
                 return;
 
