@@ -1,5 +1,6 @@
 ﻿using System;
 using PurrNet;
+using SpellBound.Core;
 using SpellBound.PlayerStateMachine;
 using UnityEngine;
 
@@ -65,6 +66,8 @@ namespace SpellBound.Controller {
             
             // Creates a POCO that handles which blend tree to .Play, SetFloat, SetBool, etc.
             CreateAnimationController();
+
+            CreateProxyCollider();
             
             InputHandler.Enable();
         }
@@ -162,6 +165,10 @@ namespace SpellBound.Controller {
             var networkAnimator = GetComponentInChildren<NetworkAnimator>();
             AnimationController = new AnimationController(networkAnimator, StateCtx);
             StateCtx.OnStateChanged?.Invoke(StateContext.DefaultState);
+        }
+
+        protected virtual void CreateProxyCollider() {
+            var proxy = gameObject.AddComponent<ProxyCollider>();
         }
     }
 }
