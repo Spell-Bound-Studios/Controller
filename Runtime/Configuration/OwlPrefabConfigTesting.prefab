@@ -567,6 +567,7 @@ GameObject:
   - component: {fileID: 3036944880350935952}
   - component: {fileID: 3578812582036417902}
   - component: {fileID: 5868306295776480022}
+  - component: {fileID: 4024346815936763778}
   m_Layer: 0
   m_Name: OwlPrefabConfigTesting
   m_TagString: Untagged
@@ -733,6 +734,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96d761a740c64b7593b39ebf33a031e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
+  movementSpeed: 5
+  airControlRate: 2
+  jumpSpeed: 10
+  jumpDuration: 0.2
+  airFriction: 0.5
+  groundFriction: 100
+  gravity: 30
+  slideGravity: 5
+  slopeLimit: 30
+  useLocalMomentum: 0
 --- !u!114 &5868306295776480022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,8 +757,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af2854c7a5bd4fc892e2d5be2cd6f985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upperVerticalLimit: 89
+  lowerVerticalLimit: 89
+  cameraSpeed: 50
+  smoothCameraRotation: 0
+  cameraSmoothingFactor: 25
+  minZoomDistance: 1
+  maxZoomDistance: 8
+  zoomIncrement: 0.2
+  cursorLockOnStart: 1
+  input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
   cameraRig: {fileID: 0}
-  playerRotationMode: 0
+  playerRotationMode: 1
+  cameraPivot: {fileID: 270550937715851909}
+--- !u!114 &4024346815936763778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2318115576665833924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 057ae068dc6d448986d418d861c1ce92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 3578812582036417902}
+  turnSpeed: 50
 --- !u!1 &2394009729420084501
 GameObject:
   m_ObjectHideFlags: 0

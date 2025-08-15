@@ -2,6 +2,9 @@
 using Helper = SpellBound.Controller.Configuration.ControllerHelper;
 
 namespace SpellBound.Controller.Configuration {
+    /// <summary>
+    /// Interface for rigidbody and collider elements. Therefore, anything that acts on either should be handled here.
+    /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
     public class PlayerMover : MonoBehaviour {
         [Header("Collider Settings:")] 
@@ -13,7 +16,8 @@ namespace SpellBound.Controller.Configuration {
         [Header("Sensor Settings:")] 
         [SerializeField] private bool isDebugging;
         private bool _isUsingExtendedSensorRange = true;
-        
+
+        private Transform _tr;
         private Rigidbody _rb;
         private CapsuleCollider _collider;
         private RaycastSensor _raycastSensor;
@@ -24,11 +28,14 @@ namespace SpellBound.Controller.Configuration {
         private int _currentLayer;
 
         private void Awake() {
+            _tr = transform;
             Setup();
             RecalculateColliderDimensions();
         }
 
         private void OnValidate() {
+            _tr = transform;
+            
             if (gameObject.activeInHierarchy)
                 RecalculateColliderDimensions();
         }
@@ -40,7 +47,7 @@ namespace SpellBound.Controller.Configuration {
             _currentGroundAdjustmentVelocity = Vector3.zero;
             
             _raycastSensor.CastLength = _isUsingExtendedSensorRange
-                    ? _baseSensorRange + colliderHeight * transform.localScale.x * stepHeightRatio
+                    ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
                     : _baseSensorRange;
             _raycastSensor.CastRaycast();
 
@@ -50,11 +57,11 @@ namespace SpellBound.Controller.Configuration {
                 return;
 
             var distance = _raycastSensor.GetDistance();
-            var upperLimit = colliderHeight * transform.localScale.x * (1f - stepHeightRatio) * 0.5f;
-            var middle = upperLimit + colliderHeight * transform.localScale.x * stepHeightRatio;
+            var upperLimit = colliderHeight * _tr.localScale.x * (1f - stepHeightRatio) * 0.5f;
+            var middle = upperLimit + colliderHeight * _tr.localScale.x * stepHeightRatio;
             var distanceToGo = middle - distance;
 
-            _currentGroundAdjustmentVelocity = transform.up * (distanceToGo / Time.fixedDeltaTime);
+            _currentGroundAdjustmentVelocity = _tr.up * (distanceToGo / Time.fixedDeltaTime);
         }
 
         public bool IsGrounded() => _isGrounded;
@@ -88,7 +95,7 @@ namespace SpellBound.Controller.Configuration {
         }
 
         private void RecalibrateSensor() {
-            _raycastSensor ??= new RaycastSensor(transform);
+            _raycastSensor ??= new RaycastSensor(_tr);
             
             _raycastSensor.SetCastOrigin(_collider.bounds.center);
             _raycastSensor.SetCastDirection(Helper.CastDirection.Down);
@@ -99,8 +106,8 @@ namespace SpellBound.Controller.Configuration {
             const float safetyDistanceFactor = 0.001f;
 
             var length = colliderHeight * (1f - stepHeightRatio) * 0.5f * colliderHeight * stepHeightRatio;
-            _baseSensorRange = length * (1f + safetyDistanceFactor) * transform.localScale.x;
-            _raycastSensor.CastLength = length * transform.localScale.x;
+            _baseSensorRange = length * (1f + safetyDistanceFactor) * _tr.localScale.x;
+            _raycastSensor.CastLength = length * _tr.localScale.x;
         }
 
         private void RecalculateSensorLayerMask() {

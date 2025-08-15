@@ -207,6 +207,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LookDirection"",
+                    ""type"": ""Value"",
+                    ""id"": ""044ecd67-0d5a-4442-b679-03c7f254270a"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MouseWheel"",
+                    ""type"": ""Value"",
+                    ""id"": ""9d7c2343-0be1-4c93-83c5-25bfa6b14b7f"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -451,6 +469,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8bec808a-aa5f-4d9d-ad60-1e8ed3fdcc79"",
+                    ""path"": ""<Pointer>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LookDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e70f509f-0cf9-40fc-84fc-b10dae7a2ca7"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -472,6 +512,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_SettingsMenu = m_PlayerInput.FindAction("SettingsMenu", throwIfNotFound: true);
         m_PlayerInput_Inventory = m_PlayerInput.FindAction("Inventory", throwIfNotFound: true);
         m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
+        m_PlayerInput_LookDirection = m_PlayerInput.FindAction("LookDirection", throwIfNotFound: true);
+        m_PlayerInput_MouseWheel = m_PlayerInput.FindAction("MouseWheel", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -565,6 +607,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_SettingsMenu;
     private readonly InputAction m_PlayerInput_Inventory;
     private readonly InputAction m_PlayerInput_Interact;
+    private readonly InputAction m_PlayerInput_LookDirection;
+    private readonly InputAction m_PlayerInput_MouseWheel;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -628,6 +672,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/Interact".
         /// </summary>
         public InputAction @Interact => m_Wrapper.m_PlayerInput_Interact;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/LookDirection".
+        /// </summary>
+        public InputAction @LookDirection => m_Wrapper.m_PlayerInput_LookDirection;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/MouseWheel".
+        /// </summary>
+        public InputAction @MouseWheel => m_Wrapper.m_PlayerInput_MouseWheel;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -693,6 +745,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @LookDirection.started += instance.OnLookDirection;
+            @LookDirection.performed += instance.OnLookDirection;
+            @LookDirection.canceled += instance.OnLookDirection;
+            @MouseWheel.started += instance.OnMouseWheel;
+            @MouseWheel.performed += instance.OnMouseWheel;
+            @MouseWheel.canceled += instance.OnMouseWheel;
         }
 
         /// <summary>
@@ -743,6 +801,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @LookDirection.started -= instance.OnLookDirection;
+            @LookDirection.performed -= instance.OnLookDirection;
+            @LookDirection.canceled -= instance.OnLookDirection;
+            @MouseWheel.started -= instance.OnMouseWheel;
+            @MouseWheel.performed -= instance.OnMouseWheel;
+            @MouseWheel.canceled -= instance.OnMouseWheel;
         }
 
         /// <summary>
@@ -874,5 +938,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteract(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LookDirection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLookDirection(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseWheel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseWheel(InputAction.CallbackContext context);
     }
 }
