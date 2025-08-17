@@ -661,7 +661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6d6435679854c86979aca5664211070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerRoot: {fileID: 3476370681025367336}
+  trackThisTransform: {fileID: 3476370681025367336}
   offset: {x: 0, y: 1.6, z: 0}
 --- !u!1 &2325054349562197315
 GameObject:
@@ -1201,6 +1201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
+  referenceTransform: {fileID: 4018206189655598281}
   movementSpeed: 5
   airControlRate: 2
   jumpSpeed: 10
@@ -1223,6 +1224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af2854c7a5bd4fc892e2d5be2cd6f985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraPivot: {fileID: 4018206189655598281}
   upperVerticalLimit: 89
   lowerVerticalLimit: 89
   cameraSpeed: 50
@@ -1235,7 +1237,6 @@ MonoBehaviour:
   input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
   cameraRig: {fileID: 0}
   playerRotationMode: 1
-  cameraPivot: {fileID: 4018206189655598281}
 --- !u!114 &541203028310611636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1249,7 +1250,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 3871644982249761375}
-  turnSpeed: 50
+  referenceTransform: {fileID: 4018206189655598281}
+  turnSpeed: 500
 --- !u!1 &4899940615211404245
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,9 @@
 using Helper = SpellBound.Controller.Configuration.ControllerHelper;
 
 namespace SpellBound.Controller.Configuration {
+    /// <summary>
+    /// POCO class intended to perform a raycast in a direction based on a transform given in the constructor.
+    /// </summary>
     public class RaycastSensor {
         public float CastLength = 1f;
         public LayerMask LayerMask = 1 << 16;
@@ -21,7 +24,7 @@ namespace SpellBound.Controller.Configuration {
         }
         
         public bool HasDetectedHit() => _hit.collider != null;
-        public float GetDistance() => _hit.distance;
+        public float GetRaycastHitDistance() => _hit.distance;
         public Vector3 GetNormal() => _hit.normal;
         public Vector3 GetPosition() => _hit.point;
         public Collider GetCollider() => _hit.collider;

@@ -4,9 +4,11 @@ using Helper = SpellBound.Controller.Configuration.ControllerHelper;
 
 namespace SpellBound.Controller.Configuration {
     /// <summary>
-    /// Interface for how the player inputs drive its members.
+    /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
     public class CameraController : MonoBehaviour {
+        // What do we want the camera to pivot around?
+        [SerializeField] private Transform cameraPivot;
         // How high you can move your camera.
         [SerializeField, Range(0f, 90f)] private float upperVerticalLimit = 89f;
         // How low you can move your camera.
@@ -33,8 +35,6 @@ namespace SpellBound.Controller.Configuration {
         private float _currentXAngle;
         // Cached local rotation value Y.
         private float _currentYAngle;
-
-        [SerializeField] private Transform cameraPivot;
         
         private void Awake() {
             _tr = transform;
@@ -75,7 +75,7 @@ namespace SpellBound.Controller.Configuration {
         public Vector3 GetFacingDirection() => _tr.forward;
         
         /// <summary>
-        /// Rotates the camera based on device horizontal and vertical input about the pivot.
+        /// Rotates the camera based on the device horizontal and vertical input about the pivot.
         /// </summary>
         private void RotateCamera(float horizontalInput, float verticalInput) {
             var targetX = _currentXAngle + verticalInput  * cameraSpeed * Time.deltaTime;
@@ -86,21 +86,14 @@ namespace SpellBound.Controller.Configuration {
             if (smoothCameraRotation) {
                 _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, cameraSmoothingFactor * Time.deltaTime);
                 _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, cameraSmoothingFactor * Time.deltaTime);
-            } else {
+            } 
+            else {
                 _currentXAngle = targetX;
                 _currentYAngle = targetY;
             }
 
-            //var yaw   = Quaternion.AngleAxis(_currentYAngle, Vector3.up);
-            //var pitch = Quaternion.AngleAxis(_currentXAngle, Vector3.right);
-            //cameraPivot.localRotation = Quaternion.AngleAxis(_currentXAngle, yaw * Vector3.right) * yaw;
-
-            //_currentXAngle += verticalInput * cameraSpeed * Time.deltaTime;
-            //_currentYAngle += horizontalInput * cameraSpeed * Time.deltaTime;
-
             _currentXAngle = Mathf.Clamp(_currentXAngle, -upperVerticalLimit, lowerVerticalLimit);
             cameraPivot.localRotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0f);
-            //cameraPivot.localRotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0);
         }
 
         private void ZoomCamera(Vector2 zoomInput) {

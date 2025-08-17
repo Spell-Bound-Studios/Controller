@@ -40,12 +40,17 @@ namespace SpellBound.Controller.Configuration {
                 RecalculateColliderDimensions();
         }
 
+        /// <summary>
+        /// Checks for the ground based on layer and raycast.
+        /// Returns early if you're not on the ground.
+        /// </summary>
         public void CheckForGround() {
             if (_currentLayer != gameObject.layer)
                 RecalculateSensorLayerMask();
 
             _currentGroundAdjustmentVelocity = Vector3.zero;
             
+            // Extends the sensor range if we are using step-up logic but otherwise uses the base range.
             _raycastSensor.CastLength = _isUsingExtendedSensorRange
                     ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
                     : _baseSensorRange;
@@ -55,8 +60,13 @@ namespace SpellBound.Controller.Configuration {
 
             if (!_isGrounded)
                 return;
-
-            var distance = _raycastSensor.GetDistance();
+            
+            // The following attempts to tackle quantifying how much we should shove the player up or down based on their
+            // collider. Imagine moving through a very bumpy region: we don't want the character to briefly enter the
+            // falling state every few steps... so this will attempt to quantify a value to push them up or down and keep
+            // them flush to the ground when they are within tolerance.
+            
+            var distance = _raycastSensor.GetRaycastHitDistance();
             var upperLimit = colliderHeight * _tr.localScale.x * (1f - stepHeightRatio) * 0.5f;
             var middle = upperLimit + colliderHeight * _tr.localScale.x * stepHeightRatio;
             var distanceToGo = middle - distance;
