@@ -12,11 +12,13 @@ namespace SpellBound.Controller.Configuration {
         [SerializeField] private float turnSpeed = 500f;
 
         private Transform _tr;
+        private Vector3 _planarUp;
         private float _currentYRotation;
         private const float FallOffAngle = 90f;
 
         private void Awake() {
             _tr = transform;
+            _planarUp = _tr.up;
         }
         
         private void Start() {
@@ -24,8 +26,7 @@ namespace SpellBound.Controller.Configuration {
                 playerController = GetComponent<PlayerController>();
 
             if (referenceTransform == null) {
-                Debug.LogWarning("[PlayerFaceInputDirection] ReferenceTransform is null, using default reference.");
-                referenceTransform = _tr;
+                referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             }
             
             _currentYRotation = _tr.eulerAngles.y;
@@ -34,37 +35,28 @@ namespace SpellBound.Controller.Configuration {
         private void LateUpdate() {
             // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
             var velocity = Vector3.ProjectOnPlane(
-                    playerController.GetMovementVelocity(), referenceTransform.up);
+                    playerController.GetMovementVelocity(), _planarUp);
             
             // Return early if we're not moving.
             if (velocity.magnitude < 0.001f)
                 return;
             
             var camForwardPlanar = Vector3.ProjectOnPlane(
-                    referenceTransform.forward, referenceTransform.up);
+                    referenceTransform.forward, _planarUp).normalized;
 
             if (camForwardPlanar.magnitude < 0.001f)
                 camForwardPlanar = Vector3.ProjectOnPlane(
-                        _tr.forward, referenceTransform.up).normalized;
+                        _tr.forward, _planarUp).normalized;
             
-            var camRightPlanar = Vector3.Cross(referenceTransform.up, camForwardPlanar);
+            var desiredFacingDir = velocity.normalized;
             
-            var forward = Vector3.Dot(velocity, camForwardPlanar);
-            var right = Vector3.Dot(velocity, camRightPlanar);
-            
-            var desiredFacingDir = Mathf.Abs(right) > Mathf.Abs(forward)
-                    ? right >= 0f ? camRightPlanar : -camRightPlanar
-                    : forward >= 0f ? camForwardPlanar : -camForwardPlanar;
-            
-            var angleDiff = Helper.GetAngle(_tr.forward, desiredFacingDir, referenceTransform.up);
-            //var angleDiff = Helper.GetAngle(referenceTransform.forward, velocity.normalized, referenceTransform.up);
+            var angleDiff = Helper.GetAngle(_tr.forward, desiredFacingDir, _planarUp);
 
             var step = Mathf.Sign(angleDiff) *
                        Mathf.InverseLerp(0f, FallOffAngle, Mathf.Abs(angleDiff)) *
                        Time.deltaTime * turnSpeed;
             
             _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
-            
             _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
         }
     }

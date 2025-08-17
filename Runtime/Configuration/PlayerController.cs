@@ -23,9 +23,7 @@ namespace SpellBound.Controller.Configuration {
         [SerializeField] private bool useLocalMomentum;
 
         private PlayerMover _playerMover;
-        
         private Transform _tr;
-        
         private Vector3 _momentum;
         private Vector3 _savedVelocity;
         private Vector3 _savedMovementVelocity;
@@ -40,9 +38,7 @@ namespace SpellBound.Controller.Configuration {
         }
 
         private void Start() {
-            if (referenceTransform == null)
-                Debug.LogWarning("[PlayerController] the reference transform is null. Using default transform and may " +
-                                 "result in odd behaviour.");
+            referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
         }
 
         private void FixedUpdate() {
@@ -76,13 +72,13 @@ namespace SpellBound.Controller.Configuration {
         public Vector3 GetMovementVelocity() => _savedMovementVelocity;
         
         private Vector3 CalculateMovementDirection() {
-            var direction = referenceTransform == null
-                    ? _tr.right * input.Direction.x + _tr.forward * input.Direction.y
-                    : Vector3.ProjectOnPlane(
-                              referenceTransform.right, referenceTransform.up).normalized * 
+            // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
+            var direction =
+                    Vector3.ProjectOnPlane(
+                              referenceTransform.right, _tr.up).normalized * 
                       input.Direction.x + 
                       Vector3.ProjectOnPlane(
-                              referenceTransform.forward, referenceTransform.up).normalized * 
+                              referenceTransform.forward, _tr.up).normalized * 
                       input.Direction.y;
             
             return direction.magnitude > 1f ? direction.normalized : direction;

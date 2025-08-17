@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using Helper = SpellBound.Controller.Configuration.ControllerHelper;
 
 namespace SpellBound.Controller.Configuration {
     public class CameraRigManager : CinemachineCameraManagerBase {
+        public static CameraRigManager Instance;
+        
         private Transform _tr;
         private readonly Dictionary<Helper.CameraType, CinemachineCamera> _cinemachineCameras = new();
         private readonly Dictionary<Helper.CameraType, CinemachineThirdPersonFollow> _thirdPersonCameras = new();
@@ -14,6 +15,13 @@ namespace SpellBound.Controller.Configuration {
         private CinemachineThirdPersonFollow _currentThirdPersonCamera;
         
         private void Awake() {
+            if (Instance != null && Instance != this) {
+                Destroy(gameObject);
+                return;
+            }
+            
+            Instance = this;
+            
             _tr = transform;
         }
         
@@ -74,6 +82,8 @@ namespace SpellBound.Controller.Configuration {
                 }
             }
         }
+        
+        public CinemachineCamera GetCurrentCamera() => _currentCinemachineCamera;
 
         public void SwitchCamera(Helper.CameraType cameraType) {
             if (!_cinemachineCameras.TryGetValue(cameraType, out var cinemachineCamera)) {

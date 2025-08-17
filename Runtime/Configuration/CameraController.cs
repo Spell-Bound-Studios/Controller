@@ -23,12 +23,11 @@ namespace SpellBound.Controller.Configuration {
         [SerializeField, Min(1f)] private float maxZoomDistance = 8f;
         // Controls how fast you zoom in and out.
         [SerializeField] private float zoomIncrement = .2f;
-        
         [SerializeField] private bool cursorLockOnStart = true;
         [SerializeField] private PlayerInputActionsSO input;
-        [SerializeField] private CameraRigManager cameraRig;
         [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
-        
+
+        private CameraRigManager _cameraRig;
         private CinemachineBrain _brain;
         private Transform _tr;
         // Cached local rotation value X.
@@ -47,17 +46,19 @@ namespace SpellBound.Controller.Configuration {
             
             _currentXAngle = _tr.localRotation.eulerAngles.x;
             _currentYAngle = _tr.localRotation.eulerAngles.y;
+            
+            _cameraRig = CameraRigManager.Instance;
         }
 
         private void OnEnable() {
             CameraSetup();
 
-            if (cameraRig)
+            if (_cameraRig)
                 input.OnMouseWheelInput += ZoomCamera;
         }
 
         private void OnDisable() {
-            if (cameraRig)
+            if (_cameraRig)
                 input.OnMouseWheelInput -= ZoomCamera;
         }
 
@@ -97,14 +98,14 @@ namespace SpellBound.Controller.Configuration {
         }
 
         private void ZoomCamera(Vector2 zoomInput) {
-            var currentZoom = cameraRig.CurrentCameraZoom();
+            var currentZoom = _cameraRig.CurrentCameraZoom();
 
             if (float.IsNaN(currentZoom))
                 return;
 
             var target = currentZoom - zoomInput.y * zoomIncrement;
             target = Mathf.Clamp(target, minZoomDistance, maxZoomDistance);
-            cameraRig.SetCameraZoom(target);
+            CameraRigManager.Instance.SetCameraZoom(target);
         }
         
         /// <summary>
@@ -113,14 +114,14 @@ namespace SpellBound.Controller.Configuration {
         private void CameraSetup() {
             _brain.WorldUpOverride = cameraPivot;
             
-            cameraRig = _brain.ActiveVirtualCamera as CameraRigManager;
+            _cameraRig = _brain.ActiveVirtualCamera as CameraRigManager;
 
-            if (cameraRig == null) {
+            if (_cameraRig == null) {
                 Debug.LogError("Camera rig is null and doesn't appear to be in scene.");
                 return;
             }
 
-            cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
+            _cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
         }
     }
 }

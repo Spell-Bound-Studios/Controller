@@ -661,8 +661,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6d6435679854c86979aca5664211070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackThisTransform: {fileID: 3476370681025367336}
-  offset: {x: 0, y: 1.6, z: 0}
+  followThisTransform: {fileID: 3476370681025367336}
+  offset: {x: 0, y: 2, z: 0}
 --- !u!1 &2325054349562197315
 GameObject:
   m_ObjectHideFlags: 0

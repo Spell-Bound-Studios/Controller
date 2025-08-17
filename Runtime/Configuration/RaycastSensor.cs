@@ -10,7 +10,7 @@ namespace SpellBound.Controller.Configuration {
         public LayerMask LayerMask = 1 << 16;
         
         private Vector3 _origin = Vector3.zero;
-        private Transform _tr;
+        private readonly Transform _tr;
         private RaycastHit _hit;
         private Helper.CastDirection _castDirection;
 

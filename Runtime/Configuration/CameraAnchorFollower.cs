@@ -5,16 +5,19 @@ namespace SpellBound.Controller.Configuration {
     /// Place this on a gameobject that you want to 1:1 match the transform with some offset.
     /// </summary>
     public class CameraAnchorFollower : MonoBehaviour {
-        [SerializeField] private Transform trackThisTransform;
-        [SerializeField] private Vector3 offset = new(-0.2f, 1.5f, 0f);
-
+        [SerializeField] private Transform followThisTransform;
+        [SerializeField] private Vector3 offset = new(0f, 2f, 0f);
+        private Transform _tr;
+        
         private void Awake() {
-            if (!trackThisTransform)
+            _tr = transform;
+            
+            if (!followThisTransform)
                 Debug.LogError("trackThisTransform is not set. Please drag it in via inspector.", this);
         }
         
         private void LateUpdate() {
-            transform.position = trackThisTransform.position + offset;
+            _tr.position = followThisTransform.position + offset;
         }
     }
 }
