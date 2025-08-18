@@ -32,8 +32,7 @@ namespace SpellBound.Controller.PlayerController {
         private RigidbodyMover _rigidbodyMover;
         private Transform _tr;
         private Vector3 _momentum;
-        private Vector3 _savedVelocity;
-        private Vector3 _savedMovementVelocity;
+        private Vector3 _velocity;
         private Vector3 _planarUp;
         private float _currentYRotation;
         
@@ -55,9 +54,8 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void FixedUpdate() {
+            // Handles additional vertical velocity if necessary.
             _rigidbodyMover.CheckForGround();
-            
-            HandleMomentum();
             
             var velocity = CalculateMovementVelocity();
             velocity += useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
@@ -65,15 +63,14 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover.SetExtendSensorRange(true);
             _rigidbodyMover.SetVelocity(velocity);
 
-            _savedVelocity = velocity;
-            _savedMovementVelocity = CalculateMovementVelocity();
+            _velocity = velocity;
         }
 
         private void LateUpdate() {
             #region TurnTowardsInput
             // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
             var velocity = Vector3.ProjectOnPlane(
-                    GetMovementVelocity(), _planarUp);
+                    _velocity, _planarUp);
             
             // Return early if we're not moving.
             if (velocity.magnitude < 0.001f)
@@ -91,27 +88,8 @@ namespace SpellBound.Controller.PlayerController {
             _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
             #endregion
         }
-        
-        public Vector3 GetMomentum() => useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
-
-        /// <summary>
-        /// Momentum is mx_dot.
-        /// </summary>
-        private void HandleMomentum() {
-            var momentum = useLocalMomentum
-                    ? _tr.localToWorldMatrix.MultiplyVector(_momentum) // local -> world Vector3.
-                    : _momentum;
-            
-            var verticalMomentum = Helper.ExtractDotVector(_momentum, _tr.up);
-            var horizontalMomentum = _momentum - verticalMomentum;
-
-            verticalMomentum -= _planarUp * (gravity * Time.deltaTime);
-            // Likely have state reference here.
-            
-        }
 
         private Vector3 CalculateMovementVelocity() => CalculateMovementDirection() * movementSpeed;
-        public Vector3 GetMovementVelocity() => _savedMovementVelocity;
         
         private Vector3 CalculateMovementDirection() {
             // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
@@ -123,7 +101,9 @@ namespace SpellBound.Controller.PlayerController {
                               referenceTransform.forward, _tr.up).normalized * 
                       input.Direction.y;
             
-            return direction.magnitude > 1f ? direction.normalized : direction;
+            return direction.magnitude > 1f 
+                    ? direction.normalized 
+                    : direction;
         }
     }
 }
