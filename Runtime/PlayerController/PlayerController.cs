@@ -26,6 +26,7 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float gravity = 30f;
         [SerializeField] private float slideGravity = 5f;
         [SerializeField] private float slopeLimit = 30f;
+        // This will be momentum given by your inputs.
         [SerializeField] private bool useLocalMomentum;
 
         private RigidbodyMover _rigidbodyMover;
@@ -55,7 +56,9 @@ namespace SpellBound.Controller.PlayerController {
 
         private void FixedUpdate() {
             _rigidbodyMover.CheckForGround();
-            // HandleMomentum();
+            
+            HandleMomentum();
+            
             var velocity = CalculateMovementVelocity();
             velocity += useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
             
@@ -91,14 +94,18 @@ namespace SpellBound.Controller.PlayerController {
         
         public Vector3 GetMomentum() => useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
 
+        /// <summary>
+        /// Momentum is mx_dot.
+        /// </summary>
         private void HandleMomentum() {
-            if (useLocalMomentum)
-                _momentum = _tr.localToWorldMatrix * _momentum;
-
+            var momentum = useLocalMomentum
+                    ? _tr.localToWorldMatrix.MultiplyVector(_momentum) // local -> world Vector3.
+                    : _momentum;
+            
             var verticalMomentum = Helper.ExtractDotVector(_momentum, _tr.up);
             var horizontalMomentum = _momentum - verticalMomentum;
 
-            verticalMomentum -= _tr.up * (gravity * Time.deltaTime);
+            verticalMomentum -= _planarUp * (gravity * Time.deltaTime);
             // Likely have state reference here.
             
         }
