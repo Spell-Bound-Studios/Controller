@@ -1,8 +1,10 @@
 ﻿using Unity.Cinemachine;
 using UnityEngine;
-using Helper = SpellBound.Controller.Configuration.ControllerHelper;
+using SpellBound.Controller.ManagersAndStatics;
+using SpellBound.Controller.PlayerInputs;
+using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.PlayerController {
     /// <summary>
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
@@ -98,7 +100,7 @@ namespace SpellBound.Controller.Configuration {
         }
 
         private void ZoomCamera(Vector2 zoomInput) {
-            var currentZoom = _cameraRig.CurrentCameraZoom();
+            var currentZoom = _cameraRig.GetCurrentCameraZoom();
 
             if (float.IsNaN(currentZoom))
                 return;

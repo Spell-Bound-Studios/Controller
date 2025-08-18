@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using Helper = SpellBound.Controller.Configuration.ControllerHelper;
+using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.PlayerController {
     /// <summary>
     /// POCO class intended to perform a raycast in a direction based on a transform given in the constructor.
     /// </summary>

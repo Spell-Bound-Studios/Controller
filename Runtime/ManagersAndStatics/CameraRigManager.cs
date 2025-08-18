@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
+using SpellBound.Controller.PlayerController;
 using Unity.Cinemachine;
 using UnityEngine;
-using Helper = SpellBound.Controller.Configuration.ControllerHelper;
+using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.ManagersAndStatics {
     public class CameraRigManager : CinemachineCameraManagerBase {
         public static CameraRigManager Instance;
         
-        private Transform _tr;
         private readonly Dictionary<Helper.CameraType, CinemachineCamera> _cinemachineCameras = new();
         private readonly Dictionary<Helper.CameraType, CinemachineThirdPersonFollow> _thirdPersonCameras = new();
         private Helper.CameraType _currentType = Helper.CameraType.Default;
@@ -21,8 +21,6 @@ namespace SpellBound.Controller.Configuration {
             }
             
             Instance = this;
-            
-            _tr = transform;
         }
         
         protected override void Start() {
@@ -84,7 +82,11 @@ namespace SpellBound.Controller.Configuration {
         }
         
         public CinemachineCamera GetCurrentCamera() => _currentCinemachineCamera;
-
+        public float GetCurrentCameraZoom() =>
+                _currentThirdPersonCamera != null
+                        ? _currentThirdPersonCamera.CameraDistance
+                        : float.NaN;
+        
         public void SwitchCamera(Helper.CameraType cameraType) {
             if (!_cinemachineCameras.TryGetValue(cameraType, out var cinemachineCamera)) {
                 Debug.LogWarning($"[CameraRigManager] No camera registered for type '{cameraType}'.");
@@ -100,11 +102,6 @@ namespace SpellBound.Controller.Configuration {
             if (_currentThirdPersonCamera != null)
                 _currentThirdPersonCamera.CameraDistance = zoomValue;
         }
-
-        public float CurrentCameraZoom() =>
-                _currentThirdPersonCamera != null
-                        ? _currentThirdPersonCamera.CameraDistance
-                        : float.NaN;
         
         protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) {
             return _currentCinemachineCamera;

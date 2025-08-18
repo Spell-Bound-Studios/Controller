@@ -1062,7 +1062,6 @@ GameObject:
   - component: {fileID: 6578589953364550362}
   - component: {fileID: 3871644982249761375}
   - component: {fileID: 3629991972403404627}
-  - component: {fileID: 541203028310611636}
   m_Layer: 0
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -1202,6 +1201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
   referenceTransform: {fileID: 4018206189655598281}
+  turnTowardsInputSpeed: 500
   movementSpeed: 5
   airControlRate: 2
   jumpSpeed: 10
@@ -1235,23 +1235,7 @@ MonoBehaviour:
   zoomIncrement: 0.2
   cursorLockOnStart: 1
   input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
-  cameraRig: {fileID: 0}
   playerRotationMode: 1
---- !u!114 &541203028310611636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4755071893885950123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 057ae068dc6d448986d418d861c1ce92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerController: {fileID: 3871644982249761375}
-  referenceTransform: {fileID: 4018206189655598281}
-  turnSpeed: 500
 --- !u!1 &4899940615211404245
 GameObject:
   m_ObjectHideFlags: 0

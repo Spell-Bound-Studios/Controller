@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using Helper = SpellBound.Controller.Configuration.ControllerHelper;
+using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.PlayerController {
     /// <summary>
     /// Interface for rigidbody and collider elements. Therefore, anything that acts on either should be handled here.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
-    public class PlayerMover : MonoBehaviour {
+    public class RigidbodyMover : MonoBehaviour {
         [Header("Collider Settings:")] 
         [SerializeField, Range(0f, 1f)] private float stepHeightRatio = 0.1f;
         [SerializeField] private float colliderHeight = 2f;

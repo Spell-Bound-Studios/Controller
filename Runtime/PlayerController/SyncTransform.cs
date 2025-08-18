@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.PlayerController {
     /// <summary>
     /// Place this on a gameobject that you want to 1:1 match the transform with some offset.
     /// </summary>
-    public class CameraAnchorFollower : MonoBehaviour {
+    public class SyncTransform : MonoBehaviour {
         [SerializeField] private Transform followThisTransform;
         [SerializeField] private Vector3 offset = new(0f, 2f, 0f);
         private Transform _tr;

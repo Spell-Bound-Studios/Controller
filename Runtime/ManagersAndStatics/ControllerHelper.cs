@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.Controller.Configuration {
+namespace SpellBound.Controller.ManagersAndStatics {
     public static class ControllerHelper {
         public const float YAngleMax = 90;
         public const float YAngleMin = -90;
