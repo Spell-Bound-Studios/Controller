@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.ManagersAndStatics;
+using SpellBound.Controller.PlayerStateMachine;
 using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
 namespace SpellBound.Controller.PlayerController {
@@ -30,6 +31,10 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private bool useLocalMomentum;
 
         private RigidbodyMover _rigidbodyMover;
+        private LocoStateMachine _locoStateMachine;
+        private ActionStateMachine _actionStateMachine;
+        private AnimationController _animationController;
+        
         private Transform _tr;
         private Vector3 _momentum;
         private Vector3 _velocity;
