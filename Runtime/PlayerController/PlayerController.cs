@@ -59,6 +59,10 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void FixedUpdate() {
+            #region ClassicalMechanics
+            // Current velocity of the rigidbody.
+            var rbVelocity = _rigidbodyMover.GetRigidbodyVelocity();
+            
             // Handles additional vertical velocity if necessary.
             _rigidbodyMover.CheckForGround();
             
@@ -69,6 +73,10 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover.SetVelocity(velocity);
 
             _velocity = velocity;
+            
+
+            #endregion
+            
         }
 
         private void LateUpdate() {

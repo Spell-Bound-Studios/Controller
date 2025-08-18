@@ -78,6 +78,7 @@ namespace SpellBound.Controller.PlayerController {
         public Vector3 GetGroundNormal() => _raycastSensor.GetNormal();
         public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
         public void SetExtendSensorRange(bool isExtended) => _isUsingExtendedSensorRange = isExtended;
+        public Vector3 GetRigidbodyVelocity() => _rb.linearVelocity;
         
         private void Setup() {
             _rb = GetComponent<Rigidbody>();
