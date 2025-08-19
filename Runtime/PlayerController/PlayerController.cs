@@ -35,6 +35,8 @@ namespace SpellBound.Controller.PlayerController {
         private ActionStateMachine _actionStateMachine;
         private AnimationController _animationController;
         
+        private LocoStateContext _locoCtx;
+        
         private Transform _tr;
         private Vector3 _momentum;
         private Vector3 _velocity;
@@ -56,6 +58,13 @@ namespace SpellBound.Controller.PlayerController {
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             _currentYRotation = _tr.eulerAngles.y;
+            
+            _locoStateMachine = new LocoStateMachine();
+            _actionStateMachine = new ActionStateMachine();
+        }
+
+        private void Update() {
+            _locoStateMachine.CurrentLocoStateDriver.UpdateState();
         }
 
         private void FixedUpdate() {
@@ -73,10 +82,15 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover.SetVelocity(velocity);
 
             _velocity = velocity;
-            
-
             #endregion
             
+            #region StateCtx
+            // Capture state values this frame and then pass in to the state machine for deterministic state context.
+            _locoCtx.MoveInput = new Vector2(input.Direction.x, input.Direction.y);
+
+            _locoStateMachine.SetContext(in _locoCtx);
+            _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
+            #endregion
         }
 
         private void LateUpdate() {
