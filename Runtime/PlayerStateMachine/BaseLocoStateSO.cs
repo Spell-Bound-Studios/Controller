@@ -43,12 +43,12 @@ namespace SpellBound.Controller.PlayerStateMachine {
         /// <summary>
         /// This method is called every frame while the state is active.
         /// </summary>
-        public abstract void UpdateStateLogic();
+        public abstract void UpdateStateLogic(in LocoStateContext ctx);
 
         /// <summary>
         /// This method is called every fixed frame rate frame while the state is active.
         /// </summary>
-        public abstract void FixedUpdateStateLogic();
+        public abstract void FixedUpdateStateLogic(in LocoStateContext ctx);
 
         /// <summary>
         /// This method checks if the state should transition to another state and
@@ -56,7 +56,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         /// Think of this as a "What rips the player out of X state".
         /// i.e. an interrupt, movement, etc.
         /// </summary>
-        public abstract void CheckSwitchStateLogic();
+        public abstract void CheckSwitchStateLogic(in LocoStateContext ctx);
 
         /// <summary>
         /// This method is called when the state is exited.

@@ -11,15 +11,15 @@ namespace SpellBound.Controller.PlayerStateMachine {
             
         }
         
-        public override void UpdateStateLogic() {
+        public override void UpdateStateLogic(in LocoStateContext ctx) {
             
         }
         
-        public override void FixedUpdateStateLogic() {
+        public override void FixedUpdateStateLogic(in LocoStateContext ctx) {
             
         }
         
-        public override void CheckSwitchStateLogic() {
+        public override void CheckSwitchStateLogic(in LocoStateContext ctx) {
             
         }
         
