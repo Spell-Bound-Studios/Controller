@@ -38,7 +38,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         /// <summary>
         /// This method is called when the state is first entered.
         /// </summary>
-        public abstract void EnterStateLogic(in LocoStateContext ctx);
+        public abstract void EnterStateLogic();
 
         /// <summary>
         /// This method is called every frame while the state is active.

@@ -7,8 +7,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             
         }
         
-        public override void EnterStateLogic(in LocoStateContext ctx) {
-            
+        public override void EnterStateLogic() {
+            StateHelper.NotifyLocoStateChange(this);
         }
         
         public override void UpdateStateLogic(in LocoStateContext ctx) {
@@ -16,7 +16,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic(in LocoStateContext ctx) {
-            
+            Debug.Log($"Reading input: {ctx.MoveInput.x}");
         }
         
         public override void CheckSwitchStateLogic(in LocoStateContext ctx) {

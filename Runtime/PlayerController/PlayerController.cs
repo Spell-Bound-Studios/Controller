@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using PurrNet;
+using UnityEngine;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.ManagersAndStatics;
 using SpellBound.Controller.PlayerStateMachine;
@@ -35,7 +37,14 @@ namespace SpellBound.Controller.PlayerController {
         private ActionStateMachine _actionStateMachine;
         private AnimationController _animationController;
         
+        [SerializeField] private BaseLocoStateSO currentLocoState;
+        //[SerializeField] private BaseStateSO baseLocoStateSO;
+        
         private LocoStateContext _locoCtx;
+
+        private readonly List<string> _defaultStatesList = new() {
+                StateHelper.DefaultGroundStateSO
+        };
         
         private Transform _tr;
         private Vector3 _momentum;
@@ -55,11 +64,21 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover = GetComponent<RigidbodyMover>();
         }
 
+        private void OnEnable() {
+            StateHelper.OnLocoStateChange += HandleLocoStateChanged;
+        }
+
+        private void OnDisable() {
+            StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
+        }
+
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             _currentYRotation = _tr.eulerAngles.y;
             
-            _locoStateMachine = new LocoStateMachine();
+            _animationController = new AnimationController(GetComponent<NetworkAnimator>());
+            
+            _locoStateMachine = new LocoStateMachine(_defaultStatesList);
             _actionStateMachine = new ActionStateMachine();
         }
 
@@ -132,5 +151,7 @@ namespace SpellBound.Controller.PlayerController {
                     ? direction.normalized 
                     : direction;
         }
+
+        private void HandleLocoStateChanged(BaseLocoStateSO state) => currentLocoState = state;
     }
 }
