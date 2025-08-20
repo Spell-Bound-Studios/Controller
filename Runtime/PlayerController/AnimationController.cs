@@ -5,7 +5,6 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerController {
     public class AnimationController {
         private readonly NetworkAnimator _animator;
-    
         private static readonly int Speed = Animator.StringToHash("speed");
     
         public AnimationController(NetworkAnimator animator) {

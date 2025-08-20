@@ -17,7 +17,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             var locoPresets = Resources.LoadAll<BaseLocoStateSO>("");
             foreach (var preset in locoPresets) {
                 if (!_locoStatePresets.TryAdd(preset.assetName, preset)) {
-                    Debug.LogError($"Duplicate item uid found {preset.uid}");
+                    Debug.LogError($"Duplicate uid found {preset.uid}", this);
                 }
             }
         }
@@ -30,7 +30,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (!string.IsNullOrEmpty(displayName)) {
                 return _locoStatePresets.TryGetValue(displayName, out preset);
             }
+            
             Debug.LogError($"Could not find state with name {displayName}", this);
+            
             preset = null;
             return false;
         }

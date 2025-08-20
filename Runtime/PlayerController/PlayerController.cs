@@ -15,6 +15,7 @@ namespace SpellBound.Controller.PlayerController {
         [Header("References")]
         [SerializeField] private PlayerInputActionsSO input;
         [SerializeField] private Transform referenceTransform;
+        [SerializeField] private NetworkAnimator animator;
         
         [Header("Settings")]
         [SerializeField] private float turnTowardsInputSpeed = 500f;
@@ -43,7 +44,8 @@ namespace SpellBound.Controller.PlayerController {
         private LocoStateContext _locoCtx;
 
         private readonly List<string> _defaultStatesList = new() {
-                StateHelper.DefaultGroundStateSO
+                StateHelper.DefaultGroundStateSO,
+                StateHelper.DefaultFallingStateSO
         };
         
         private Transform _tr;
@@ -62,6 +64,12 @@ namespace SpellBound.Controller.PlayerController {
                 Debug.LogError("PlayerController: Drag and drop an input SO in.", this);
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
+
+            if (animator == null) {
+                Debug.LogError("PlayerController: Drag and drop animator component in.", this);
+                animator = GetComponentInChildren<NetworkAnimator>();
+            }
+                
         }
 
         private void OnEnable() {
@@ -70,13 +78,15 @@ namespace SpellBound.Controller.PlayerController {
 
         private void OnDisable() {
             StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
+
+            _animationController?.DisposeEvents();
         }
 
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             _currentYRotation = _tr.eulerAngles.y;
             
-            _animationController = new AnimationController(GetComponent<NetworkAnimator>());
+            _animationController = new AnimationController(animator);
             
             _locoStateMachine = new LocoStateMachine(_defaultStatesList);
             _actionStateMachine = new ActionStateMachine();
@@ -106,6 +116,7 @@ namespace SpellBound.Controller.PlayerController {
             #region StateCtx
             // Capture state values this frame and then pass in to the state machine for deterministic state context.
             _locoCtx.MoveInput = new Vector2(input.Direction.x, input.Direction.y);
+            _locoCtx.Speed = _velocity.magnitude;
 
             _locoStateMachine.SetContext(in _locoCtx);
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();

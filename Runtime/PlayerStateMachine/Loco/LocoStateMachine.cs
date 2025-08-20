@@ -10,18 +10,33 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public GroundStateDriver GroundStateDriver;
         public GroundStateSO GroundState;
         
+        public FallingStateDriver FallingStateDriver;
+        public FallingStateSO FallingState;
+        
         public LocoStateMachine(List<string> defaultStatesList) {
             GroundStateDriver = new GroundStateDriver(this);
+            FallingStateDriver = new FallingStateDriver(this);
             
             var defaultStates = StateHelper.GetDefaultStatesFromDB(defaultStatesList);
 
             foreach (var state in defaultStates) {
-                if (state is GroundStateSO so) {
-                    GroundState = so;
+                switch (state) {
+                    case GroundStateSO gso:
+                        GroundState = gso;
+                        break;
+                    case FallingStateSO fso:
+                        FallingState = fso;
+                        break;
                 }
             }
             
-            CurrentLocoStateDriver = GroundStateDriver;
+            if (defaultStates.Count <= 0)
+                Debug.LogError($"Default state count found in constructor: {defaultStates.Count}. Please verify that" +
+                                "default states list is created/exists by instantiator.");
+            
+            Debug.Log("DefaultStates found: " + defaultStatesList.Count);
+            
+            CurrentLocoStateDriver = FallingStateDriver;
             CurrentLocoStateDriver.EnterState();
         }
 

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
-    [CreateAssetMenu(fileName = "GroundState", menuName = "Spellbound/LocoStates/GroundState")]
-    public class GroundStateSO : BaseLocoStateSO {
+    [CreateAssetMenu(fileName = "FallingState", menuName = "Spellbound/LocoStates/FallingState")]
+    public class FallingStateSO : BaseLocoStateSO {
         public override void Initialize() {
             
         }
