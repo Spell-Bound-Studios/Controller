@@ -7,7 +7,7 @@ namespace SpellBound.Controller.PlayerController {
     /// </summary>
     public class RaycastSensor {
         public float CastLength = 1f;
-        public LayerMask LayerMask = 1 << 16;
+        public LayerMask LayerMask = 1 << 6;
         
         private Vector3 _origin = Vector3.zero;
         private readonly Transform _tr;

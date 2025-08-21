@@ -16,7 +16,7 @@ namespace SpellBound.Controller.PlayerController {
         // How low you can move your camera.
         [SerializeField, Range(0f, 90f)] private float lowerVerticalLimit = 89f;
         // How fast you can move your camera.
-        [SerializeField] private float cameraSpeed = 25f;
+        [SerializeField] private float cameraSpeed = 0.5f;
         // Optional lerp applied to input.
         [SerializeField] private bool smoothCameraRotation;
         // Multiplies the time.deltaTime by this factor.
@@ -81,14 +81,15 @@ namespace SpellBound.Controller.PlayerController {
         /// Rotates the camera based on the device horizontal and vertical input about the pivot.
         /// </summary>
         private void RotateCamera(float horizontalInput, float verticalInput) {
-            var targetX = _currentXAngle + verticalInput  * cameraSpeed * Time.deltaTime;
-            var targetY = _currentYAngle + horizontalInput * cameraSpeed * Time.deltaTime;
+            var targetX = _currentXAngle + verticalInput  * cameraSpeed;
+            var targetY = _currentYAngle + horizontalInput * cameraSpeed;
 
             targetX = Mathf.Clamp(targetX, -upperVerticalLimit, lowerVerticalLimit);
 
             if (smoothCameraRotation) {
-                _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, cameraSmoothingFactor * Time.deltaTime);
-                _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, cameraSmoothingFactor * Time.deltaTime);
+                var blend = 1f - Mathf.Exp(-cameraSmoothingFactor * Time.unscaledDeltaTime);
+                _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, blend);
+                _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, blend);
             } 
             else {
                 _currentXAngle = targetX;

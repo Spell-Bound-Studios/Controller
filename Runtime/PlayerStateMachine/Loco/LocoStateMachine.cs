@@ -4,8 +4,6 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     public sealed class LocoStateMachine {
         public PlayerController.PlayerController PlayerController;
-        internal LocoStateContext Ctx;
-        
         public BaseLocoStateDriver CurrentLocoStateDriver;
         
         public GroundStateDriver GroundStateDriver;
@@ -20,7 +18,11 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public JumpingStateDriver JumpingStateDriver;
         public JumpingStateSO JumpingState;
         
+        internal LocoStateContext Ctx;
+        
         public LocoStateMachine(PlayerController.PlayerController pc, List<string> defaultStatesList) {
+            PlayerController = pc;
+            
             GroundStateDriver = new GroundStateDriver(this);
             FallingStateDriver = new FallingStateDriver(this);
             LandingStateDriver = new LandingStateDriver(this);
@@ -48,9 +50,10 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (defaultStates.Count <= 0)
                 Debug.LogError($"Default state count found in constructor: {defaultStates.Count}. Please verify that" +
                                 "default states list is created/exists by instantiator.");
-            
-            Debug.Log("DefaultStates found: " + defaultStatesList.Count);
-            
+
+            if (CurrentLocoStateDriver != null) 
+                return;
+
             CurrentLocoStateDriver = FallingStateDriver;
             CurrentLocoStateDriver.EnterState();
         }

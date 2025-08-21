@@ -1214,7 +1214,6 @@ MonoBehaviour:
   slopeLimit: 30
   useLocalMomentum: 0
   currentLocoState: {fileID: 0}
-  ani: {fileID: 9033583272491304146}
 --- !u!114 &3629991972403404627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1230,7 +1229,7 @@ MonoBehaviour:
   cameraPivot: {fileID: 4018206189655598281}
   upperVerticalLimit: 89
   lowerVerticalLimit: 89
-  cameraSpeed: 50
+  cameraSpeed: 0.5
   smoothCameraRotation: 1
   cameraSmoothingFactor: 25
   minZoomDistance: 1

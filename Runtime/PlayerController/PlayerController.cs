@@ -120,6 +120,7 @@ namespace SpellBound.Controller.PlayerController {
             _locoCtx.MoveInput = new Vector2(input.Direction.x, input.Direction.y);
             _locoCtx.Speed = _velocity.magnitude;
             _locoCtx.Grounded = _rigidbodyMover.IsGrounded();
+            Debug.Log("Grounded is: " + _locoCtx.Grounded);
 
             _locoStateMachine.SetContext(in _locoCtx);
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
