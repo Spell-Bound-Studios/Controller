@@ -2,6 +2,7 @@
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public abstract class BaseLocoStateSO : ScriptableObject {
+        protected LocoStateMachine StateMachine;
         public string uid;
         public string assetName;
         
@@ -29,16 +30,11 @@ namespace SpellBound.Controller.PlayerStateMachine {
             }
         }
 #endif
-        
-        /// <summary>
-        /// This method initializes the state with the necessary context.
-        /// </summary>
-        public abstract void Initialize();
 
         /// <summary>
         /// This method is called when the state is first entered.
         /// </summary>
-        public abstract void EnterStateLogic();
+        public abstract void EnterStateLogic(LocoStateMachine stateMachine);
 
         /// <summary>
         /// This method is called every frame while the state is active.

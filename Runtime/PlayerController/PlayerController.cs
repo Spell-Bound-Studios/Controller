@@ -45,7 +45,9 @@ namespace SpellBound.Controller.PlayerController {
 
         private readonly List<string> _defaultStatesList = new() {
                 StateHelper.DefaultGroundStateSO,
-                StateHelper.DefaultFallingStateSO
+                StateHelper.DefaultFallingStateSO,
+                StateHelper.DefaultJumpingStateSO,
+                StateHelper.DefaultLandingStateSO,
         };
         
         private Transform _tr;
@@ -88,14 +90,14 @@ namespace SpellBound.Controller.PlayerController {
             
             _animationController = new AnimationController(animator);
             
-            _locoStateMachine = new LocoStateMachine(_defaultStatesList);
+            _locoStateMachine = new LocoStateMachine(this, _defaultStatesList);
             _actionStateMachine = new ActionStateMachine();
         }
 
         private void Update() {
             _locoStateMachine.CurrentLocoStateDriver.UpdateState();
         }
-
+        
         private void FixedUpdate() {
             #region ClassicalMechanics
             // Current velocity of the rigidbody.
@@ -117,6 +119,7 @@ namespace SpellBound.Controller.PlayerController {
             // Capture state values this frame and then pass in to the state machine for deterministic state context.
             _locoCtx.MoveInput = new Vector2(input.Direction.x, input.Direction.y);
             _locoCtx.Speed = _velocity.magnitude;
+            _locoCtx.Grounded = _rigidbodyMover.IsGrounded();
 
             _locoStateMachine.SetContext(in _locoCtx);
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();

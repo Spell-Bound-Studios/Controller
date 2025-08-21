@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public sealed class LocoStateMachine {
+        public PlayerController.PlayerController PlayerController;
         internal LocoStateContext Ctx;
         
         public BaseLocoStateDriver CurrentLocoStateDriver;
@@ -13,9 +14,17 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public FallingStateDriver FallingStateDriver;
         public FallingStateSO FallingState;
         
-        public LocoStateMachine(List<string> defaultStatesList) {
+        public LandingStateDriver LandingStateDriver;
+        public LandingStateSO LandingState;
+        
+        public JumpingStateDriver JumpingStateDriver;
+        public JumpingStateSO JumpingState;
+        
+        public LocoStateMachine(PlayerController.PlayerController pc, List<string> defaultStatesList) {
             GroundStateDriver = new GroundStateDriver(this);
             FallingStateDriver = new FallingStateDriver(this);
+            LandingStateDriver = new LandingStateDriver(this);
+            JumpingStateDriver =  new JumpingStateDriver(this);
             
             var defaultStates = StateHelper.GetDefaultStatesFromDB(defaultStatesList);
 
@@ -26,6 +35,12 @@ namespace SpellBound.Controller.PlayerStateMachine {
                         break;
                     case FallingStateSO fso:
                         FallingState = fso;
+                        break;
+                    case LandingStateSO lso:
+                        LandingState = lso;
+                        break;
+                    case JumpingStateSO jso:
+                        JumpingState = jso;
                         break;
                 }
             }
@@ -44,6 +59,10 @@ namespace SpellBound.Controller.PlayerStateMachine {
             Ctx = context;
         }
 
-        
+        public void ChangeState(BaseLocoStateDriver newDriver) {
+            CurrentLocoStateDriver.ExitState();
+            CurrentLocoStateDriver = newDriver;
+            CurrentLocoStateDriver.EnterState();
+        }
     }
 }

@@ -1214,6 +1214,7 @@ MonoBehaviour:
   slopeLimit: 30
   useLocalMomentum: 0
   currentLocoState: {fileID: 0}
+  ani: {fileID: 9033583272491304146}
 --- !u!114 &3629991972403404627
 MonoBehaviour:
   m_ObjectHideFlags: 0
