@@ -54,6 +54,7 @@ namespace SpellBound.Controller.PlayerController {
             _raycastSensor.CastLength = _isUsingExtendedSensorRange
                     ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
                     : _baseSensorRange;
+            Debug.Log(_baseSensorRange);
             _raycastSensor.CastRaycast();
 
             _isGrounded = _raycastSensor.HasDetectedHit();
@@ -114,11 +115,11 @@ namespace SpellBound.Controller.PlayerController {
             RecalculateSensorLayerMask();
 
             // Prevent clipping issues when the sensor range is calculated.
-            const float safetyDistanceFactor = 0.001f;
-
-            var length = colliderHeight * (1f - stepHeightRatio) * 0.5f * colliderHeight * stepHeightRatio;
-            _baseSensorRange = length * (1f + safetyDistanceFactor) * _tr.localScale.x;
-            _raycastSensor.CastLength = length * _tr.localScale.x;
+            const float offsetProtrusion = 0.005f;
+            
+            
+            var halfColliderHeight = _collider.height * stepHeightRatio * 0.5f * _tr.localScale.y;
+            _baseSensorRange = halfColliderHeight + offsetProtrusion;
         }
 
         private void RecalculateSensorLayerMask() {

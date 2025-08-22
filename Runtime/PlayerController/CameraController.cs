@@ -90,7 +90,7 @@ namespace SpellBound.Controller.PlayerController {
                 var blend = 1f - Mathf.Exp(-cameraSmoothingFactor * Time.unscaledDeltaTime);
                 _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, blend);
                 _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, blend);
-            } 
+            }
             else {
                 _currentXAngle = targetX;
                 _currentYAngle = targetY;
