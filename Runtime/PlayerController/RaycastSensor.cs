@@ -7,20 +7,38 @@ namespace SpellBound.Controller.PlayerController {
     /// </summary>
     public class RaycastSensor {
         public float CastLength = 1f;
+        public float SphereCastLength = 1f;
+        public float SphereRadius = 1f;
         public LayerMask LayerMask = 1 << 6;
         
         private Vector3 _origin = Vector3.zero;
         private readonly Transform _tr;
         private RaycastHit _hit;
+        private RaycastHit _sphereHit;
         private Helper.CastDirection _castDirection;
 
         public RaycastSensor(Transform playerTransform) => _tr = playerTransform;
 
         public void CastRaycast() {
-            var worldOrigin = _tr.TransformPoint(_origin);
+            var worldOrigin = GetCastOriginWorld();
             var worldDir = GetCastDirection();
+
+            Physics.Raycast(
+                    origin: worldOrigin, 
+                    direction: worldDir, 
+                    hitInfo: out _hit, 
+                    maxDistance: CastLength, 
+                    layerMask: LayerMask,
+                    queryTriggerInteraction: QueryTriggerInteraction.Ignore);
             
-            Physics.Raycast(worldOrigin, worldDir, out _hit, CastLength, LayerMask, QueryTriggerInteraction.Ignore);
+            Physics.SphereCast(
+                    origin: worldOrigin, 
+                    radius: SphereRadius, 
+                    direction: worldDir, 
+                    hitInfo: out _sphereHit, 
+                    maxDistance: SphereCastLength, 
+                    layerMask: LayerMask, 
+                    queryTriggerInteraction: QueryTriggerInteraction.Ignore);
         }
         
         public bool HasDetectedHit() => _hit.collider != null;
@@ -31,6 +49,11 @@ namespace SpellBound.Controller.PlayerController {
         public Transform GetTransform() => _hit.transform;
         public void SetCastOrigin(Vector3 pos) => _origin = _tr.InverseTransformPoint(pos);
         public void SetCastDirection(Helper.CastDirection direction) => _castDirection = direction;
+        public bool HasDetectedSphereHit() => _sphereHit.collider !=null;
+        public float GetSphereHitDistance() => _sphereHit.distance;
+        public Vector3 GetSphereHitPoint() => _sphereHit.point;
+        public Vector3 GetCastOriginWorld() => _tr.TransformPoint(_origin);
+        public Vector3 GetCastDirectionWorld() => GetCastDirection();
 
         private Vector3 GetCastDirection() {
             return _castDirection switch {

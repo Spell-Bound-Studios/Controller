@@ -13,7 +13,7 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float colliderThickness = 1f;
         [SerializeField] private Vector3 colliderOffset = new(0, .4f, 0);
 
-        [Header("Sensor Settings:")] 
+        [Header("Sensor Settings:")]
         [SerializeField] private bool isDebugging;
         private bool _isUsingExtendedSensorRange = true;
 
@@ -26,6 +26,10 @@ namespace SpellBound.Controller.PlayerController {
         private float _baseSensorRange;
         private Vector3 _currentGroundAdjustmentVelocity;
         private int _currentLayer;
+        
+        
+        
+        [SerializeField] private float _colliderHalfSize;
 
         private void Awake() {
             _tr = transform;
@@ -39,7 +43,7 @@ namespace SpellBound.Controller.PlayerController {
             if (gameObject.activeInHierarchy)
                 RecalculateColliderDimensions();
         }
-
+        
         /// <summary>
         /// Checks for the ground based on layer and raycast.
         /// Returns early if you're not on the ground.
@@ -54,7 +58,12 @@ namespace SpellBound.Controller.PlayerController {
             _raycastSensor.CastLength = _isUsingExtendedSensorRange
                     ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
                     : _baseSensorRange;
+            
             Debug.Log(_baseSensorRange);
+            
+            _raycastSensor.SphereRadius = _collider.radius;
+            _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
+            
             _raycastSensor.CastRaycast();
 
             _isGrounded = _raycastSensor.HasDetectedHit();
@@ -67,11 +76,15 @@ namespace SpellBound.Controller.PlayerController {
             // falling state every few steps... so this will attempt to quantify a value to push them up or down and keep
             // them flush to the ground when they are within tolerance.
             
+            // Distance from the ground.
             var distance = _raycastSensor.GetRaycastHitDistance();
+            // Top boundary of where the player should be positioned.
             var upperLimit = colliderHeight * _tr.localScale.x * (1f - stepHeightRatio) * 0.5f;
+            // Where feet should be relative to the ground.
             var middle = upperLimit + colliderHeight * _tr.localScale.x * stepHeightRatio;
+            // Difference between where the player is and where they should be: the middle.
             var distanceToGo = middle - distance;
-
+            // Velocity needs to move the player to the correct position.
             _currentGroundAdjustmentVelocity = _tr.up * (distanceToGo / Time.fixedDeltaTime);
         }
 
@@ -116,26 +129,50 @@ namespace SpellBound.Controller.PlayerController {
 
             // Prevent clipping issues when the sensor range is calculated.
             const float offsetProtrusion = 0.005f;
-            
-            
-            var halfColliderHeight = _collider.height * stepHeightRatio * 0.5f * _tr.localScale.y;
-            _baseSensorRange = halfColliderHeight + offsetProtrusion;
+            _colliderHalfSize = _collider.height * stepHeightRatio * 0.5f * _tr.localScale.y;
+            _baseSensorRange = _colliderHalfSize + offsetProtrusion;
         }
 
         private void RecalculateSensorLayerMask() {
             var objLayer = gameObject.layer;
             var layerMask = Physics.AllLayers;
 
-            for (var i = 0; i < 32; i++) {
+            for (var i = 0; i < 32; i++)
                 if (Physics.GetIgnoreLayerCollision(objLayer, i))
                     layerMask &= ~(1 << i);
-            }
             
             var ignoreRaycastLayer = LayerMask.NameToLayer("Ignore Raycast");
             layerMask &= ~(1 << ignoreRaycastLayer);
             
             _raycastSensor.LayerMask = layerMask;
             _currentLayer = objLayer;
+        }
+        
+        private void OnDrawGizmosSelected() {
+            if (!isDebugging)
+                return;
+            
+            if (_raycastSensor == null) 
+                return;
+
+            var origin = _raycastSensor.GetCastOriginWorld();
+            var dir = _raycastSensor.GetCastDirectionWorld();
+
+            var rayLen = _raycastSensor.HasDetectedHit() 
+                    ? _raycastSensor.GetRaycastHitDistance() 
+                    : _raycastSensor.CastLength;
+            
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(origin, origin + dir * rayLen);
+            Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
+
+            var sphereLen = _raycastSensor.HasDetectedSphereHit() 
+                    ? _raycastSensor.GetSphereHitDistance() 
+                    : _raycastSensor.SphereCastLength;
+            
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(origin, origin + dir * sphereLen);
+            Gizmos.DrawWireSphere(origin + dir * sphereLen, _raycastSensor.SphereRadius);
         }
     }
 }
