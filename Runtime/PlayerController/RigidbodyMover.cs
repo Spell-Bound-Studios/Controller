@@ -147,6 +147,10 @@ namespace SpellBound.Controller.PlayerController {
             _raycastSensor.LayerMask = layerMask;
             _currentLayer = objLayer;
         }
+
+        public void ApplyJumpForce(float jumpForce) {
+            _rb.AddForce(_tr.up * jumpForce, ForceMode.Impulse);
+        }
         
         private void OnDrawGizmosSelected() {
             if (!isDebugging)

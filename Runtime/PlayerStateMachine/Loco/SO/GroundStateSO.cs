@@ -9,18 +9,21 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Grounded);
         }
         
-        public override void UpdateStateLogic(in LocoStateContext ctx) {
-            CheckSwitchStateLogic(in ctx);
-            StateHelper.NotifyLocoAnimationSpeedChange(ctx.Speed);
+        public override void UpdateStateLogic() {
+            CheckSwitchStateLogic();
+            StateHelper.NotifyLocoAnimationSpeedChange(Cc.HorizontalSpeed);
         }
         
-        public override void FixedUpdateStateLogic(in LocoStateContext ctx) {
-
+        public override void FixedUpdateStateLogic() {
+            Cc.HandleHorizontalVelocityInput();
         }
         
-        public override void CheckSwitchStateLogic(in LocoStateContext ctx) {
-            if (!ctx.Grounded)
+        public override void CheckSwitchStateLogic() {
+            if (!Cc.GroundFlag)
                 StateMachine.ChangeState(StateMachine.FallingStateDriver);
+            
+            if (Cc.JumpFlag)
+                StateMachine.ChangeState(StateMachine.JumpingStateDriver);
         }
         
         public override void ExitStateLogic() {

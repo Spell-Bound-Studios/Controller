@@ -11,9 +11,9 @@ namespace SpellBound.Controller.PlayerController {
     /// Input and stats meet here to inform supporting members.
     /// </summary>
     [RequireComponent(typeof(RigidbodyMover))]
-    public class PlayerController : MonoBehaviour {
+    public class CharacterController : MonoBehaviour {
         [Header("References")]
-        [SerializeField] private PlayerInputActionsSO input;
+        [SerializeField] public PlayerInputActionsSO input;
         [SerializeField] private Transform referenceTransform;
         [SerializeField] private NetworkAnimator animator;
         
@@ -38,12 +38,11 @@ namespace SpellBound.Controller.PlayerController {
         private ActionStateMachine _actionStateMachine;
         private AnimationController _animationController;
         
+        // Visuals - never used.
         [SerializeField] private BaseLocoStateSO currentLocoState;
         //[SerializeField] private BaseStateSO baseLocoStateSO;
-        
-        private LocoStateContext _locoCtx;
 
-        private readonly List<string> _defaultStatesList = new() {
+        private readonly List<string> _defaultLocoStatesList = new() {
                 StateHelper.DefaultGroundStateSO,
                 StateHelper.DefaultFallingStateSO,
                 StateHelper.DefaultJumpingStateSO,
@@ -57,6 +56,17 @@ namespace SpellBound.Controller.PlayerController {
         private float _currentYRotation;
         
         private const float FallOffAngle = 90f;
+
+        
+        
+        // State Polling --Condensed Value Types--
+        
+        public float HorizontalSpeed;
+        public bool JumpFlag;
+        public bool GroundFlag => _rigidbodyMover.IsGrounded();
+
+        
+        
         
         private void Awake() {
             _tr = transform;
@@ -71,17 +81,24 @@ namespace SpellBound.Controller.PlayerController {
                 Debug.LogError("PlayerController: Drag and drop animator component in.", this);
                 animator = GetComponentInChildren<NetworkAnimator>();
             }
-                
         }
 
         private void OnEnable() {
             StateHelper.OnLocoStateChange += HandleLocoStateChanged;
+
+            if (input) {
+                input.OnJumpInput += HandleJumpPressed;
+            }
         }
 
         private void OnDisable() {
             StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
 
             _animationController?.DisposeEvents();
+            
+            if (input) {
+                input.OnJumpInput -= HandleJumpPressed;
+            }
         }
 
         private void Start() {
@@ -90,7 +107,7 @@ namespace SpellBound.Controller.PlayerController {
             
             _animationController = new AnimationController(animator);
             
-            _locoStateMachine = new LocoStateMachine(this, _defaultStatesList);
+            _locoStateMachine = new LocoStateMachine(this, _defaultLocoStatesList);
             _actionStateMachine = new ActionStateMachine();
         }
 
@@ -99,39 +116,30 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         private void FixedUpdate() {
-            #region ClassicalMechanics
-            // Current velocity of the rigidbody.
-            var rbVelocity = _rigidbodyMover.GetRigidbodyVelocity();
-            
+            _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
+        }
+
+        private void LateUpdate() {
+            HandleCharacterTurnTowardsHorizontalVelocity();
+        }
+
+        public void HandleHorizontalVelocityInput() {
             // Handles additional vertical velocity if necessary.
             _rigidbodyMover.CheckForGround();
             
             var velocity = CalculateMovementVelocity();
             velocity += useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
-            
+            Debug.Log($"[Planar vel before SetVelocity] {velocity}");
             _rigidbodyMover.SetExtendSensorRange(true);
             _rigidbodyMover.SetVelocity(velocity);
-
-            _velocity = velocity;
-            #endregion
             
-            #region StateCtx
-            // Capture state values this frame and then pass in to the state machine for deterministic state context.
-            _locoCtx.MoveInput = new Vector2(input.Direction.x, input.Direction.y);
-            _locoCtx.Speed = _velocity.magnitude;
-            _locoCtx.Grounded = _rigidbodyMover.IsGrounded();
-            Debug.Log("Grounded is: " + _locoCtx.Grounded);
-
-            _locoStateMachine.SetContext(in _locoCtx);
-            _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
-            #endregion
+            _velocity = velocity;
+            HorizontalSpeed = _velocity.magnitude;
         }
 
-        private void LateUpdate() {
-            #region TurnTowardsInput
+        public void HandleCharacterTurnTowardsHorizontalVelocity() {
             // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
-            var velocity = Vector3.ProjectOnPlane(
-                    _velocity, _planarUp);
+            var velocity = Vector3.ProjectOnPlane(_velocity, _planarUp);
             
             // Return early if we're not moving.
             if (velocity.magnitude < 0.001f)
@@ -147,11 +155,17 @@ namespace SpellBound.Controller.PlayerController {
             
             _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
             _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
-            #endregion
         }
 
+        /// <summary>
+        /// Returns the desired velocity vector.
+        /// </summary>
+        /// <returns></returns>
         private Vector3 CalculateMovementVelocity() => CalculateMovementDirection() * movementSpeed;
         
+        /// <summary>
+        /// Returns a direction that the player is moving.
+        /// </summary>
         private Vector3 CalculateMovementDirection() {
             // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
             var direction =
@@ -168,5 +182,20 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void HandleLocoStateChanged(BaseLocoStateSO state) => currentLocoState = state;
+        
+        private void HandleJumpPressed() {
+            if (!_rigidbodyMover.IsGrounded())
+                return;
+
+            if (!ResourceCheck())
+                return;
+            
+            JumpFlag = true;
+            _rigidbodyMover.ApplyJumpForce(10f);
+        }
+
+        private bool ResourceCheck() {
+            return true;
+        }
     }
 }

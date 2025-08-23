@@ -14,18 +14,18 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Landing);
             
             // Coroutines must yield before state checks begin.
-            _landRoutine = StateMachine.PlayerController.StartCoroutine(LandRoutine());
+            _landRoutine = StateMachine.CharacterController.StartCoroutine(LandRoutine());
         }
         
-        public override void UpdateStateLogic(in LocoStateContext ctx) {
-            CheckSwitchStateLogic(in ctx);
+        public override void UpdateStateLogic() {
+            CheckSwitchStateLogic();
         }
         
-        public override void FixedUpdateStateLogic(in LocoStateContext ctx) {
+        public override void FixedUpdateStateLogic() {
 
         }
         
-        public override void CheckSwitchStateLogic(in LocoStateContext ctx) {
+        public override void CheckSwitchStateLogic() {
             if (_landRoutine == null) 
                 StateMachine.ChangeState(StateMachine.GroundStateDriver);
         }

@@ -32,5 +32,4 @@ namespace SpellBound.Controller.PlayerController {
             _animator.SetFloat(Speed, blendValue);
         }
     }
-    
 }

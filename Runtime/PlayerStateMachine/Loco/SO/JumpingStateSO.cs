@@ -10,28 +10,28 @@ namespace SpellBound.Controller.PlayerStateMachine {
         private Coroutine _jumpMaxRoutine;
         
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
+            Debug.Log("SUP");
             StateMachine = stateMachine;
-            
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Jumping);
             
-            _jumpMinRoutine = StateMachine.PlayerController.StartCoroutine(JumpMinRoutine());
-            _jumpMaxRoutine = StateMachine.PlayerController.StartCoroutine(JumpMaxRoutine());
+            _jumpMinRoutine = StateMachine.CharacterController.StartCoroutine(JumpMinRoutine());
+            _jumpMaxRoutine = StateMachine.CharacterController.StartCoroutine(JumpMaxRoutine());
         }
         
-        public override void UpdateStateLogic(in LocoStateContext ctx) {
-            CheckSwitchStateLogic(in ctx);
+        public override void UpdateStateLogic() {
+            CheckSwitchStateLogic();
         }
         
-        public override void FixedUpdateStateLogic(in LocoStateContext ctx) {
+        public override void FixedUpdateStateLogic() {
 
         }
         
-        public override void CheckSwitchStateLogic(in LocoStateContext ctx) {
+        public override void CheckSwitchStateLogic() {
             // If the minimum time expires
             if (_jumpMinRoutine == null) {
                 // Check grounded and exit ground state.
-                if (ctx.Grounded) 
+                if (Cc.GroundFlag) 
                     StateMachine.ChangeState(StateMachine.LandingStateDriver);
             }
             // If maximum time expires
@@ -42,7 +42,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void ExitStateLogic() {
             if (_jumpMaxRoutine != null)
-                StateMachine.PlayerController.StopCoroutine(_jumpMaxRoutine);
+                StateMachine.CharacterController.StopCoroutine(_jumpMaxRoutine);
+
+            Cc.JumpFlag = false;
         }
         
         private IEnumerator JumpMinRoutine() {

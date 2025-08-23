@@ -6,10 +6,13 @@ using static InputActions;
 namespace SpellBound.Controller.PlayerInputs {
     [CreateAssetMenu(fileName = "PlayerInputs", menuName = "Spellbound/PlayerInputs/PlayerInputs")]
     public class PlayerInputActionsSO : ScriptableObject, IPlayerInputActions {
+        private InputActions _inputActions;
+        
         public event Action<Vector2> OnMoveInput = delegate { };
         public event Action<Vector2> OnLookInput = delegate { };
         public event Action<Vector2> OnMouseWheelInput = delegate { };
-        private InputActions _inputActions;
+        public event Action OnJumpInput = delegate { };
+        
         
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
         public Vector3 LookDirection => _inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
@@ -31,8 +34,11 @@ namespace SpellBound.Controller.PlayerInputs {
         public void OnMovement(InputAction.CallbackContext context) {
             OnMoveInput.Invoke(context.ReadValue<Vector2>());
         }
-        
-        public void OnJump(InputAction.CallbackContext context) { }
+
+        public void OnJump(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnJumpInput.Invoke();
+        }
         public void OnRightClick(InputAction.CallbackContext context) { }
         public void OnLeftClick(InputAction.CallbackContext context) { }
         public void OnSprint(InputAction.CallbackContext context) { }

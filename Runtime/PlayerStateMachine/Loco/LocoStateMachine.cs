@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using CharacterController = SpellBound.Controller.PlayerController.CharacterController;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public sealed class LocoStateMachine {
-        public PlayerController.PlayerController PlayerController;
+        public CharacterController CharacterController;
+        
         public BaseLocoStateDriver CurrentLocoStateDriver;
         
         public GroundStateDriver GroundStateDriver;
@@ -18,10 +20,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public JumpingStateDriver JumpingStateDriver;
         public JumpingStateSO JumpingState;
         
-        internal LocoStateContext Ctx;
-        
-        public LocoStateMachine(PlayerController.PlayerController pc, List<string> defaultStatesList) {
-            PlayerController = pc;
+        public LocoStateMachine(CharacterController cc, List<string> defaultStatesList) {
+            CharacterController = cc;
             
             GroundStateDriver = new GroundStateDriver(this);
             FallingStateDriver = new FallingStateDriver(this);
@@ -56,10 +56,6 @@ namespace SpellBound.Controller.PlayerStateMachine {
 
             CurrentLocoStateDriver = FallingStateDriver;
             CurrentLocoStateDriver.EnterState();
-        }
-
-        public void SetContext(in LocoStateContext context) {
-            Ctx = context;
         }
 
         public void ChangeState(BaseLocoStateDriver newDriver) {
