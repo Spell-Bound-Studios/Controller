@@ -128,13 +128,17 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover.CheckForGround();
             
             var velocity = CalculateMovementVelocity();
-            velocity += useLocalMomentum ? _tr.localToWorldMatrix * _momentum : _momentum;
-            Debug.Log($"[Planar vel before SetVelocity] {velocity}");
+            velocity.y += _rigidbodyMover.GetRigidbodyVelocity().y;
+
             _rigidbodyMover.SetExtendSensorRange(true);
             _rigidbodyMover.SetVelocity(velocity);
             
             _velocity = velocity;
             HorizontalSpeed = _velocity.magnitude;
+        }
+
+        public void HandleMomentum() {
+            
         }
 
         public void HandleCharacterTurnTowardsHorizontalVelocity() {
