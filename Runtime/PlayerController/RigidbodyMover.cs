@@ -15,7 +15,6 @@ namespace SpellBound.Controller.PlayerController {
 
         [Header("Sensor Settings:")]
         [SerializeField] private bool isDebugging;
-        private bool _isUsingExtendedSensorRange;
 
         private Transform _tr;
         private Rigidbody _rb;
@@ -52,9 +51,7 @@ namespace SpellBound.Controller.PlayerController {
             _currentGroundAdjustmentVelocity = Vector3.zero;
             
             // Extends the sensor range if we are using step-up logic but otherwise uses the base range.
-            _raycastSensor.CastLength = _isUsingExtendedSensorRange
-                    ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
-                    : _baseSensorRange;
+            _raycastSensor.CastLength = _baseSensorRange;
             
             _raycastSensor.SphereRadius = _collider.radius;
             _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
@@ -86,7 +83,7 @@ namespace SpellBound.Controller.PlayerController {
         public bool IsGrounded() => _isGrounded;
         public Vector3 GetGroundNormal() => _raycastSensor.GetNormal();
         public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
-        public void SetExtendSensorRange(bool isExtended) => _isUsingExtendedSensorRange = isExtended;
+        public void SetSensorRange(float multiplier) => _baseSensorRange *= multiplier;
         public Vector3 GetRigidbodyVelocity() => _rb.linearVelocity;
         
         private void Setup() {

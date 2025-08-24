@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SpellBound.Controller.ManagersAndStatics;
+using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "FallingState", menuName = "Spellbound/LocoStates/FallingState")]
@@ -9,6 +10,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Falling);
             
             Debug.Log("FallingStateSO EnterStateLogic");
+            Cc.SetSensorRange(ControllerHelper.RaycastLength.Extended);
         }
         
         public override void UpdateStateLogic() {
@@ -25,7 +27,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void ExitStateLogic() {
-            
+            Cc.SetSensorRange(ControllerHelper.RaycastLength.Normal);
         }
     }
 }

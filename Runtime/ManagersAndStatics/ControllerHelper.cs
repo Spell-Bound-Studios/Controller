@@ -27,6 +27,12 @@ namespace SpellBound.Controller.ManagersAndStatics {
             Down
         }
 
+        public enum RaycastLength {
+            Normal,
+            Extended,
+            Retracted
+        }
+
         /// <summary>
         /// From git-amends channel and returns a component of a vector that is in the direction of a given vector.
         /// </summary>

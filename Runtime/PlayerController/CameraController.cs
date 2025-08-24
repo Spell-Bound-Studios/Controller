@@ -46,6 +46,9 @@ namespace SpellBound.Controller.PlayerController {
             if (!_brain && Camera.main) 
                 Camera.main.TryGetComponent(out _brain);
             
+            if (!_brain)
+                _brain = FindFirstObjectByType<CinemachineBrain>();
+            
             _currentXAngle = _tr.localRotation.eulerAngles.x;
             _currentYAngle = _tr.localRotation.eulerAngles.y;
             

@@ -32,7 +32,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             // If the minimum time expires
             if (_jumpMinRoutine == null) {
                 // Check grounded and exit ground state.
-                if (Cc.GroundFlag) 
+                if (Cc.GroundFlag)
                     StateMachine.ChangeState(StateMachine.LandingStateDriver);
             }
             // If maximum time expires

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PurrNet;
 using UnityEngine;
 using SpellBound.Controller.PlayerInputs;
@@ -122,8 +123,7 @@ namespace SpellBound.Controller.PlayerController {
             
             var velocity = CalculateMovementVelocity();
             velocity.y += _rigidbodyMover.GetRigidbodyVelocity().y;
-
-            //_rigidbodyMover.SetExtendSensorRange(false);
+            
             _rigidbodyMover.SetVelocity(velocity);
             
             _velocity = velocity;
@@ -192,6 +192,22 @@ namespace SpellBound.Controller.PlayerController {
 
         private bool ResourceCheck() {
             return true;
+        }
+
+        public void SetSensorRange(Helper.RaycastLength sensorLength) {
+            switch (sensorLength) {
+                case Helper.RaycastLength.Normal:
+                    _rigidbodyMover.SetSensorRange(1);
+                    break;
+                case Helper.RaycastLength.Extended:
+                    _rigidbodyMover.SetSensorRange(1.2f);
+                    break;
+                case Helper.RaycastLength.Retracted:
+                    _rigidbodyMover.SetSensorRange(0.5f);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
+            }
         }
     }
 }

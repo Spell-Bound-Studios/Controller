@@ -67,19 +67,6 @@ namespace SpellBound.Controller.ManagersAndStatics {
                 Debug.LogError("[CameraRigManager] No cameras found at all!", this);
             }
         }
-
-        protected override void Update() {
-            base.Update();
-            
-            if (Input.GetKeyDown(KeyCode.E)) {
-                if (_currentType == Helper.CameraType.Default && _cinemachineCameras.ContainsKey(Helper.CameraType.Zoomed)) {
-                    SwitchCamera(Helper.CameraType.Zoomed);
-                }
-                else if (_cinemachineCameras.ContainsKey(Helper.CameraType.Default)) {
-                    SwitchCamera(Helper.CameraType.Default);
-                }
-            }
-        }
         
         public CinemachineCamera GetCurrentCamera() => _currentCinemachineCamera;
         public float GetCurrentCameraZoom() =>
