@@ -1,10 +1,10 @@
-﻿using CharacterController = SpellBound.Controller.PlayerController.CharacterController;
+﻿using SpellBound.Controller.PlayerController;
 using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public abstract class BaseLocoStateSO : ScriptableObject {
         protected LocoStateMachine StateMachine;
-        protected CharacterController Cc => StateMachine?.CharacterController;
+        protected CharController Cc => StateMachine?.CharController;
         public string uid;
         public string assetName;
         

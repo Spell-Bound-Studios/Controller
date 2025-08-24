@@ -43,9 +43,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void ExitStateLogic() {
             if (_jumpMaxRoutine != null)
-                StateMachine.CharacterController.StopCoroutine(_jumpMaxRoutine);
+                StateMachine.CharController.StopCoroutine(_jumpMaxRoutine);
 
-            Cc.JumpFlag = false;
+            Cc.jumpFlag = false;
         }
         
         private IEnumerator JumpMinRoutine() {

@@ -11,7 +11,7 @@ namespace SpellBound.Controller.PlayerController {
     /// Input and stats meet here to inform supporting members.
     /// </summary>
     [RequireComponent(typeof(RigidbodyMover))]
-    public class CharacterController : MonoBehaviour {
+    public class CharController : MonoBehaviour {
         [Header("References")]
         [SerializeField] public PlayerInputActionsSO input;
         [SerializeField] private Transform referenceTransform;
@@ -55,18 +55,10 @@ namespace SpellBound.Controller.PlayerController {
         private Vector3 _planarUp;
         private float _currentYRotation;
         
-        
-
-        
-        
         // State Polling --Condensed Value Types--
-        
-        public float HorizontalSpeed;
-        public bool JumpFlag;
+        public float horizontalSpeed;
+        public bool jumpFlag;
         public bool GroundFlag => _rigidbodyMover.IsGrounded();
-
-        
-        
         
         private void Awake() {
             _tr = transform;
@@ -77,10 +69,11 @@ namespace SpellBound.Controller.PlayerController {
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
 
-            if (animator == null) {
-                Debug.LogError("PlayerController: Drag and drop animator component in.", this);
-                animator = GetComponentInChildren<NetworkAnimator>();
-            }
+            if (animator != null) 
+                return;
+
+            Debug.LogError("PlayerController: Drag and drop animator component in.", this);
+            animator = GetComponentInChildren<NetworkAnimator>();
         }
 
         private void OnEnable() {
@@ -134,7 +127,7 @@ namespace SpellBound.Controller.PlayerController {
             _rigidbodyMover.SetVelocity(velocity);
             
             _velocity = velocity;
-            HorizontalSpeed = Vector3.ProjectOnPlane(_velocity, _planarUp).magnitude;
+            horizontalSpeed = Vector3.ProjectOnPlane(_velocity, _planarUp).magnitude;
         }
 
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
@@ -190,7 +183,7 @@ namespace SpellBound.Controller.PlayerController {
             if (!ResourceCheck())
                 return;
             
-            JumpFlag = true;
+            jumpFlag = true;
         }
 
         public void Jump() {

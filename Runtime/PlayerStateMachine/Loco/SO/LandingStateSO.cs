@@ -14,7 +14,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Landing);
             
             // Coroutines must yield before state checks begin.
-            _landRoutine = StateMachine.CharacterController.StartCoroutine(LandRoutine());
+            _landRoutine = StateMachine.CharController.StartCoroutine(LandRoutine());
             
             Debug.Log("LandingStateSO EnterStateLogic");
         }

@@ -26,10 +26,7 @@ namespace SpellBound.Controller.PlayerController {
         private float _baseSensorRange;
         private Vector3 _currentGroundAdjustmentVelocity;
         private int _currentLayer;
-        
-        
-        
-        [SerializeField] private float _colliderHalfSize;
+        private float _colliderHalfSize;
 
         private void Awake() {
             _tr = transform;

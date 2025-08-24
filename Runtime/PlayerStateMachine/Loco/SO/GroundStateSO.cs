@@ -13,7 +13,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void UpdateStateLogic() {
             CheckSwitchStateLogic();
-            StateHelper.NotifyLocoAnimationSpeedChange(Cc.HorizontalSpeed);
+            StateHelper.NotifyLocoAnimationSpeedChange(Cc.horizontalSpeed);
         }
         
         public override void FixedUpdateStateLogic() {
@@ -24,7 +24,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (!Cc.GroundFlag)
                 StateMachine.ChangeState(StateMachine.FallingStateDriver);
             
-            if (Cc.JumpFlag)
+            if (Cc.jumpFlag)
                 StateMachine.ChangeState(StateMachine.JumpingStateDriver);
         }
         
