@@ -1140,7 +1140,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1.8
+  m_Height: 1.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.89, z: 0}
 --- !u!54 &7246171158203664198
@@ -1184,9 +1184,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stepHeightRatio: 0.1
   colliderHeight: 2
-  colliderThickness: 1
+  colliderDiameter: 1
   colliderOffset: {x: 0, y: 0.4, z: 0}
   isDebugging: 1
+  _colliderHalfSize: 0
 --- !u!114 &3871644982249761375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1214,6 +1215,8 @@ MonoBehaviour:
   slopeLimit: 30
   useLocalMomentum: 0
   currentLocoState: {fileID: 0}
+  HorizontalSpeed: 0
+  JumpFlag: 0
 --- !u!114 &3629991972403404627
 MonoBehaviour:
   m_ObjectHideFlags: 0

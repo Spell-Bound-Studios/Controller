@@ -5,7 +5,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "LandingState", menuName = "Spellbound/LocoStates/LandingState")]
     public class LandingStateSO : BaseLocoStateSO {
         // Landing Thresholds
-        private readonly WaitForSeconds _landingDuration = new(0.25f);
+        private readonly WaitForSeconds _landingDuration = new(0.15f);
         private Coroutine _landRoutine;
         
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
@@ -15,6 +15,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             
             // Coroutines must yield before state checks begin.
             _landRoutine = StateMachine.CharacterController.StartCoroutine(LandRoutine());
+            
+            Debug.Log("LandingStateSO EnterStateLogic");
         }
         
         public override void UpdateStateLogic() {
@@ -22,7 +24,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-
+            Cc.HandleHorizontalVelocityInput();
         }
         
         public override void CheckSwitchStateLogic() {

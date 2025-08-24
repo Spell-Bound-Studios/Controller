@@ -30,9 +30,9 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float gravity = 30f;
         [SerializeField] private float slideGravity = 5f;
         [SerializeField] private float slopeLimit = 30f;
-        // This will be momentum given by your inputs.
-        [SerializeField] private bool useLocalMomentum;
 
+        private const float RotationFallOffAngle = 90f;
+        
         private RigidbodyMover _rigidbodyMover;
         private LocoStateMachine _locoStateMachine;
         private ActionStateMachine _actionStateMachine;
@@ -55,7 +55,7 @@ namespace SpellBound.Controller.PlayerController {
         private Vector3 _planarUp;
         private float _currentYRotation;
         
-        private const float FallOffAngle = 90f;
+        
 
         
         
@@ -130,18 +130,14 @@ namespace SpellBound.Controller.PlayerController {
             var velocity = CalculateMovementVelocity();
             velocity.y += _rigidbodyMover.GetRigidbodyVelocity().y;
 
-            _rigidbodyMover.SetExtendSensorRange(true);
+            _rigidbodyMover.SetExtendSensorRange(false);
             _rigidbodyMover.SetVelocity(velocity);
             
             _velocity = velocity;
-            HorizontalSpeed = _velocity.magnitude;
+            HorizontalSpeed = Vector3.ProjectOnPlane(_velocity, _planarUp).magnitude;
         }
 
-        public void HandleMomentum() {
-            
-        }
-
-        public void HandleCharacterTurnTowardsHorizontalVelocity() {
+        private void HandleCharacterTurnTowardsHorizontalVelocity() {
             // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
             var velocity = Vector3.ProjectOnPlane(_velocity, _planarUp);
             
@@ -154,7 +150,7 @@ namespace SpellBound.Controller.PlayerController {
             var angleDiff = Helper.GetAngle(_tr.forward, desiredFacingDir, _planarUp);
 
             var step = Mathf.Sign(angleDiff) *
-                       Mathf.InverseLerp(0f, FallOffAngle, Mathf.Abs(angleDiff)) *
+                       Mathf.InverseLerp(0f, RotationFallOffAngle, Mathf.Abs(angleDiff)) *
                        Time.deltaTime * turnTowardsInputSpeed;
             
             _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
@@ -195,6 +191,9 @@ namespace SpellBound.Controller.PlayerController {
                 return;
             
             JumpFlag = true;
+        }
+
+        public void Jump() {
             _rigidbodyMover.ApplyJumpForce(10f);
         }
 

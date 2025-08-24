@@ -10,7 +10,7 @@ namespace SpellBound.Controller.PlayerController {
         [Header("Collider Settings:")] 
         [SerializeField, Range(0f, 1f)] private float stepHeightRatio = 0.1f;
         [SerializeField] private float colliderHeight = 2f;
-        [SerializeField] private float colliderThickness = 1f;
+        [SerializeField] private float colliderDiameter = 1f;
         [SerializeField] private Vector3 colliderOffset = new(0, .4f, 0);
 
         [Header("Sensor Settings:")]
@@ -85,7 +85,7 @@ namespace SpellBound.Controller.PlayerController {
             // Difference between where the player is and where they should be: the middle.
             var distanceToGo = middle - distance;
             // Velocity needs to move the player to the correct position.
-            _currentGroundAdjustmentVelocity = _tr.up * (distanceToGo / Time.fixedDeltaTime);
+            //_currentGroundAdjustmentVelocity = _tr.up * (distanceToGo / Time.fixedDeltaTime);
         }
 
         public bool IsGrounded() => _isGrounded;
@@ -108,7 +108,7 @@ namespace SpellBound.Controller.PlayerController {
                 Setup();
 
             _collider.height = colliderHeight * (1f - stepHeightRatio);
-            _collider.radius = colliderThickness * 0.5f;
+            _collider.radius = colliderDiameter * 0.5f;
             _collider.center = colliderOffset * 
                                colliderHeight + 
                                new Vector3(0f, stepHeightRatio * _collider.height * 0.5f, 0f);
@@ -128,9 +128,11 @@ namespace SpellBound.Controller.PlayerController {
             RecalculateSensorLayerMask();
 
             // Prevent clipping issues when the sensor range is calculated.
-            const float offsetProtrusion = 0.005f;
-            _colliderHalfSize = _collider.height * stepHeightRatio * 0.5f * _tr.localScale.y;
-            _baseSensorRange = _colliderHalfSize + offsetProtrusion;
+            const float offsetProtrusion = 0.001f;
+            
+            var length = colliderHeight * (1f - stepHeightRatio) * 0.5f + colliderHeight * stepHeightRatio;
+            _baseSensorRange = length * (1f + offsetProtrusion) * _tr.localScale.x;
+            _raycastSensor.CastLength = length * _tr.localScale.x;
         }
 
         private void RecalculateSensorLayerMask() {

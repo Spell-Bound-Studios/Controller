@@ -10,13 +10,14 @@ namespace SpellBound.Controller.PlayerStateMachine {
         private Coroutine _jumpMaxRoutine;
         
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
-            Debug.Log("SUP");
             StateMachine = stateMachine;
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Jumping);
             
-            _jumpMinRoutine = StateMachine.CharacterController.StartCoroutine(JumpMinRoutine());
-            _jumpMaxRoutine = StateMachine.CharacterController.StartCoroutine(JumpMaxRoutine());
+            _jumpMinRoutine = Cc.StartCoroutine(JumpMinRoutine());
+            _jumpMaxRoutine = Cc.StartCoroutine(JumpMaxRoutine());
+            Debug.Log("Jump State Enter");
+            Cc.Jump();
         }
         
         public override void UpdateStateLogic() {
@@ -24,7 +25,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-
+            Cc.HandleHorizontalVelocityInput();
         }
         
         public override void CheckSwitchStateLogic() {

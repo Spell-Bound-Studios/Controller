@@ -7,6 +7,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateMachine = stateMachine;
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Grounded);
+            
+            Debug.Log("GroundStateSO EnterStateLogic");
         }
         
         public override void UpdateStateLogic() {
