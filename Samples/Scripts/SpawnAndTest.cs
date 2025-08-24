@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace SpellBound.Controller.Examples {
+namespace SpellBound.Controller.Samples {
     public class SpawnAndTest : MonoBehaviour {
         [SerializeField] private GameObject playerPrefab;
         [SerializeField] private Button spawnPlayerBtn;
