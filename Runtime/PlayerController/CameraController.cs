@@ -49,6 +49,9 @@ namespace SpellBound.Controller.PlayerController {
             if (!_brain)
                 _brain = FindFirstObjectByType<CinemachineBrain>();
             
+            if (!_brain)
+                Debug.LogError("No brain found. CinemachineBrain missing from scene.", this);
+            
             _currentXAngle = _tr.localRotation.eulerAngles.x;
             _currentYAngle = _tr.localRotation.eulerAngles.y;
             
@@ -119,8 +122,6 @@ namespace SpellBound.Controller.PlayerController {
         /// </summary>
         private void CameraSetup() {
             _brain.WorldUpOverride = cameraPivot;
-            
-            _cameraRig = _brain.ActiveVirtualCamera as CameraRigManager;
 
             if (_cameraRig == null) {
                 Debug.LogError("Camera rig is null and doesn't appear to be in scene.");
