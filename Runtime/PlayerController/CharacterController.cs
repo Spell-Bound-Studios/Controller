@@ -130,7 +130,7 @@ namespace SpellBound.Controller.PlayerController {
             var velocity = CalculateMovementVelocity();
             velocity.y += _rigidbodyMover.GetRigidbodyVelocity().y;
 
-            _rigidbodyMover.SetExtendSensorRange(false);
+            //_rigidbodyMover.SetExtendSensorRange(false);
             _rigidbodyMover.SetVelocity(velocity);
             
             _velocity = velocity;
@@ -194,7 +194,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void Jump() {
-            _rigidbodyMover.ApplyJumpForce(10f);
+            _rigidbodyMover.ApplyJumpForce(5f);
         }
 
         private bool ResourceCheck() {

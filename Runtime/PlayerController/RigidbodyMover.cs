@@ -15,7 +15,7 @@ namespace SpellBound.Controller.PlayerController {
 
         [Header("Sensor Settings:")]
         [SerializeField] private bool isDebugging;
-        private bool _isUsingExtendedSensorRange = true;
+        private bool _isUsingExtendedSensorRange;
 
         private Transform _tr;
         private Rigidbody _rb;
@@ -58,8 +58,6 @@ namespace SpellBound.Controller.PlayerController {
             _raycastSensor.CastLength = _isUsingExtendedSensorRange
                     ? _baseSensorRange + colliderHeight * _tr.localScale.x * stepHeightRatio
                     : _baseSensorRange;
-            
-            Debug.Log(_baseSensorRange);
             
             _raycastSensor.SphereRadius = _collider.radius;
             _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
