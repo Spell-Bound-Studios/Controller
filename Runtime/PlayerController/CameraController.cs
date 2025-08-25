@@ -55,6 +55,16 @@ namespace SpellBound.Controller.PlayerController {
             _currentXAngle = _tr.localRotation.eulerAngles.x;
             _currentYAngle = _tr.localRotation.eulerAngles.y;
             
+            if (CameraRigManager.Instance == null)
+                Debug.LogError("CameraController has a dependency on CameraRigManager. Please ensure the camera rig" +
+                               "prefab is in the scene or the CameraRigManager script is on your custom camera rig.", 
+                        this);
+            
+            if (SyncTransform.Instance == null)
+                Debug.LogError("CameraController has a dependency on SyncTransform. Please ensure the CameraFollow" +
+                               "prefab is in the scene or the SyncTransform script is on your custom object.", 
+                        this);
+            
             _cameraRig = CameraRigManager.Instance;
         }
 
@@ -121,6 +131,11 @@ namespace SpellBound.Controller.PlayerController {
         /// Sets our cameraRig tracking target.
         /// </summary>
         private void CameraSetup() {
+            SyncTransform.Instance.SetFollowTransform(gameObject.transform);
+
+            if (!cameraPivot)
+                cameraPivot = SyncTransform.Instance.transform;
+            
             _brain.WorldUpOverride = cameraPivot;
 
             if (_cameraRig == null) {

@@ -200,7 +200,7 @@ namespace SpellBound.Controller.PlayerController {
                     _rigidbodyMover.SetSensorRange(1);
                     break;
                 case Helper.RaycastLength.Extended:
-                    _rigidbodyMover.SetSensorRange(1.2f);
+                    _rigidbodyMover.SetSensorRange(1.1f);
                     break;
                 case Helper.RaycastLength.Retracted:
                     _rigidbodyMover.SetSensorRange(0.5f);
