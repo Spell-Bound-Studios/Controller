@@ -1,4 +1,7 @@
-﻿namespace SpellBound.Controller.PlayerStateMachine {
+﻿using UnityEngine;
+
+namespace SpellBound.Controller.PlayerStateMachine {
+    [CreateAssetMenu(fileName = "ReadyState", menuName = "Spellbound/ActionStates/ReadyState")]
     public class ReadyStateSO : BaseActionStateSO {
         public override void EnterStateLogic(ActionStateMachine stateMachine) {
             StateMachine = stateMachine;

@@ -10,13 +10,12 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
+            
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Landing);
             
             // Coroutines must yield before state checks begin.
             _landRoutine = StateMachine.CharController.StartCoroutine(LandRoutine());
-            
-            Debug.Log("LandingStateSO EnterStateLogic");
         }
         
         public override void UpdateStateLogic() {

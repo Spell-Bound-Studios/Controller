@@ -5,10 +5,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
     public class GroundStateSO : BaseLocoStateSO {
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
+            
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Grounded);
-            
-            Debug.Log("GroundStateSO EnterStateLogic");
         }
         
         public override void UpdateStateLogic() {

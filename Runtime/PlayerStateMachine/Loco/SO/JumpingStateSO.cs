@@ -11,12 +11,13 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
+            
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Jumping);
             
             _jumpMinRoutine = Cc.StartCoroutine(JumpMinRoutine());
             _jumpMaxRoutine = Cc.StartCoroutine(JumpMaxRoutine());
-            Debug.Log("Jump State Enter");
+
             Cc.Jump();
         }
         

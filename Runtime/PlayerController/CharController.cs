@@ -41,7 +41,7 @@ namespace SpellBound.Controller.PlayerController {
         
         // Visuals - never used.
         [SerializeField] private BaseLocoStateSO currentLocoState;
-        //[SerializeField] private BaseStateSO baseLocoStateSO;
+        [SerializeField] private BaseActionStateSO currentActionState;
 
         private readonly List<string> _defaultLocoStatesList = new() {
                 StateHelper.DefaultGroundStateSO,
@@ -83,6 +83,7 @@ namespace SpellBound.Controller.PlayerController {
 
         private void OnEnable() {
             StateHelper.OnLocoStateChange += HandleLocoStateChanged;
+            StateHelper.OnActionStateChange += HandleActionStateChanged;
 
             if (input) {
                 input.OnJumpInput += HandleJumpPressed;
@@ -91,6 +92,7 @@ namespace SpellBound.Controller.PlayerController {
 
         private void OnDisable() {
             StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
+            StateHelper.OnActionStateChange -= HandleActionStateChanged;
 
             _animationController?.DisposeEvents();
             
@@ -179,6 +181,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void HandleLocoStateChanged(BaseLocoStateSO state) => currentLocoState = state;
+        private void HandleActionStateChanged(BaseActionStateSO state) => currentActionState = state;
         
         private void HandleJumpPressed() {
             if (!_rigidbodyMover.IsGrounded())

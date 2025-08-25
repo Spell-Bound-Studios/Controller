@@ -6,10 +6,10 @@ namespace SpellBound.Controller.PlayerStateMachine {
     public class FallingStateSO : BaseLocoStateSO {
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
+            
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Falling);
             
-            Debug.Log("FallingStateSO EnterStateLogic");
             Cc.SetSensorRange(ControllerHelper.RaycastLength.Extended);
         }
         
