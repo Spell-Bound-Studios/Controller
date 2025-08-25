@@ -49,6 +49,10 @@ namespace SpellBound.Controller.PlayerController {
                 StateHelper.DefaultJumpingStateSO,
                 StateHelper.DefaultLandingStateSO,
         };
+
+        private readonly List<string> _defaultActionStatesList = new() {
+                StateHelper.DefaultReadyStateSO
+        };
         
         private Transform _tr;
         private Vector3 _momentum;
@@ -102,7 +106,7 @@ namespace SpellBound.Controller.PlayerController {
             _animationController = new AnimationController(animator);
             
             _locoStateMachine = new LocoStateMachine(this, _defaultLocoStatesList);
-            _actionStateMachine = new ActionStateMachine();
+            _actionStateMachine = new ActionStateMachine(this, _defaultActionStatesList);
         }
 
         private void Update() {

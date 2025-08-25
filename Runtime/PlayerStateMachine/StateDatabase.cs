@@ -5,6 +5,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
     public class StateDatabase : MonoBehaviour {
         public static StateDatabase Instance;
         private readonly Dictionary<string, BaseLocoStateSO> _locoStatePresets = new();
+        private readonly Dictionary<string, BaseActionStateSO> _actionStatePresets = new();
 
         private void Awake() {
             if (Instance != null && Instance != this) {
@@ -20,6 +21,13 @@ namespace SpellBound.Controller.PlayerStateMachine {
                     Debug.LogError($"Duplicate uid found {preset.uid}", this);
                 }
             }
+            
+            var actionPresets = Resources.LoadAll<BaseActionStateSO>("");
+            foreach (var preset in actionPresets) {
+                if (!_actionStatePresets.TryAdd(preset.assetName, preset)) {
+                    Debug.LogError($"Duplicate uid found {preset.uid}", this);
+                }
+            }
         }
 
         /// <summary>
@@ -29,6 +37,17 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public bool TryGetLocoState(string displayName, out BaseLocoStateSO preset) {
             if (!string.IsNullOrEmpty(displayName)) {
                 return _locoStatePresets.TryGetValue(displayName, out preset);
+            }
+            
+            Debug.LogError($"Could not find state with name {displayName}", this);
+            
+            preset = null;
+            return false;
+        }
+        
+        public bool TryGetActionState(string displayName, out BaseActionStateSO preset) {
+            if (!string.IsNullOrEmpty(displayName)) {
+                return _actionStatePresets.TryGetValue(displayName, out preset);
             }
             
             Debug.LogError($"Could not find state with name {displayName}", this);

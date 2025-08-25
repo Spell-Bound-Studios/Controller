@@ -1,11 +1,7 @@
 ﻿namespace SpellBound.Controller.PlayerStateMachine {
-    public abstract class BaseActionState {
-        protected ActionStateMachine StateMachine;
-
-        protected BaseActionState(ActionStateMachine actionStateMachine) {
-            StateMachine = actionStateMachine;
-        }
-        
+    public abstract class BaseActionStateDriver {
+        protected readonly ActionStateMachine StateMachine;
+        protected BaseActionStateDriver(ActionStateMachine actionStateMachine) => StateMachine = actionStateMachine;
         public abstract void EnterState();
         public abstract void UpdateState();
         public abstract void FixedUpdateState();

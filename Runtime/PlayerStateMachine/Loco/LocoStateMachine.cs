@@ -28,7 +28,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             LandingStateDriver = new LandingStateDriver(this);
             JumpingStateDriver =  new JumpingStateDriver(this);
             
-            var defaultStates = StateHelper.GetDefaultStatesFromDB(defaultStatesList);
+            var defaultStates = StateHelper.GetDefaultLocoStatesFromDB(defaultStatesList);
 
             foreach (var state in defaultStates) {
                 switch (state) {

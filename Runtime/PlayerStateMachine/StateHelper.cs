@@ -5,6 +5,7 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     public static class StateHelper {
         public static event Action<BaseLocoStateSO> OnLocoStateChange = delegate { };
+        public static event Action<BaseActionStateSO> OnActionStateChange = delegate { };
         public static event Action<States> OnStateChanged = delegate { };
         public static event Action<float> OnAnimationSpeedChanged = delegate { };
         
@@ -12,6 +13,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public const string DefaultFallingStateSO = "FallingState";
         public const string DefaultLandingStateSO = "LandingState";
         public const string DefaultJumpingStateSO = "JumpingState";
+
+        public const string DefaultReadyStateSO = "ReadyState";
         
         public static readonly Dictionary<States, int> AnimationStateDict;
 
@@ -38,7 +41,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             };
         }
         
-        public static List<BaseLocoStateSO> GetDefaultStatesFromDB(List<string> stateName) {
+        public static List<BaseLocoStateSO> GetDefaultLocoStatesFromDB(List<string> stateName) {
             var states = new List<BaseLocoStateSO>();
             
             foreach (var s in stateName) {
@@ -51,9 +54,27 @@ namespace SpellBound.Controller.PlayerStateMachine {
             }
             return states;
         }
+        
+        public static List<BaseActionStateSO> GetDefaultActionStatesFromDB(List<string> stateName) {
+            var states = new List<BaseActionStateSO>();
+            
+            foreach (var s in stateName) {
+                if (!StateDatabase.Instance.TryGetActionState(s, out var preset)) {
+                    Debug.LogError($"No action state with name {s}.");
+                    return null;
+                }
+
+                states.Add(preset);
+            }
+            return states;
+        }
 
         public static void NotifyLocoStateChange(BaseLocoStateSO state) => OnLocoStateChange.Invoke(state);
         public static void NotifyLocoAnimationChange(States state) => OnStateChanged.Invoke(state);
         public static void NotifyLocoAnimationSpeedChange(float speed) => OnAnimationSpeedChanged.Invoke(speed);
+        
+        public static void NotifyActionStateChange(BaseActionStateSO state) => OnActionStateChange.Invoke(state);
+        public static void NotifyActionAnimationChange(States state) => OnStateChanged.Invoke(state);
+        public static void NotifyActionAnimationSpeedChange(float speed) => OnAnimationSpeedChanged.Invoke(speed);
     }
 }
