@@ -1,0 +1,64 @@
+﻿using SpellBound.Controller.PlayerController;
+using UnityEngine;
+
+namespace SpellBound.Controller.PlayerStateMachine {
+    public abstract class BaseActionStateSO : ScriptableObject {
+        protected ActionStateMachine StateMachine;
+        protected CharController Cc => StateMachine?.CharController;
+        public string uid;
+        public string assetName;
+        
+#if UNITY_EDITOR
+        /// <summary>
+        /// Creates guids based on an asset path for us when something gets updated.
+        /// </summary>
+        private void OnValidate() {
+            var assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
+            var newName = name;
+            
+            if (assetPath == null) {
+                uid = string.Empty;
+                return;
+            }
+
+            if (assetName != newName) {
+                assetName = newName;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+            
+            var assetGuid = UnityEditor.AssetDatabase.GUIDFromAssetPath(assetPath).ToString();
+            if (string.IsNullOrEmpty(uid) || uid != assetGuid) {
+                uid = assetGuid;
+            }
+        }
+#endif
+        
+        /// <summary>
+        /// This method is called when the state is first entered.
+        /// </summary>
+        public abstract void EnterStateLogic(ActionStateMachine stateMachine);
+
+        /// <summary>
+        /// This method is called every frame while the state is active.
+        /// </summary>
+        public abstract void UpdateStateLogic();
+
+        /// <summary>
+        /// This method is called every fixed frame rate frame while the state is active.
+        /// </summary>
+        public abstract void FixedUpdateStateLogic();
+
+        /// <summary>
+        /// This method checks if the state should transition to another state and
+        /// is called in EnterStateLogic in the specific SO.
+        /// Think of this as a "What rips the player out of X state".
+        /// i.e. an interrupt, movement, etc.
+        /// </summary>
+        public abstract void CheckSwitchStateLogic();
+
+        /// <summary>
+        /// This method is called when the state is exited.
+        /// </summary>
+        public abstract void ExitStateLogic();
+    }
+}
