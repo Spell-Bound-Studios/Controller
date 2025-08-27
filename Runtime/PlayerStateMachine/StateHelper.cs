@@ -15,6 +15,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public const string DefaultJumpingStateSO = "JumpingState";
 
         public const string DefaultReadyStateSO = "ReadyState";
+        public const string DefaultGCDStateSO = "GCDState";
         
         public static readonly Dictionary<States, int> AnimationStateDict;
 

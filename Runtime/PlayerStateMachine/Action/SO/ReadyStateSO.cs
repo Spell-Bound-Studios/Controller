@@ -5,6 +5,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
     public class ReadyStateSO : BaseActionStateSO {
         public override void EnterStateLogic(ActionStateMachine stateMachine) {
             StateMachine = stateMachine;
+            
             StateHelper.NotifyActionStateChange(this);
         }
         
@@ -12,16 +13,16 @@ namespace SpellBound.Controller.PlayerStateMachine {
             CheckSwitchStateLogic();
         }
         
-        public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
-        }
+        public override void FixedUpdateStateLogic() { }
         
         public override void CheckSwitchStateLogic() {
-
+            if (Cc.hotKeyOnePressed)
+                StateMachine.ChangeState(StateMachine.GCDStateDriver);
+            
+            if (Cc.interactKeyPressed)
+                StateMachine.ChangeState(StateMachine.GCDStateDriver);
         }
         
-        public override void ExitStateLogic() {
-            
-        }
+        public override void ExitStateLogic() { }
     }
 }

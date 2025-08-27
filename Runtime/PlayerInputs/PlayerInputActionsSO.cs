@@ -12,6 +12,9 @@ namespace SpellBound.Controller.PlayerInputs {
         public event Action<Vector2> OnLookInput = delegate { };
         public event Action<Vector2> OnMouseWheelInput = delegate { };
         public event Action OnJumpInput = delegate { };
+        public event Action OnInteractPressed = delegate { };
+        public event Action OnInventoryPressed = delegate { };
+        public event Action OnHotkeyOnePressed = delegate { };
         
         
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
@@ -42,14 +45,26 @@ namespace SpellBound.Controller.PlayerInputs {
         public void OnRightClick(InputAction.CallbackContext context) { }
         public void OnLeftClick(InputAction.CallbackContext context) { }
         public void OnSprint(InputAction.CallbackContext context) { }
-        public void OnHotkeyOne(InputAction.CallbackContext context) { }
+
+        public void OnHotkeyOne(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnHotkeyOnePressed.Invoke();
+        }
         public void OnHotkeyTwo(InputAction.CallbackContext context) { }
         public void OnHotkeyThree(InputAction.CallbackContext context) { }
         public void OnHotkeyFour(InputAction.CallbackContext context) { }
         public void OnCharacterMenu(InputAction.CallbackContext context) { }
         public void OnSettingsMenu(InputAction.CallbackContext context) { }
-        public void OnInventory(InputAction.CallbackContext context) { }
-        public void OnInteract(InputAction.CallbackContext context) { }
+
+        public void OnInventory(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnInventoryPressed.Invoke();
+        }
+
+        public void OnInteract(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnInteractPressed.Invoke();
+        }
 
         public void OnLookDirection(InputAction.CallbackContext context) {
             OnLookInput.Invoke(context.ReadValue<Vector2>());

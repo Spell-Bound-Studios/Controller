@@ -39,6 +39,22 @@ namespace SpellBound.Controller.PlayerController {
         
         private void Awake() {
             _tr = transform;
+        }
+
+        private void OnEnable() {
+            if (_cameraRig)
+                input.OnMouseWheelInput += ZoomCamera;
+        }
+
+        private void OnDisable() {
+            if (_cameraRig)
+                input.OnMouseWheelInput -= ZoomCamera;
+        }
+
+        private void Start() {
+            Cursor.lockState = cursorLockOnStart
+                    ? CursorLockMode.Locked
+                    : CursorLockMode.None;
             
             if (input == null)
                 Debug.LogError("CameraController: Drag and drop an input SO in.", this);
@@ -66,24 +82,8 @@ namespace SpellBound.Controller.PlayerController {
                         this);
             
             _cameraRig = CameraRigManager.Instance;
-        }
-
-        private void OnEnable() {
+            
             CameraSetup();
-
-            if (_cameraRig)
-                input.OnMouseWheelInput += ZoomCamera;
-        }
-
-        private void OnDisable() {
-            if (_cameraRig)
-                input.OnMouseWheelInput -= ZoomCamera;
-        }
-
-        private void Start() {
-            Cursor.lockState = cursorLockOnStart
-                    ? CursorLockMode.Locked
-                    : CursorLockMode.None;
         }
 
         private void Update() {

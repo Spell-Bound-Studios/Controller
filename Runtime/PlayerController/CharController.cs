@@ -5,6 +5,7 @@ using UnityEngine;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.ManagersAndStatics;
 using SpellBound.Controller.PlayerStateMachine;
+using SpellBound.Core;
 using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
 namespace SpellBound.Controller.PlayerController {
@@ -51,7 +52,8 @@ namespace SpellBound.Controller.PlayerController {
         };
 
         private readonly List<string> _defaultActionStatesList = new() {
-                StateHelper.DefaultReadyStateSO
+                StateHelper.DefaultReadyStateSO,
+                StateHelper.DefaultGCDStateSO
         };
         
         private Transform _tr;
@@ -66,6 +68,7 @@ namespace SpellBound.Controller.PlayerController {
         public bool GroundFlag => _rigidbodyMover.IsGrounded();
         
         private void Awake() {
+            Debug.Log("Char Controller awake");
             _tr = transform;
             _planarUp = _tr.up;
             
@@ -87,7 +90,11 @@ namespace SpellBound.Controller.PlayerController {
 
             if (input) {
                 input.OnJumpInput += HandleJumpPressed;
+                input.OnInteractPressed += HandleInteractPressed;
+                input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
             }
+            
+            RaycastSystem.OnRaycastHitObjPreset += HandleObjectFromWorld;
         }
 
         private void OnDisable() {
@@ -98,7 +105,11 @@ namespace SpellBound.Controller.PlayerController {
             
             if (input) {
                 input.OnJumpInput -= HandleJumpPressed;
+                input.OnInteractPressed -= HandleInteractPressed;
+                input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
             }
+            
+            RaycastSystem.OnRaycastHitObjPreset -= HandleObjectFromWorld;
         }
 
         private void Start() {
@@ -113,10 +124,12 @@ namespace SpellBound.Controller.PlayerController {
 
         private void Update() {
             _locoStateMachine.CurrentLocoStateDriver.UpdateState();
+            _actionStateMachine.CurrentActionStateDriver.UpdateState();
         }
         
         private void FixedUpdate() {
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
+            _actionStateMachine.CurrentActionStateDriver.FixedUpdateState();
         }
 
         private void LateUpdate() {
@@ -150,7 +163,7 @@ namespace SpellBound.Controller.PlayerController {
 
             var step = Mathf.Sign(angleDiff) *
                        Mathf.InverseLerp(0f, RotationFallOffAngle, Mathf.Abs(angleDiff)) *
-                       Time.deltaTime * turnTowardsInputSpeed;
+                       Time.unscaledDeltaTime * turnTowardsInputSpeed;
             
             _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
             _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
@@ -215,6 +228,40 @@ namespace SpellBound.Controller.PlayerController {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
             }
+        }
+        
+        public bool hotKeyOnePressed;
+        public bool interactKeyPressed;
+        private ObjectPreset _objectPresetHovering;
+
+        private void HandleInteractPressed() {
+            if (interactKeyPressed)
+                return;
+            
+            if (_objectPresetHovering == null)
+                return;
+            
+            interactKeyPressed = true;
+        }
+        
+        private void HandleObjectFromWorld(ObjectPreset op) {
+            _objectPresetHovering = op;
+        }
+
+        private void HandleHotkeyOnePressed() {
+            if (hotKeyOnePressed)
+                return;
+            
+            if (!Physics.Raycast(
+                        referenceTransform.position,
+                        input.LookDirection,
+                        out var hit,
+                        10f,
+                        1 << 6,
+                        QueryTriggerInteraction.Ignore))
+                return;
+
+            hotKeyOnePressed = true;
         }
     }
 }

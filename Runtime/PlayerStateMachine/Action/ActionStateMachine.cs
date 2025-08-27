@@ -11,10 +11,14 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public ReadyStateDriver ReadyStateDriver;
         public ReadyStateSO ReadyState;
         
+        public GCDStateDriver GCDStateDriver;
+        public GCDStateSO GCDState;
+        
         public ActionStateMachine(CharController cc, List<string> defaultStatesList) {
             CharController = cc;
             
             ReadyStateDriver = new ReadyStateDriver(this);
+            GCDStateDriver = new GCDStateDriver(this);
             
             var defaultStates = StateHelper.GetDefaultActionStatesFromDB(defaultStatesList);
 
@@ -22,6 +26,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
                 switch (state) {
                     case ReadyStateSO rso:
                         ReadyState = rso;
+                        break;
+                    case GCDStateSO gso:
+                        GCDState = gso;
                         break;
                 }
             }
