@@ -14,7 +14,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void EnterStateLogic(ActionStateMachine stateMachine) {
             StateMachine = stateMachine;
-            Debug.Log("Gcd entered.");
+
             StateHelper.NotifyActionStateChange(this);
             
             _gcdDelay = new WaitForSeconds(DefaultDelay);

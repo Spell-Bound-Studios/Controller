@@ -20,7 +20,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
                 StateMachine.ChangeState(StateMachine.GCDStateDriver);
             
             if (Cc.interactKeyPressed)
-                StateMachine.ChangeState(StateMachine.GCDStateDriver);
+                StateMachine.ChangeState(StateMachine.InteractStateDriver);
         }
         
         public override void ExitStateLogic() { }

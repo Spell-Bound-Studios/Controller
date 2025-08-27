@@ -53,7 +53,8 @@ namespace SpellBound.Controller.PlayerController {
 
         private readonly List<string> _defaultActionStatesList = new() {
                 StateHelper.DefaultReadyStateSO,
-                StateHelper.DefaultGCDStateSO
+                StateHelper.DefaultGCDStateSO,
+                StateHelper.DefaultInteractStateSO,
         };
         
         private Transform _tr;
@@ -68,7 +69,6 @@ namespace SpellBound.Controller.PlayerController {
         public bool GroundFlag => _rigidbodyMover.IsGrounded();
         
         private void Awake() {
-            Debug.Log("Char Controller awake");
             _tr = transform;
             _planarUp = _tr.up;
             
@@ -233,6 +233,7 @@ namespace SpellBound.Controller.PlayerController {
         public bool hotKeyOnePressed;
         public bool interactKeyPressed;
         private ObjectPreset _objectPresetHovering;
+        private RaycastHit _forwardRaycastHit;
 
         private void HandleInteractPressed() {
             if (interactKeyPressed)
@@ -240,13 +241,19 @@ namespace SpellBound.Controller.PlayerController {
             
             if (_objectPresetHovering == null)
                 return;
+
+            if (!_objectPresetHovering.TryGetModule(out InteractableModule interactable))
+                return;
+
+            /*if (!interactable.TryGetComponent<IInteractable>(out var target))
+                return;*/
+
+            //target.Interact(gameObject);
             
             interactKeyPressed = true;
         }
         
-        private void HandleObjectFromWorld(ObjectPreset op) {
-            _objectPresetHovering = op;
-        }
+        private void HandleObjectFromWorld(ObjectPreset op) => _objectPresetHovering = op;
 
         private void HandleHotkeyOnePressed() {
             if (hotKeyOnePressed)
