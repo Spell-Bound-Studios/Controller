@@ -85,6 +85,8 @@ namespace SpellBound.Controller.PlayerController {
         public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
         public void SetSensorRange(float multiplier) => _baseSensorRange *= multiplier;
         public Vector3 GetRigidbodyVelocity() => _rb.linearVelocity;
+        public Quaternion GetRigidbodyRotation() => _rb.rotation;
+        public void SetRigidbodyRotation(Quaternion rotation) => _rb.MoveRotation(rotation);
         
         private void Setup() {
             _rb = GetComponent<Rigidbody>();

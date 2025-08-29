@@ -130,9 +130,7 @@ namespace SpellBound.Controller.PlayerController {
         private void FixedUpdate() {
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
             _actionStateMachine.CurrentActionStateDriver.FixedUpdateState();
-        }
-
-        private void LateUpdate() {
+            
             HandleCharacterTurnTowardsHorizontalVelocity();
         }
 
@@ -150,23 +148,22 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
-            // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
-            var velocity = Vector3.ProjectOnPlane(_velocity, _planarUp);
-            
-            // Return early if we're not moving.
-            if (velocity.magnitude < 0.001f)
-                return;
-            
-            var desiredFacingDir = velocity.normalized;
-            
-            var angleDiff = Helper.GetAngle(_tr.forward, desiredFacingDir, _planarUp);
+            var planarVelocity = Vector3.ProjectOnPlane(
+                    _rigidbodyMover.GetRigidbodyVelocity(), _planarUp);
 
-            var step = Mathf.Sign(angleDiff) *
-                       Mathf.InverseLerp(0f, RotationFallOffAngle, Mathf.Abs(angleDiff)) *
-                       Time.unscaledDeltaTime * turnTowardsInputSpeed;
+            if (planarVelocity.sqrMagnitude < 1e-6f) 
+                return;
+
+            var desiredDir = planarVelocity.normalized;
+            var targetRotation = Quaternion.LookRotation(desiredDir, _planarUp);
+            var angleDiff = Quaternion.Angle(_rigidbodyMover.GetRigidbodyRotation(), targetRotation);
+            var speedFactor = Mathf.InverseLerp(0f, RotationFallOffAngle, angleDiff);
             
-            _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
-            _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
+            var maxStepDeg = turnTowardsInputSpeed * speedFactor * Time.fixedDeltaTime;
+
+            var nextRotation = Quaternion.RotateTowards(_rigidbodyMover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
+            
+            _rigidbodyMover.SetRigidbodyRotation(nextRotation);
         }
 
         /// <summary>
