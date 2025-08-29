@@ -151,7 +151,7 @@ namespace SpellBound.Controller.PlayerController {
             var planarVelocity = Vector3.ProjectOnPlane(
                     _rigidbodyMover.GetRigidbodyVelocity(), _planarUp);
 
-            if (planarVelocity.sqrMagnitude < 1e-6f) 
+            if (planarVelocity.sqrMagnitude < 1e-6f)
                 return;
 
             var desiredDir = planarVelocity.normalized;
