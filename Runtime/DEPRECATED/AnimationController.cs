@@ -1,4 +1,4 @@
-﻿using PurrNet;
+﻿/*using PurrNet;
 using SpellBound.PlayerStateMachine;
 using UnityEngine;
 
@@ -37,4 +37,4 @@ namespace SpellBound.Controller {
             _animator.SetFloat(Speed, blendValue);
         }
     }
-}
+}*/
