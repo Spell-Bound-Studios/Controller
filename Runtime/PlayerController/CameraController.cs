@@ -28,7 +28,8 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private bool cursorLockOnStart = true;
         [SerializeField] private PlayerInputActionsSO input;
         [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
-
+        [SerializeField] private bool cameraFollowMouse = true;
+        
         private CameraRigManager _cameraRig;
         private CinemachineBrain _brain;
         private Transform _tr;
@@ -97,6 +98,9 @@ namespace SpellBound.Controller.PlayerController {
         /// Rotates the camera based on the device horizontal and vertical input about the pivot.
         /// </summary>
         private void RotateCamera(float horizontalInput, float verticalInput) {
+            if (!cameraFollowMouse)
+                return;
+            
             var targetX = _currentXAngle + verticalInput  * cameraSpeed;
             var targetY = _currentYAngle + horizontalInput * cameraSpeed;
 
@@ -117,6 +121,9 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void ZoomCamera(Vector2 zoomInput) {
+            if (!cameraFollowMouse)
+                return;
+            
             var currentZoom = _cameraRig.GetCurrentCameraZoom();
 
             if (float.IsNaN(currentZoom))
@@ -145,5 +152,7 @@ namespace SpellBound.Controller.PlayerController {
 
             _cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
         }
+        
+        public void SetCameraFollowMouse(bool follow) => cameraFollowMouse = follow;
     }
 }

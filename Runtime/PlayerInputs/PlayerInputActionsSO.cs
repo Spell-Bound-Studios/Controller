@@ -8,8 +8,6 @@ namespace SpellBound.Controller.PlayerInputs {
     public class PlayerInputActionsSO : ScriptableObject, IPlayerInputActions {
         private InputActions _inputActions;
         
-        public event Action<Vector2> OnMoveInput = delegate { };
-        public event Action<Vector2> OnLookInput = delegate { };
         public event Action<Vector2> OnMouseWheelInput = delegate { };
         public event Action OnJumpInput = delegate { };
         public event Action OnInteractPressed = delegate { };
@@ -35,9 +33,7 @@ namespace SpellBound.Controller.PlayerInputs {
             _inputActions.Disable();
         }
         
-        public void OnMovement(InputAction.CallbackContext context) {
-            OnMoveInput.Invoke(context.ReadValue<Vector2>());
-        }
+        public void OnMovement(InputAction.CallbackContext context) { }
 
         public void OnJump(InputAction.CallbackContext context) {
             if (context.performed)
@@ -72,9 +68,7 @@ namespace SpellBound.Controller.PlayerInputs {
                 OnInteractPressed.Invoke();
         }
 
-        public void OnLookDirection(InputAction.CallbackContext context) {
-            OnLookInput.Invoke(context.ReadValue<Vector2>());
-        }
+        public void OnLookDirection(InputAction.CallbackContext context) { }
 
         public void OnMouseWheel(InputAction.CallbackContext context) {
             OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
