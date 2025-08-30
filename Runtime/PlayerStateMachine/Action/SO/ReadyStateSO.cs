@@ -63,6 +63,10 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (physicsWorld.CollisionWorld.CastRay(rayInput, out var hitEcs)) {
                 Debug.Log($"[ECS] Raycast hit Entity: {hitEcs.Entity.Index} at position {hitEcs.Position}");
                 var sbb = SpellBoundSwapManager.InteractionSwap(hitEcs.Entity);
+
+                if (!sbb)
+                    return;
+                
                 if (sbb.TryGetComponent<IInteractable>(out var swappedTarget)) {
                     swappedTarget.Interact(Cc.gameObject);
                     StateMachine.ChangeState(StateMachine.InteractStateDriver);
