@@ -1,4 +1,5 @@
-﻿using Unity.Cinemachine;
+﻿using System.ComponentModel;
+using Unity.Cinemachine;
 using UnityEngine;
 using SpellBound.Controller.ManagersAndStatics;
 using SpellBound.Controller.PlayerInputs;
@@ -9,26 +10,25 @@ namespace SpellBound.Controller.PlayerController {
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
     public class CameraController : MonoBehaviour {
+        [Header("Inspector Only Settings")]
+        [SerializeField] private PlayerInputActionsSO input;
         // What do we want the camera to pivot around?
         [SerializeField] private Transform cameraPivot;
         // How high you can move your camera.
         [SerializeField, Range(0f, 90f)] private float upperVerticalLimit = 89f;
         // How low you can move your camera.
         [SerializeField, Range(0f, 90f)] private float lowerVerticalLimit = 89f;
-        // How fast you can move your camera.
-        [SerializeField] private float cameraSpeed = 0.5f;
-        // Optional lerp applied to input.
-        [SerializeField] private bool smoothCameraRotation;
         // Multiplies the time.deltaTime by this factor.
         [SerializeField, Range(1f, 50f)] private float cameraSmoothingFactor = 25f;
-        [SerializeField, Min(0.1f)] private float minZoomDistance = 1f;
-        [SerializeField, Min(1f)] private float maxZoomDistance = 8f;
         // Controls how fast you zoom in and out.
         [SerializeField] private float zoomIncrement = .2f;
         [SerializeField] private bool cursorLockOnStart = true;
-        [SerializeField] private PlayerInputActionsSO input;
-        [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
         [SerializeField] private bool cameraFollowMouse = true;
+        [Header("Player Settings")]
+        [SerializeField, Description("How fast you can move your camera.")] private float cameraSpeed = 0.5f;
+        [SerializeField, Description("Optional lerp applied to input.")] private bool smoothCameraRotation;
+        [SerializeField, Min(0.1f)] private float minZoomDistance = 1f;
+        [SerializeField, Min(1f)] private float maxZoomDistance = 8f;
         
         private CameraRigManager _cameraRig;
         private CinemachineBrain _brain;
@@ -38,12 +38,11 @@ namespace SpellBound.Controller.PlayerController {
         // Cached local rotation value Y.
         private float _currentYAngle;
         
+        // UNUSED ATM
+        [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
+        
         private void Awake() {
             _tr = transform;
-        }
-
-        private void OnEnable() {
-            
         }
 
         private void OnDisable() {
@@ -156,5 +155,8 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         public void SetCameraFollowMouse(bool follow) => cameraFollowMouse = follow;
+        public void SetCameraSpeed(float speed) => cameraSpeed = speed;
+        public float GetCameraSpeed() => cameraSpeed;
+        public void SetCameraSmooth(bool isSmooth) => smoothCameraRotation = isSmooth;
     }
 }
