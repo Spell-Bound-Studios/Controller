@@ -5,7 +5,6 @@ using UnityEngine;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.ManagersAndStatics;
 using SpellBound.Controller.PlayerStateMachine;
-using SpellBound.Core;
 using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
 namespace SpellBound.Controller.PlayerController {
@@ -58,10 +57,8 @@ namespace SpellBound.Controller.PlayerController {
         };
         
         private Transform _tr;
-        private Vector3 _momentum;
         private Vector3 _velocity;
         private Vector3 _planarUp;
-        private float _currentYRotation;
         
         // State Polling --Condensed Value Types--
         public float horizontalSpeed;
@@ -71,9 +68,9 @@ namespace SpellBound.Controller.PlayerController {
         private void Awake() {
             _tr = transform;
             _planarUp = _tr.up;
-            
+
             if (input == null)
-                Debug.LogError("PlayerController: Drag and drop an input SO in.", this);
+                InputManager.Instance.GetInputs();
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
 
@@ -93,8 +90,6 @@ namespace SpellBound.Controller.PlayerController {
                 input.OnInteractPressed += HandleInteractPressed;
                 input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
             }
-            
-            RaycastSystem.OnRaycastHitObjPreset += HandleObjectFromWorld;
         }
 
         private void OnDisable() {
@@ -108,13 +103,10 @@ namespace SpellBound.Controller.PlayerController {
                 input.OnInteractPressed -= HandleInteractPressed;
                 input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
             }
-            
-            RaycastSystem.OnRaycastHitObjPreset -= HandleObjectFromWorld;
         }
 
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
-            _currentYRotation = _tr.eulerAngles.y;
             
             _animationController = new AnimationController(animator);
             
@@ -227,33 +219,18 @@ namespace SpellBound.Controller.PlayerController {
             }
         }
         
-        public bool hotKeyOnePressed;
-        public bool interactKeyPressed;
-        private ObjectPreset _objectPresetHovering;
-        private RaycastHit _forwardRaycastHit;
+        public bool hotkeyOneFlagged;
+        public bool interactFlagged;
 
         private void HandleInteractPressed() {
-            if (interactKeyPressed)
+            if (interactFlagged)
                 return;
             
-            if (_objectPresetHovering == null)
-                return;
-
-            if (!_objectPresetHovering.TryGetModule(out InteractableModule interactable))
-                return;
-
-            /*if (!interactable.TryGetComponent<IInteractable>(out var target))
-                return;*/
-
-            //target.Interact(gameObject);
-            
-            interactKeyPressed = true;
+            interactFlagged = true;
         }
-        
-        private void HandleObjectFromWorld(ObjectPreset op) => _objectPresetHovering = op;
 
         private void HandleHotkeyOnePressed() {
-            if (hotKeyOnePressed)
+            if (hotkeyOneFlagged)
                 return;
             
             if (!Physics.Raycast(
@@ -265,7 +242,9 @@ namespace SpellBound.Controller.PlayerController {
                         QueryTriggerInteraction.Ignore))
                 return;
 
-            hotKeyOnePressed = true;
+            hotkeyOneFlagged = true;
         }
+
+        public Transform GetReferenceTransform() => referenceTransform;
     }
 }
