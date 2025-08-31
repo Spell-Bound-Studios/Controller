@@ -51,14 +51,14 @@ namespace SpellBound.Controller.PlayerController {
         };
 
         private readonly List<string> _defaultActionStatesList = new() {
-                StateHelper.DefaultReadyStateSO
+                StateHelper.DefaultReadyStateSO,
+                StateHelper.DefaultGCDStateSO,
+                StateHelper.DefaultInteractStateSO,
         };
         
         private Transform _tr;
-        private Vector3 _momentum;
         private Vector3 _velocity;
         private Vector3 _planarUp;
-        private float _currentYRotation;
         
         // State Polling --Condensed Value Types--
         public float horizontalSpeed;
@@ -68,9 +68,9 @@ namespace SpellBound.Controller.PlayerController {
         private void Awake() {
             _tr = transform;
             _planarUp = _tr.up;
-            
+
             if (input == null)
-                Debug.LogError("PlayerController: Drag and drop an input SO in.", this);
+                InputManager.Instance.GetInputs();
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
 
@@ -87,6 +87,8 @@ namespace SpellBound.Controller.PlayerController {
 
             if (input) {
                 input.OnJumpInput += HandleJumpPressed;
+                input.OnInteractPressed += HandleInteractPressed;
+                input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
             }
         }
 
@@ -98,12 +100,13 @@ namespace SpellBound.Controller.PlayerController {
             
             if (input) {
                 input.OnJumpInput -= HandleJumpPressed;
+                input.OnInteractPressed -= HandleInteractPressed;
+                input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
             }
         }
 
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
-            _currentYRotation = _tr.eulerAngles.y;
             
             _animationController = new AnimationController(animator);
             
@@ -113,13 +116,13 @@ namespace SpellBound.Controller.PlayerController {
 
         private void Update() {
             _locoStateMachine.CurrentLocoStateDriver.UpdateState();
+            _actionStateMachine.CurrentActionStateDriver.UpdateState();
         }
         
         private void FixedUpdate() {
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
-        }
-
-        private void LateUpdate() {
+            _actionStateMachine.CurrentActionStateDriver.FixedUpdateState();
+            
             HandleCharacterTurnTowardsHorizontalVelocity();
         }
 
@@ -137,23 +140,22 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
-            // Basically gives the x,z components of our velocity vector since they are normal to the up direction.
-            var velocity = Vector3.ProjectOnPlane(_velocity, _planarUp);
-            
-            // Return early if we're not moving.
-            if (velocity.magnitude < 0.001f)
-                return;
-            
-            var desiredFacingDir = velocity.normalized;
-            
-            var angleDiff = Helper.GetAngle(_tr.forward, desiredFacingDir, _planarUp);
+            var planarVelocity = Vector3.ProjectOnPlane(
+                    _rigidbodyMover.GetRigidbodyVelocity(), _planarUp);
 
-            var step = Mathf.Sign(angleDiff) *
-                       Mathf.InverseLerp(0f, RotationFallOffAngle, Mathf.Abs(angleDiff)) *
-                       Time.deltaTime * turnTowardsInputSpeed;
+            if (planarVelocity.sqrMagnitude < 1e-6f)
+                return;
+
+            var desiredDir = planarVelocity.normalized;
+            var targetRotation = Quaternion.LookRotation(desiredDir, _planarUp);
+            var angleDiff = Quaternion.Angle(_rigidbodyMover.GetRigidbodyRotation(), targetRotation);
+            var speedFactor = Mathf.InverseLerp(0f, RotationFallOffAngle, angleDiff);
             
-            _currentYRotation += Mathf.Abs(step) > Mathf.Abs(angleDiff) ? angleDiff : step;
-            _tr.localRotation = Quaternion.Euler(0, _currentYRotation, 0);
+            var maxStepDeg = turnTowardsInputSpeed * speedFactor * Time.fixedDeltaTime;
+
+            var nextRotation = Quaternion.RotateTowards(_rigidbodyMover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
+            
+            _rigidbodyMover.SetRigidbodyRotation(nextRotation);
         }
 
         /// <summary>
@@ -216,5 +218,33 @@ namespace SpellBound.Controller.PlayerController {
                     throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
             }
         }
+        
+        public bool hotkeyOneFlagged;
+        public bool interactFlagged;
+
+        private void HandleInteractPressed() {
+            if (interactFlagged)
+                return;
+            
+            interactFlagged = true;
+        }
+
+        private void HandleHotkeyOnePressed() {
+            if (hotkeyOneFlagged)
+                return;
+            
+            if (!Physics.Raycast(
+                        referenceTransform.position,
+                        input.LookDirection,
+                        out var hit,
+                        10f,
+                        1 << 6,
+                        QueryTriggerInteraction.Ignore))
+                return;
+
+            hotkeyOneFlagged = true;
+        }
+
+        public Transform GetReferenceTransform() => referenceTransform;
     }
 }

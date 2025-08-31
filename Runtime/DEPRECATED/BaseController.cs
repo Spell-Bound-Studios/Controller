@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using PurrNet;
 using SpellBound.Core;
 using SpellBound.PlayerStateMachine;
@@ -171,4 +171,4 @@ namespace SpellBound.Controller {
             var proxy = gameObject.AddComponent<ProxyCollider>();
         }
     }
-}
+}*/
