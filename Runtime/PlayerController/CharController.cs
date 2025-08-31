@@ -60,10 +60,14 @@ namespace SpellBound.Controller.PlayerController {
         private Vector3 _velocity;
         private Vector3 _planarUp;
         
+        // #######################################
         // State Polling --Condensed Value Types--
+        // #######################################
         public float horizontalSpeed;
         public bool jumpFlag;
         public bool GroundFlag => _rigidbodyMover.IsGrounded();
+        public bool hotkeyOneFlagged;
+        public bool interactFlagged;
         
         private void Awake() {
             _tr = transform;
@@ -85,11 +89,12 @@ namespace SpellBound.Controller.PlayerController {
             StateHelper.OnLocoStateChange += HandleLocoStateChanged;
             StateHelper.OnActionStateChange += HandleActionStateChanged;
 
-            if (input) {
-                input.OnJumpInput += HandleJumpPressed;
-                input.OnInteractPressed += HandleInteractPressed;
-                input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
-            }
+            if (!input) 
+                return;
+
+            input.OnJumpInput += HandleJumpPressed;
+            input.OnInteractPressed += HandleInteractPressed;
+            input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
         }
 
         private void OnDisable() {
@@ -97,12 +102,13 @@ namespace SpellBound.Controller.PlayerController {
             StateHelper.OnActionStateChange -= HandleActionStateChanged;
 
             _animationController?.DisposeEvents();
-            
-            if (input) {
-                input.OnJumpInput -= HandleJumpPressed;
-                input.OnInteractPressed -= HandleInteractPressed;
-                input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
-            }
+
+            if (!input) 
+                return;
+
+            input.OnJumpInput -= HandleJumpPressed;
+            input.OnInteractPressed -= HandleInteractPressed;
+            input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
         }
 
         private void Start() {
@@ -153,7 +159,8 @@ namespace SpellBound.Controller.PlayerController {
             
             var maxStepDeg = turnTowardsInputSpeed * speedFactor * Time.fixedDeltaTime;
 
-            var nextRotation = Quaternion.RotateTowards(_rigidbodyMover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
+            var nextRotation = Quaternion.RotateTowards(
+                    _rigidbodyMover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
             
             _rigidbodyMover.SetRigidbodyRotation(nextRotation);
         }
@@ -185,6 +192,25 @@ namespace SpellBound.Controller.PlayerController {
         private void HandleLocoStateChanged(BaseLocoStateSO state) => currentLocoState = state;
         private void HandleActionStateChanged(BaseActionStateSO state) => currentActionState = state;
         
+        public Transform GetReferenceTransform() => referenceTransform;
+        
+        public void SetSensorRange(Helper.RaycastLength sensorLength) {
+            switch (sensorLength) {
+                case Helper.RaycastLength.Normal:
+                    _rigidbodyMover.SetSensorRange(1);
+                    break;
+                case Helper.RaycastLength.Extended:
+                    _rigidbodyMover.SetSensorRange(1.1f);
+                    break;
+                case Helper.RaycastLength.Retracted:
+                    _rigidbodyMover.SetSensorRange(0.5f);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
+            }
+        }
+
+        #region StateEvaluaters
         private void HandleJumpPressed() {
             if (!_rigidbodyMover.IsGrounded())
                 return;
@@ -202,26 +228,7 @@ namespace SpellBound.Controller.PlayerController {
         private bool ResourceCheck() {
             return true;
         }
-
-        public void SetSensorRange(Helper.RaycastLength sensorLength) {
-            switch (sensorLength) {
-                case Helper.RaycastLength.Normal:
-                    _rigidbodyMover.SetSensorRange(1);
-                    break;
-                case Helper.RaycastLength.Extended:
-                    _rigidbodyMover.SetSensorRange(1.1f);
-                    break;
-                case Helper.RaycastLength.Retracted:
-                    _rigidbodyMover.SetSensorRange(0.5f);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
-            }
-        }
         
-        public bool hotkeyOneFlagged;
-        public bool interactFlagged;
-
         private void HandleInteractPressed() {
             if (interactFlagged)
                 return;
@@ -244,7 +251,6 @@ namespace SpellBound.Controller.PlayerController {
 
             hotkeyOneFlagged = true;
         }
-
-        public Transform GetReferenceTransform() => referenceTransform;
+        #endregion
     }
 }
