@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public sealed class LocoStateMachine {
-        public CharController CharController;
+        public SbCharacterControllerBase CharController;
         
         public BaseLocoStateDriver CurrentLocoStateDriver;
         
@@ -20,7 +20,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public JumpingStateDriver JumpingStateDriver;
         public JumpingStateSO JumpingState;
         
-        public LocoStateMachine(CharController cc, List<string> defaultStatesList) {
+        public LocoStateMachine(SbCharacterControllerBase cc, List<string> defaultStatesList) {
             CharController = cc;
             
             GroundStateDriver = new GroundStateDriver(this);

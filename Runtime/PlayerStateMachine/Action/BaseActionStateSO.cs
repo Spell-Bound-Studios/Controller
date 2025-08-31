@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     public abstract class BaseActionStateSO : ScriptableObject {
         protected ActionStateMachine StateMachine;
-        protected CharController Cc => StateMachine?.CharController;
+        protected SbCharacterControllerBase Cc => StateMachine?.CharController;
         public string uid;
         public string assetName;
         
