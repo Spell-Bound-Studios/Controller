@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
     public sealed class ActionStateMachine {
-        public CharController CharController;
+        public SbCharacterControllerBase CharController;
         
         public BaseActionStateDriver CurrentActionStateDriver;
         
@@ -17,7 +17,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public InteractStateDriver InteractStateDriver;
         public InteractStateSO InteractState;
         
-        public ActionStateMachine(CharController cc, List<string> defaultStatesList) {
+        public ActionStateMachine(SbCharacterControllerBase cc, List<string> defaultStatesList) {
             CharController = cc;
             
             ReadyStateDriver = new ReadyStateDriver(this);

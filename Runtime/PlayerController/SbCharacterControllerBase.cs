@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using PurrNet;
-using UnityEngine;
-using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.ManagersAndStatics;
+using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.PlayerStateMachine;
+using UnityEngine;
 using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
 
 namespace SpellBound.Controller.PlayerController {
@@ -12,11 +11,10 @@ namespace SpellBound.Controller.PlayerController {
     /// Input and stats meet here to inform supporting members.
     /// </summary>
     [RequireComponent(typeof(RigidbodyMover))]
-    public class CharController : MonoBehaviour {
+    public abstract class SbCharacterControllerBase : MonoBehaviour {
         [Header("References")]
         [SerializeField] public PlayerInputActionsSO input;
         [SerializeField] private Transform referenceTransform;
-        [SerializeField] private NetworkAnimator animator;
         
         [Header("Settings")]
         [SerializeField] private float turnTowardsInputSpeed = 500f;
@@ -37,9 +35,9 @@ namespace SpellBound.Controller.PlayerController {
         private RigidbodyMover _rigidbodyMover;
         private LocoStateMachine _locoStateMachine;
         private ActionStateMachine _actionStateMachine;
-        private AnimationController _animationController;
+        private AnimationControllerBase _animator;
         
-        // Visuals - never used.
+        [Header("State Debugging")]
         [SerializeField] private BaseLocoStateSO currentLocoState;
         [SerializeField] private BaseActionStateSO currentActionState;
 
@@ -69,22 +67,21 @@ namespace SpellBound.Controller.PlayerController {
         public bool hotkeyOneFlagged;
         public bool interactFlagged;
         
+        /// <summary>
+        /// Derived classes must provide the correct animation controller.
+        /// </summary>
+        protected abstract AnimationControllerBase CreateAnimationController();
+        
         private void Awake() {
             _tr = transform;
             _planarUp = _tr.up;
-
+            
             if (input == null)
-                InputManager.Instance.GetInputs();
+                Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
-
-            if (animator != null) 
-                return;
-
-            Debug.LogError("PlayerController: Drag and drop animator component in.", this);
-            animator = GetComponentInChildren<NetworkAnimator>();
         }
-
+        
         private void OnEnable() {
             StateHelper.OnLocoStateChange += HandleLocoStateChanged;
             StateHelper.OnActionStateChange += HandleActionStateChanged;
@@ -101,7 +98,7 @@ namespace SpellBound.Controller.PlayerController {
             StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
             StateHelper.OnActionStateChange -= HandleActionStateChanged;
 
-            _animationController?.DisposeEvents();
+            _animator?.DisposeEvents();
 
             if (!input) 
                 return;
@@ -110,16 +107,20 @@ namespace SpellBound.Controller.PlayerController {
             input.OnInteractPressed -= HandleInteractPressed;
             input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
         }
-
+        
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
+
+            _animator = CreateAnimationController();
             
-            _animationController = new AnimationController(animator);
+            if (_animator == null)
+                Debug.LogError("CharacterControllerBase requires an animator via the CreateAnimationController override.", 
+                        this);
             
             _locoStateMachine = new LocoStateMachine(this, _defaultLocoStatesList);
             _actionStateMachine = new ActionStateMachine(this, _defaultActionStatesList);
         }
-
+        
         private void Update() {
             _locoStateMachine.CurrentLocoStateDriver.UpdateState();
             _actionStateMachine.CurrentActionStateDriver.UpdateState();
@@ -131,7 +132,7 @@ namespace SpellBound.Controller.PlayerController {
             
             HandleCharacterTurnTowardsHorizontalVelocity();
         }
-
+        
         public void HandleHorizontalVelocityInput() {
             // Handles additional vertical velocity if necessary.
             _rigidbodyMover.CheckForGround();
