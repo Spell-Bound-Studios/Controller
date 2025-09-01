@@ -75,9 +75,9 @@ namespace SpellBound.Controller.PlayerController {
         private void Awake() {
             _tr = transform;
             _planarUp = _tr.up;
-
+            
             if (input == null)
-                InputManager.Instance.GetInputs();
+                Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
             
             _rigidbodyMover = GetComponent<RigidbodyMover>();
         }

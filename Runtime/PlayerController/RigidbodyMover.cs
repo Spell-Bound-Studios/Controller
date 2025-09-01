@@ -16,12 +16,15 @@ namespace SpellBound.Controller.PlayerController {
         [Header("Sensor Settings:")]
         [SerializeField] private bool isDebugging;
 
+        [SerializeField] private float inclineGroundTolerance = 60f;
+
         private Transform _tr;
         private Rigidbody _rb;
         private CapsuleCollider _collider;
         private RaycastSensor _raycastSensor;
 
         private bool _isGrounded;
+        private bool _isSliding;
         private float _baseSensorRange;
         private Vector3 _currentGroundAdjustmentVelocity;
         private int _currentLayer;
@@ -57,8 +60,17 @@ namespace SpellBound.Controller.PlayerController {
             _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
             
             _raycastSensor.CastRaycast();
+            
+            var detectedHit = _raycastSensor.HasDetectedHit();
+            var groundNormal = _raycastSensor.GetNormal();
 
-            _isGrounded = _raycastSensor.HasDetectedHit();
+            if (Vector3.Angle(groundNormal, Vector3.up) > inclineGroundTolerance) {
+                _isGrounded = false;
+                _isSliding = true;
+                return;
+            }
+
+            _isGrounded = detectedHit;
 
             if (!_isGrounded)
                 return;

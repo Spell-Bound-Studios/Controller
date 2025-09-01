@@ -1839,7 +1839,7 @@ GameObject:
   - component: {fileID: 6040560134325711661}
   - component: {fileID: 7093219048439434907}
   - component: {fileID: 818432367506289426}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerRig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
