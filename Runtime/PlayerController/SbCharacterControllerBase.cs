@@ -146,6 +146,18 @@ namespace SpellBound.Controller.PlayerController {
             horizontalSpeed = Vector3.ProjectOnPlane(_velocity, _planarUp).magnitude;
         }
 
+        public void HandleHorizontalForceInput() {
+            _rigidbodyMover.CheckForGround();
+
+            _rigidbodyMover.SetLinearDampening(_rigidbodyMover.IsGrounded() 
+                    ? 10 
+                    : 0);
+
+            var direction = CalculateMovementDirection();
+            
+            _rigidbodyMover.ApplyForce(direction * 80f);
+        }
+
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
             var planarVelocity = Vector3.ProjectOnPlane(
                     _rigidbodyMover.GetRigidbodyVelocity(), _planarUp);
@@ -223,7 +235,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void Jump() {
-            _rigidbodyMover.ApplyJumpForce(5f);
+            _rigidbodyMover.ApplyJumpForce(15f);
         }
 
         private bool ResourceCheck() {

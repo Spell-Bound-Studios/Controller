@@ -13,9 +13,12 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float colliderDiameter = 1f;
         [SerializeField] private Vector3 colliderOffset = new(0, .4f, 0);
 
+        [Header("Rigidbody Settings:")]
+        [SerializeField] private ForceMode horizontalForceMode = ForceMode.Force;
+        [SerializeField] private ForceMode verticalForceMode = ForceMode.Impulse;
+        
         [Header("Sensor Settings:")]
         [SerializeField] private bool isDebugging;
-
         [SerializeField] private float inclineGroundTolerance = 60f;
 
         private Transform _tr;
@@ -93,12 +96,16 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public bool IsGrounded() => _isGrounded;
+        public bool IsSliding() => _isSliding;
         public Vector3 GetGroundNormal() => _raycastSensor.GetNormal();
+
         public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
         public void SetSensorRange(float multiplier) => _baseSensorRange *= multiplier;
         public Vector3 GetRigidbodyVelocity() => _rb.linearVelocity;
         public Quaternion GetRigidbodyRotation() => _rb.rotation;
         public void SetRigidbodyRotation(Quaternion rotation) => _rb.MoveRotation(rotation);
+        public void ApplyForce(Vector3 direction) => _rb.AddForce(direction, horizontalForceMode);
+        public void SetLinearDampening(float amount) => _rb.linearDamping = amount;
         
         private void Setup() {
             _rb = GetComponent<Rigidbody>();
@@ -157,7 +164,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void ApplyJumpForce(float jumpForce) {
-            _rb.AddForce(_tr.up * jumpForce, ForceMode.Impulse);
+            _rb.AddForce(_tr.up * jumpForce, verticalForceMode);
         }
         
         private void OnDrawGizmosSelected() {
@@ -185,6 +192,73 @@ namespace SpellBound.Controller.PlayerController {
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(origin, origin + dir * sphereLen);
             Gizmos.DrawWireSphere(origin + dir * sphereLen, _raycastSensor.SphereRadius);
+        }
+        
+        /// <summary>
+        /// Unused and experimental.
+        /// </summary>
+        private int _maxBounces = 5;
+        private float _skinWidth = 0.005f;
+        private float _maxSlopeAngle = 55f;
+        private Vector3 CollideAndSlide(Vector3 velocity, Vector3 pos, int depth, bool gravityPass, Vector3 initialVelocity) {
+            var bounds = _collider.bounds;
+            bounds.Expand(-2 * _skinWidth);
+            
+            if (depth >= _maxBounces) {
+                return Vector3.zero;
+            }
+            
+            var dist = velocity.magnitude + _skinWidth;
+
+            if (!Physics.SphereCast(_collider.center, _collider.radius, velocity.normalized, out var hit,
+                        dist, 1 << 6)) 
+                return velocity;
+
+            var snapToSurface = velocity.normalized * (hit.distance - _skinWidth);
+            var remaining = velocity - snapToSurface;
+            var angle = Vector3.Angle(Vector3.up, hit.normal);
+
+            if (snapToSurface.magnitude <= _skinWidth)
+                snapToSurface = Vector3.zero;
+
+            if (angle <= _maxSlopeAngle) {
+                if (gravityPass) {
+                    return snapToSurface;
+                }
+
+                remaining = ProjectAndScale(remaining, hit.normal);
+            }
+            else {
+                var scale = 1 - Vector3.Dot(
+                        new Vector3(hit.normal.x, 0, hit.normal.z).normalized,
+                        -new Vector3(initialVelocity.x, 0, initialVelocity.z).normalized);
+                
+                if (_isGrounded && !gravityPass) {
+                    remaining = ProjectAndScale(
+                            new Vector3(remaining.x, 0, remaining.z),
+                            new Vector3(hit.normal.x, 0, hit.normal.z)
+                            ).normalized;
+                    remaining *= scale;
+                }
+                else {
+                    remaining = ProjectAndScale(remaining, hit.normal) * scale;
+                }
+            }
+            
+            return snapToSurface + 
+                   CollideAndSlide(
+                           remaining, 
+                           pos + snapToSurface, 
+                           depth + 1, 
+                           gravityPass, 
+                           initialVelocity);
+        }
+
+        private static Vector3 ProjectAndScale(Vector3 vec, Vector3 normal) {
+            var mag = vec.magnitude;
+            vec = Vector3.ProjectOnPlane(vec, normal).normalized;
+            vec *= mag;
+            return vec;
         }
     }
 }

@@ -1873,7 +1873,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8702816091274949866}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 831f888cea743904d88f1da6c80bd17d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1964,6 +1964,7 @@ MonoBehaviour:
   colliderDiameter: 1
   colliderOffset: {x: 0, y: 0.4, z: 0}
   isDebugging: 1
+  inclineGroundTolerance: 60
 --- !u!114 &818432367506289426
 MonoBehaviour:
   m_ObjectHideFlags: 0
