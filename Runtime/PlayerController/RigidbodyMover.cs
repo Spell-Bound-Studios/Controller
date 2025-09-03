@@ -18,7 +18,6 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private ForceMode verticalForceMode = ForceMode.Impulse;
         
         [Header("Sensor Settings:")]
-        [SerializeField] private bool isDebugging;
         [SerializeField] private float inclineGroundTolerance = 60f;
 
         private Transform _tr;
@@ -29,6 +28,7 @@ namespace SpellBound.Controller.PlayerController {
         private bool _isGrounded;
         private bool _isSliding;
         private float _baseSensorRange;
+        private float _adjustedSensorRange;
         private Vector3 _currentGroundAdjustmentVelocity;
         private int _currentLayer;
         private float _colliderHalfSize;
@@ -57,7 +57,7 @@ namespace SpellBound.Controller.PlayerController {
             _currentGroundAdjustmentVelocity = Vector3.zero;
             
             // Extends the sensor range if we are using step-up logic but otherwise uses the base range.
-            _raycastSensor.CastLength = _baseSensorRange;
+            _raycastSensor.CastLength = _adjustedSensorRange;
             
             _raycastSensor.SphereRadius = _collider.radius;
             _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
@@ -98,9 +98,9 @@ namespace SpellBound.Controller.PlayerController {
         public bool IsGrounded() => _isGrounded;
         public bool IsSliding() => _isSliding;
         public Vector3 GetGroundNormal() => _raycastSensor.GetNormal();
-
+        public RaycastSensor GetRaycastSensor() => _raycastSensor;
         public void SetVelocity(Vector3 velocity) => _rb.linearVelocity = velocity + _currentGroundAdjustmentVelocity;
-        public void SetSensorRange(float multiplier) => _baseSensorRange *= multiplier;
+        public void SetSensorRange(float amount) => _adjustedSensorRange = _baseSensorRange * amount;
         public Vector3 GetRigidbodyVelocity() => _rb.linearVelocity;
         public Quaternion GetRigidbodyRotation() => _rb.rotation;
         public void SetRigidbodyRotation(Quaternion rotation) => _rb.MoveRotation(rotation);
@@ -165,33 +165,6 @@ namespace SpellBound.Controller.PlayerController {
 
         public void ApplyJumpForce(float jumpForce) {
             _rb.AddForce(_tr.up * jumpForce, verticalForceMode);
-        }
-        
-        private void OnDrawGizmosSelected() {
-            if (!isDebugging)
-                return;
-            
-            if (_raycastSensor == null) 
-                return;
-
-            var origin = _raycastSensor.GetCastOriginWorld();
-            var dir = _raycastSensor.GetCastDirectionWorld();
-
-            var rayLen = _raycastSensor.HasDetectedHit() 
-                    ? _raycastSensor.GetRaycastHitDistance() 
-                    : _raycastSensor.CastLength;
-            
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(origin, origin + dir * rayLen);
-            Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
-
-            var sphereLen = _raycastSensor.HasDetectedSphereHit() 
-                    ? _raycastSensor.GetSphereHitDistance() 
-                    : _raycastSensor.SphereCastLength;
-            
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(origin, origin + dir * sphereLen);
-            Gizmos.DrawWireSphere(origin + dir * sphereLen, _raycastSensor.SphereRadius);
         }
         
         /// <summary>

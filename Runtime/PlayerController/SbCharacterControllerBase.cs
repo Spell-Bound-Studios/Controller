@@ -37,10 +37,6 @@ namespace SpellBound.Controller.PlayerController {
         private ActionStateMachine _actionStateMachine;
         private AnimationControllerBase _animator;
         
-        [Header("State Debugging")]
-        [SerializeField] private BaseLocoStateSO currentLocoState;
-        [SerializeField] private BaseActionStateSO currentActionState;
-
         private readonly List<string> _defaultLocoStatesList = new() {
                 StateHelper.DefaultGroundStateSO,
                 StateHelper.DefaultFallingStateSO,
@@ -83,9 +79,6 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         private void OnEnable() {
-            StateHelper.OnLocoStateChange += HandleLocoStateChanged;
-            StateHelper.OnActionStateChange += HandleActionStateChanged;
-
             if (!input) 
                 return;
 
@@ -95,9 +88,6 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void OnDisable() {
-            StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
-            StateHelper.OnActionStateChange -= HandleActionStateChanged;
-
             _animator?.DisposeEvents();
 
             if (!input) 
@@ -201,9 +191,6 @@ namespace SpellBound.Controller.PlayerController {
                     ? direction.normalized 
                     : direction;
         }
-
-        private void HandleLocoStateChanged(BaseLocoStateSO state) => currentLocoState = state;
-        private void HandleActionStateChanged(BaseActionStateSO state) => currentActionState = state;
         
         public Transform GetReferenceTransform() => referenceTransform;
         
@@ -235,7 +222,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void Jump() {
-            _rigidbodyMover.ApplyJumpForce(15f);
+            _rigidbodyMover.ApplyJumpForce(5f);
         }
 
         private bool ResourceCheck() {
