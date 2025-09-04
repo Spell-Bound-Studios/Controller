@@ -27,7 +27,7 @@ namespace SpellBound.Controller.Samples {
             if (playerInputActionsSO != null)
                 playerInputActionsSO.OnInteractPressed -= HandleEPressed;
         }
-        
+
         private void CollectChildTemplates() {
             _templates.Clear();
             
@@ -61,8 +61,7 @@ namespace SpellBound.Controller.Samples {
             var rotation = Quaternion.LookRotation(dir, Vector3.up);
 
             var go = Instantiate(template, spawnPos, rotation);
-
-            // Ensure a Rigidbody exists and is configured for fast motion.
+            
             if (!go.TryGetComponent<Rigidbody>(out var rb)) {
                 rb = go.AddComponent<Rigidbody>();
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -71,7 +70,7 @@ namespace SpellBound.Controller.Samples {
             }
             
             rb.AddForce(dir * throwSpeed, ForceMode.VelocityChange);
-
+            
             Destroy(go, timeUntilDestroy);
         }
     }
