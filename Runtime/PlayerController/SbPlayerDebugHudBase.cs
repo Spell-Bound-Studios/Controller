@@ -33,9 +33,6 @@ namespace SpellBound.Controller.PlayerController {
         private SbCharacterControllerBase _controller;
         private RaycastSensor _sensor;
         private RectTransform _container;
-        
-        private BaseLocoStateSO _currentLocoState;
-        private BaseActionStateSO _currentActionState;
 
         private bool _togglesDirty;
         private bool _layoutDirty;
@@ -75,15 +72,9 @@ namespace SpellBound.Controller.PlayerController {
 
             RegisterAllProviders();
             ApplyToggleVisibility();
-            
-            StateHelper.OnLocoStateChange += HandleLocoStateChanged;
-            StateHelper.OnActionStateChange += HandleActionStateChanged;
         }
 
         private void OnDisable() {
-            StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
-            StateHelper.OnActionStateChange -= HandleActionStateChanged;
-            
             _getters.Clear();
             _labels.Clear();
             _gizmos.Clear();
@@ -135,9 +126,6 @@ namespace SpellBound.Controller.PlayerController {
             LayoutRebuilder.ForceRebuildLayoutImmediate(_container);
             Canvas.ForceUpdateCanvases();
         }
-        
-        private void HandleLocoStateChanged(BaseLocoStateSO state) => _currentLocoState = state;
-        private void HandleActionStateChanged(BaseActionStateSO state) => _currentActionState = state;
 
         #region Debugging Backend
         // #########################

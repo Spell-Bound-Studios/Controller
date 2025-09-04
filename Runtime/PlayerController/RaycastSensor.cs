@@ -67,17 +67,20 @@ namespace SpellBound.Controller.PlayerController {
             };
         }
         
+        /// <summary>
+        /// Runs if the debugger is attached.
+        /// </summary>
         public void RegisterDebugInfo(SbPlayerDebugHudBase hud) {
             hud.Field("Ray.CastLength", () => CastLength.ToString("F2"));
             hud.Field("Ray.SphereLength", () => SphereCastLength.ToString("F2"));
             hud.Field("Ray.SphereRadius", () => SphereRadius.ToString("F2"));
             hud.Field("Ray.HasHit", () => (_hit.collider ? "true" : "false"));
             hud.Field("Ray.HitDist", () => _hit.collider ? _hit.distance.ToString("F3") : "-");
-            hud.Field("Ray.HitNormal", () => _hit.collider ? FormatVec(_hit.normal) : "-");
-            hud.Field("Ray.HitPoint", () => _hit.collider ? FormatVec(_hit.point)  : "-");
+            hud.Field("Ray.HitNormal", () => _hit.collider ? Helper.FormatVec(_hit.normal) : "-");
+            hud.Field("Ray.HitPoint", () => _hit.collider ? Helper.FormatVec(_hit.point)  : "-");
             hud.Field("Ray.HasSphereHit", () => (_sphereHit.collider ? "true" : "false"));
             hud.Field("Ray.SphereHitDist", () => _sphereHit.collider ? _sphereHit.distance.ToString("F3") : "-");
-            hud.Field("Ray.SphereHitPoint", () => _sphereHit.collider ? FormatVec(_sphereHit.point) : "-");
+            hud.Field("Ray.SphereHitPoint", () => _sphereHit.collider ? Helper.FormatVec(_sphereHit.point) : "-");
 
             hud.Gizmo(() => {
                 var origin = GetCastOriginWorld();
@@ -94,7 +97,5 @@ namespace SpellBound.Controller.PlayerController {
                 Gizmos.DrawWireSphere(origin + dir * sphereLen, SphereRadius);
             });
         }
-        
-        private static string FormatVec(Vector3 v) => $"{v.x:F2},{v.y:F2},{v.z:F2}";
     }
 }

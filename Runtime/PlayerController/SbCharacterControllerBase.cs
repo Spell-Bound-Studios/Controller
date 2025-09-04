@@ -11,7 +11,7 @@ namespace SpellBound.Controller.PlayerController {
     /// Input and stats meet here to inform supporting members.
     /// </summary>
     [RequireComponent(typeof(RigidbodyMover))]
-    public abstract class SbCharacterControllerBase : MonoBehaviour {
+    public abstract class SbCharacterControllerBase : MonoBehaviour, IDebuggingInfo {
         [Header("References")]
         [SerializeField] public PlayerInputActionsSO input;
         [SerializeField] private Transform referenceTransform;
@@ -23,7 +23,7 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float movementSpeed = 5f;
         [SerializeField] private float airControlRate = 2f;
         [SerializeField] private float jumpSpeed = 10f;
-        [SerializeField] private float jumpDuration = 0.2f;
+        [SerializeField] private float jumpForce = 5f;
         [SerializeField] private float airFriction = 0.5f;
         [SerializeField] private float groundFriction = 100f;
         [SerializeField] private float gravity = 30f;
@@ -36,6 +36,9 @@ namespace SpellBound.Controller.PlayerController {
         private LocoStateMachine _locoStateMachine;
         private ActionStateMachine _actionStateMachine;
         private AnimationControllerBase _animator;
+        
+        private BaseLocoStateSO _currentLocoState;
+        private BaseActionStateSO _currentActionState;
         
         private readonly List<string> _defaultLocoStatesList = new() {
                 StateHelper.DefaultGroundStateSO,
@@ -79,6 +82,9 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         private void OnEnable() {
+            StateHelper.OnLocoStateChange += HandleLocoStateChanged;
+            StateHelper.OnActionStateChange += HandleActionStateChanged;
+            
             if (!input) 
                 return;
 
@@ -88,6 +94,9 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void OnDisable() {
+            StateHelper.OnLocoStateChange -= HandleLocoStateChanged;
+            StateHelper.OnActionStateChange -= HandleActionStateChanged;
+            
             _animator?.DisposeEvents();
 
             if (!input) 
@@ -122,6 +131,9 @@ namespace SpellBound.Controller.PlayerController {
             
             HandleCharacterTurnTowardsHorizontalVelocity();
         }
+        
+        private void HandleLocoStateChanged(BaseLocoStateSO state) => _currentLocoState = state;
+        private void HandleActionStateChanged(BaseActionStateSO state) => _currentActionState = state;
         
         public void HandleHorizontalVelocityInput() {
             // Handles additional vertical velocity if necessary.
@@ -222,7 +234,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void Jump() {
-            _rigidbodyMover.ApplyJumpForce(5f);
+            _rigidbodyMover.ApplyJumpForce(jumpForce);
         }
 
         private bool ResourceCheck() {
@@ -252,5 +264,42 @@ namespace SpellBound.Controller.PlayerController {
             hotkeyOneFlagged = true;
         }
         #endregion
+
+        /// <summary>
+        /// Runs if the debugger is attached.
+        /// </summary>
+        public void RegisterDebugInfo(SbPlayerDebugHudBase hud) {
+            hud.Field("Controller.LocoState", () => {
+                var lsName = _currentLocoState ? _currentLocoState.name : "-";
+                return lsName;
+            });
+            
+            hud.Field("Controller.ActionState", () => {
+                var asName = _currentActionState ? _currentActionState.name : "-";
+                return asName;
+            });
+            
+            hud.Field("Controller.HorizontalSpeed", () => {
+                if (_rigidbodyMover == null) 
+                    return "-";
+                
+                var v = _rigidbodyMover.GetRigidbodyVelocity();
+                var hMag = Vector3.ProjectOnPlane(v, _planarUp).magnitude;
+                return hMag.ToString("F2");
+            });
+
+            // Vertical speed (signed, + is along character up)
+            hud.Field("Controller.VerticalSpeed", () => {
+                if (_rigidbodyMover == null) 
+                    return "-";
+                
+                var v = _rigidbodyMover.GetRigidbodyVelocity();
+                var vMag = Vector3.Dot(v, _planarUp);
+                return vMag.ToString("F2");
+            });
+
+            // Jump force (current configured value)
+            hud.Field("Controller.JumpForce", () => jumpForce.ToString("F2"));
+        }
     }
 }

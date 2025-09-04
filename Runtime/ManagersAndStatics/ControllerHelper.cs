@@ -57,5 +57,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
             var sign = Mathf.Sign(Vector3.Dot(planeNormal, Vector3.Cross(vector1, vector2)));
             return angle * sign;
         }
+        
+        public static string FormatVec(Vector3 v) => $"{v.x:F2},{v.y:F2},{v.z:F2}";
     }
 }

@@ -16,20 +16,30 @@ MonoBehaviour:
   - key: Ray.CastLength
     enabled: 1
   - key: Ray.SphereLength
-    enabled: 1
+    enabled: 0
   - key: Ray.SphereRadius
-    enabled: 1
+    enabled: 0
   - key: Ray.HasHit
-    enabled: 1
+    enabled: 0
   - key: Ray.HitDist
-    enabled: 1
+    enabled: 0
   - key: Ray.HitNormal
     enabled: 1
   - key: Ray.HitPoint
-    enabled: 1
+    enabled: 0
   - key: Ray.HasSphereHit
-    enabled: 1
+    enabled: 0
   - key: Ray.SphereHitDist
-    enabled: 1
+    enabled: 0
   - key: Ray.SphereHitPoint
+    enabled: 0
+  - key: Controller.HorizontalSpeed
+    enabled: 1
+  - key: Controller.VerticalSpeed
+    enabled: 1
+  - key: Controller.JumpForce
+    enabled: 0
+  - key: Controller.LocoState
+    enabled: 1
+  - key: Controller.ActionState
     enabled: 1
