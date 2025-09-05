@@ -4,6 +4,9 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "FallingState", menuName = "Spellbound/LocoStates/FallingState")]
     public class FallingStateSO : BaseLocoStateSO {
+        private const float HSpeedModifier = 1f;
+        private const float VSpeedModifer = 1f;
+        
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
             
@@ -18,7 +21,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            Cc.HandleInput(HSpeedModifier, VSpeedModifer);
         }
         
         public override void CheckSwitchStateLogic() {

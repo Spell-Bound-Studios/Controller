@@ -28,11 +28,10 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private float groundFriction = 100f;
         [SerializeField] private float gravity = 30f;
         [SerializeField] private float slideGravity = 5f;
-        [SerializeField] private float slopeLimit = 30f;
 
         private const float RotationFallOffAngle = 90f;
         
-        private RigidbodyMover _rigidbodyMover;
+        private RigidbodyMover _mover;
         private LocoStateMachine _locoStateMachine;
         private ActionStateMachine _actionStateMachine;
         private AnimationControllerBase _animator;
@@ -54,7 +53,7 @@ namespace SpellBound.Controller.PlayerController {
         };
         
         private Transform _tr;
-        private Vector3 _velocity;
+        private Vector3 _horizontalVelocity;
         private Vector3 _planarUp;
         
         // #######################################
@@ -62,7 +61,7 @@ namespace SpellBound.Controller.PlayerController {
         // #######################################
         public float horizontalSpeed;
         public bool jumpFlag;
-        public bool GroundFlag => _rigidbodyMover.IsGrounded();
+        public bool GroundFlag => _mover.IsGrounded();
         public bool hotkeyOneFlagged;
         public bool interactFlagged;
         
@@ -78,7 +77,7 @@ namespace SpellBound.Controller.PlayerController {
             if (input == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
             
-            _rigidbodyMover = GetComponent<RigidbodyMover>();
+            _mover = GetComponent<RigidbodyMover>();
         }
         
         private void OnEnable() {
@@ -126,6 +125,9 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         private void FixedUpdate() {
+            // Drives the ground sensor and states will read the result.
+            _mover.RunGroundSensor();
+            
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
             _actionStateMachine.CurrentActionStateDriver.FixedUpdateState();
             
@@ -135,68 +137,63 @@ namespace SpellBound.Controller.PlayerController {
         private void HandleLocoStateChanged(BaseLocoStateSO state) => _currentLocoState = state;
         private void HandleActionStateChanged(BaseActionStateSO state) => _currentActionState = state;
         
-        public void HandleHorizontalVelocityInput() {
-            // Handles additional vertical velocity if necessary.
-            _rigidbodyMover.CheckForGround();
+        public void HandleInput(float hSpeedModifier, float vSpeedModifier) {
+            var inputDesired = CalculateCameraRelativeMovementFromInput();
+            var weightForce = _mover.GetMass() * gravity;
             
-            var velocity = CalculateMovementVelocity();
-            velocity.y += _rigidbodyMover.GetRigidbodyVelocity().y;
+            var currentHorizontalVelocity = _mover.GetRigidbodyVelocity();
+            currentHorizontalVelocity.y = 0;
             
-            _rigidbodyMover.SetVelocity(velocity);
+            _horizontalVelocity = hSpeedModifier * movementSpeed * inputDesired - currentHorizontalVelocity;
+            _mover.ApplyForce(_horizontalVelocity);
             
-            _velocity = velocity;
-            horizontalSpeed = Vector3.ProjectOnPlane(_velocity, _planarUp).magnitude;
+            // Calculate the actual horizontal speed at the end so that we can send to animator.
+            horizontalSpeed = Vector3.ProjectOnPlane(currentHorizontalVelocity, _planarUp).magnitude;
         }
 
         public void HandleHorizontalForceInput() {
-            _rigidbodyMover.CheckForGround();
+            _mover.RunGroundSensor();
 
-            _rigidbodyMover.SetLinearDampening(_rigidbodyMover.IsGrounded() 
+            _mover.SetLinearDampening(_mover.IsGrounded() 
                     ? 10 
                     : 0);
 
-            var direction = CalculateMovementDirection();
+            var direction = CalculateCameraRelativeMovementFromInput();
             
-            _rigidbodyMover.ApplyForce(direction * 80f);
+            _mover.ApplyForce(direction * 80f);
         }
 
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
             var planarVelocity = Vector3.ProjectOnPlane(
-                    _rigidbodyMover.GetRigidbodyVelocity(), _planarUp);
+                    _mover.GetRigidbodyVelocity(), _planarUp);
 
             if (planarVelocity.sqrMagnitude < 1e-6f)
                 return;
 
             var desiredDir = planarVelocity.normalized;
             var targetRotation = Quaternion.LookRotation(desiredDir, _planarUp);
-            var angleDiff = Quaternion.Angle(_rigidbodyMover.GetRigidbodyRotation(), targetRotation);
+            var angleDiff = Quaternion.Angle(_mover.GetRigidbodyRotation(), targetRotation);
             var speedFactor = Mathf.InverseLerp(0f, RotationFallOffAngle, angleDiff);
             
             var maxStepDeg = turnTowardsInputSpeed * speedFactor * Time.fixedDeltaTime;
 
             var nextRotation = Quaternion.RotateTowards(
-                    _rigidbodyMover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
+                    _mover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
             
-            _rigidbodyMover.SetRigidbodyRotation(nextRotation);
+            _mover.SetRigidbodyRotation(nextRotation);
         }
-
-        /// <summary>
-        /// Returns the desired velocity vector.
-        /// </summary>
-        /// <returns></returns>
-        private Vector3 CalculateMovementVelocity() => CalculateMovementDirection() * movementSpeed;
         
         /// <summary>
-        /// Returns a direction that the player is moving.
+        /// Returns a horizontal movement vector from camera-relative input.
         /// </summary>
-        private Vector3 CalculateMovementDirection() {
+        private Vector3 CalculateCameraRelativeMovementFromInput() {
             // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
             var direction =
                     Vector3.ProjectOnPlane(
-                              referenceTransform.right, _tr.up).normalized * 
+                              referenceTransform.right, _planarUp).normalized * 
                       input.Direction.x + 
                       Vector3.ProjectOnPlane(
-                              referenceTransform.forward, _tr.up).normalized * 
+                              referenceTransform.forward, _planarUp).normalized * 
                       input.Direction.y;
             
             return direction.magnitude > 1f 
@@ -209,13 +206,13 @@ namespace SpellBound.Controller.PlayerController {
         public void SetSensorRange(Helper.RaycastLength sensorLength) {
             switch (sensorLength) {
                 case Helper.RaycastLength.Normal:
-                    _rigidbodyMover.SetSensorRange(1);
+                    _mover.SetSensorRange(1);
                     break;
                 case Helper.RaycastLength.Extended:
-                    _rigidbodyMover.SetSensorRange(1.1f);
+                    _mover.SetSensorRange(1.1f);
                     break;
                 case Helper.RaycastLength.Retracted:
-                    _rigidbodyMover.SetSensorRange(0.5f);
+                    _mover.SetSensorRange(0.5f);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
@@ -224,7 +221,7 @@ namespace SpellBound.Controller.PlayerController {
 
         #region StateEvaluaters
         private void HandleJumpPressed() {
-            if (!_rigidbodyMover.IsGrounded())
+            if (!_mover.IsGrounded())
                 return;
 
             if (!ResourceCheck())
@@ -234,7 +231,7 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         public void Jump() {
-            _rigidbodyMover.ApplyJumpForce(jumpForce);
+            _mover.ApplyJumpForce(jumpForce);
         }
 
         private bool ResourceCheck() {
@@ -280,20 +277,19 @@ namespace SpellBound.Controller.PlayerController {
             });
             
             hud.Field("Controller.HorizontalSpeed", () => {
-                if (_rigidbodyMover == null) 
+                if (_mover == null) 
                     return "-";
                 
-                var v = _rigidbodyMover.GetRigidbodyVelocity();
+                var v = _mover.GetRigidbodyVelocity();
                 var hMag = Vector3.ProjectOnPlane(v, _planarUp).magnitude;
                 return hMag.ToString("F2");
             });
-
-            // Vertical speed (signed, + is along character up)
+            
             hud.Field("Controller.VerticalSpeed", () => {
-                if (_rigidbodyMover == null) 
+                if (_mover == null) 
                     return "-";
                 
-                var v = _rigidbodyMover.GetRigidbodyVelocity();
+                var v = _mover.GetRigidbodyVelocity();
                 var vMag = Vector3.Dot(v, _planarUp);
                 return vMag.ToString("F2");
             });

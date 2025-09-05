@@ -3,6 +3,9 @@
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "GroundState", menuName = "Spellbound/LocoStates/GroundState")]
     public class GroundStateSO : BaseLocoStateSO {
+        private const float HSpeedModifier = 1f;
+        private const float VSpeedModifer = 1f;
+        
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
             
@@ -12,11 +15,11 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void UpdateStateLogic() {
             CheckSwitchStateLogic();
-            StateHelper.NotifyLocoAnimationSpeedChange(Cc.horizontalSpeed);
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            Cc.HandleInput(HSpeedModifier, VSpeedModifer);
+            StateHelper.NotifyLocoAnimationSpeedChange(Cc.horizontalSpeed);
         }
         
         public override void CheckSwitchStateLogic() {

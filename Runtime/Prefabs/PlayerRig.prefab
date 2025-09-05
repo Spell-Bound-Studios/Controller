@@ -1935,12 +1935,11 @@ MonoBehaviour:
   movementSpeed: 5
   airControlRate: 2
   jumpSpeed: 10
-  jumpDuration: 0.2
+  jumpForce: 5
   airFriction: 0.5
   groundFriction: 100
   gravity: 30
   slideGravity: 5
-  slopeLimit: 30
   horizontalSpeed: 0
   jumpFlag: 0
   hotkeyOneFlagged: 0
@@ -1962,7 +1961,7 @@ MonoBehaviour:
   colliderHeight: 2
   colliderDiameter: 1
   colliderOffset: {x: 0, y: 0.4, z: 0}
-  horizontalForceMode: 0
+  horizontalForceMode: 2
   verticalForceMode: 1
   inclineGroundTolerance: 60
 --- !u!114 &818432367506289426
@@ -2004,8 +2003,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debuggingCanvasPrefab: {fileID: 9177738118118135308, guid: fc46b5e8f91bcf44880476f3bd43d72e, type: 3}
   profile: {fileID: 11400000, guid: 291e84c3cbc27ab4a88681f8791eee07, type: 2}
-  currentLocoState: {fileID: 0}
-  currentActionState: {fileID: 0}
+  fieldToggles: []
   showRaycastGizmos: 1
 --- !u!1 &9024056515028608916
 GameObject:

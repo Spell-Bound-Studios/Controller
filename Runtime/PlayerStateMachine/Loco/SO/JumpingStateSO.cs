@@ -4,6 +4,9 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "JumpingState", menuName = "Spellbound/LocoStates/JumpingState")]
     public class JumpingStateSO : BaseLocoStateSO {
+        private const float HSpeedModifier = 1f;
+        private const float VSpeedModifer = 1f;
+        
         private readonly WaitForSeconds _minJumpDuration = new(0.3f);
         private readonly WaitForSeconds _maxJumpDuration = new(3f);
         private Coroutine _jumpMinRoutine;
@@ -26,7 +29,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            Cc.HandleInput(HSpeedModifier, VSpeedModifer);
         }
         
         public override void CheckSwitchStateLogic() {

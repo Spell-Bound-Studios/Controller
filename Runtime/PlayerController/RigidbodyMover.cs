@@ -14,11 +14,11 @@ namespace SpellBound.Controller.PlayerController {
         [SerializeField] private Vector3 colliderOffset = new(0, .4f, 0);
 
         [Header("Rigidbody Settings:")]
-        [SerializeField] private ForceMode horizontalForceMode = ForceMode.Force;
+        [SerializeField] private ForceMode horizontalForceMode = ForceMode.VelocityChange;
         [SerializeField] private ForceMode verticalForceMode = ForceMode.Impulse;
         
         [Header("Sensor Settings:")]
-        [SerializeField] private float inclineGroundTolerance = 60f;
+        [SerializeField] private float inclineGroundTolerance = 45f;
 
         private Transform _tr;
         private Rigidbody _rb;
@@ -47,20 +47,13 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         /// <summary>
-        /// Checks for the ground based on layer and raycast.
-        /// Returns early if you're not on the ground.
+        /// Checks for the ground based on layer, angle, and raycast length.
         /// </summary>
-        public void CheckForGround() {
+        public void RunGroundSensor() {
             if (_currentLayer != gameObject.layer)
                 RecalculateSensorLayerMask();
-
-            _currentGroundAdjustmentVelocity = Vector3.zero;
             
-            // Extends the sensor range if we are using step-up logic but otherwise uses the base range.
             _raycastSensor.CastLength = _adjustedSensorRange;
-            
-            _raycastSensor.SphereRadius = _collider.radius;
-            _raycastSensor.SphereCastLength = _colliderHalfSize + stepHeightRatio;
             
             _raycastSensor.CastRaycast();
             
@@ -74,25 +67,6 @@ namespace SpellBound.Controller.PlayerController {
             }
 
             _isGrounded = detectedHit;
-
-            if (!_isGrounded)
-                return;
-            
-            // The following attempts to tackle quantifying how much we should shove the player up or down based on their
-            // collider. Imagine moving through a very bumpy region: we don't want the character to briefly enter the
-            // falling state every few steps... so this will attempt to quantify a value to push them up or down and keep
-            // them flush to the ground when they are within tolerance.
-            
-            // Distance from the ground.
-            var distance = _raycastSensor.GetRaycastHitDistance();
-            // Top boundary of where the player should be positioned.
-            var upperLimit = colliderHeight * _tr.localScale.x * (1f - stepHeightRatio) * 0.5f;
-            // Where feet should be relative to the ground.
-            var middle = upperLimit + colliderHeight * _tr.localScale.x * stepHeightRatio;
-            // Difference between where the player is and where they should be: the middle.
-            var distanceToGo = middle - distance;
-            // Velocity needs to move the player to the correct position.
-            //_currentGroundAdjustmentVelocity = _tr.up * (distanceToGo / Time.fixedDeltaTime);
         }
 
         public bool IsGrounded() => _isGrounded;
@@ -106,6 +80,8 @@ namespace SpellBound.Controller.PlayerController {
         public void SetRigidbodyRotation(Quaternion rotation) => _rb.MoveRotation(rotation);
         public void ApplyForce(Vector3 direction) => _rb.AddForce(direction, horizontalForceMode);
         public void SetLinearDampening(float amount) => _rb.linearDamping = amount;
+        public float GetInclineGroundTolerance() => inclineGroundTolerance;
+        public float GetMass() => _rb.mass;
         
         private void Setup() {
             _rb = GetComponent<Rigidbody>();
@@ -137,6 +113,7 @@ namespace SpellBound.Controller.PlayerController {
             
             _raycastSensor.SetCastOrigin(_collider.bounds.center);
             _raycastSensor.SetCastDirection(Helper.CastDirection.Down);
+            _raycastSensor.SetSphereRadius(_collider.radius + colliderOffset.y);
 
             RecalculateSensorLayerMask();
 

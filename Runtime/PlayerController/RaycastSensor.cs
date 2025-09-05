@@ -36,7 +36,7 @@ namespace SpellBound.Controller.PlayerController {
                     radius: SphereRadius, 
                     direction: worldDir, 
                     hitInfo: out _sphereHit, 
-                    maxDistance: SphereCastLength, 
+                    maxDistance: CastLength, 
                     layerMask: LayerMask, 
                     queryTriggerInteraction: QueryTriggerInteraction.Ignore);
         }
@@ -52,6 +52,7 @@ namespace SpellBound.Controller.PlayerController {
         public bool HasDetectedSphereHit() => _sphereHit.collider !=null;
         public float GetSphereHitDistance() => _sphereHit.distance;
         public Vector3 GetSphereHitPoint() => _sphereHit.point;
+        public void SetSphereRadius(float radius) => SphereRadius = radius;
         public Vector3 GetCastOriginWorld() => _tr.TransformPoint(_origin);
         public Vector3 GetCastDirectionWorld() => GetCastDirection();
 
