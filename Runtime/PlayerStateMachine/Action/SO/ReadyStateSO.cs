@@ -1,4 +1,5 @@
-﻿using SpellBound.Core;
+﻿using SpellBound.Controller.PlayerController;
+using SpellBound.Core;
 using SpellBound.CorsairsWorld;
 using Unity.Entities;
 using Unity.Physics;
@@ -30,15 +31,15 @@ namespace SpellBound.Controller.PlayerStateMachine {
 
         private void HandleHotkeyOnePressed() {
             if (!Physics.Raycast(
-                        Cc.referenceTransform.position,
+                        SyncTransform.Instance.transform.position,
                         Cc.referenceTransform.forward,
                         out var hit,
-                        10f,
+                        6f,
                         1 << 6
                 ))
                 return;
             
-            ClientChunkManager.Instance.DigSphere(hit.point, 2f, -255);
+            ClientChunkManager.Instance.DigSphere(hit.point, 1f, -255);
             StateMachine.ChangeState(StateMachine.GCDStateDriver);
         }
         
