@@ -17,7 +17,7 @@ namespace SpellBound.Controller.PlayerController {
         [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
         
         [Header("Camera Follow Reference:")]
-        public Transform referenceTransform { get; private set; }
+        [field: SerializeField] public Transform referenceTransform { get; private set; }
         
         [Header("Collider Settings:")] 
         [field: SerializeField] public ResizableCapsuleCollider ResizableCapsuleCollider { get; private set; }
