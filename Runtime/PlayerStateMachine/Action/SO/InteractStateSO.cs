@@ -27,7 +27,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
 
         public override void ExitStateLogic() {
-            Cc.interactFlagged = false;
+            //Cc.interactFlagged = false;
         }
         
         private IEnumerator Routine() {

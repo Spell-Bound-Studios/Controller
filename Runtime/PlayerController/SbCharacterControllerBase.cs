@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpellBound.Controller.ManagersAndStatics;
+using Spellbound.Controller.PlayerController;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
@@ -10,31 +11,30 @@ namespace SpellBound.Controller.PlayerController {
     /// <summary>
     /// Input and stats meet here to inform supporting members.
     /// </summary>
-    [RequireComponent(typeof(RigidbodyMover))]
+    [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
     public abstract class SbCharacterControllerBase : MonoBehaviour, IDebuggingInfo {
-        [Header("References")]
-        [SerializeField] public PlayerInputActionsSO input;
-        [SerializeField] private Transform referenceTransform;
+        [Header("Input Reference:"), Tooltip("Please drag and drop.")]
+        [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
         
-        [Header("Settings")]
-        [SerializeField] private float turnTowardsInputSpeed = 500f;
+        [Header("Camera Follow Reference:")]
+        public Transform referenceTransform { get; private set; }
         
-        [Header("Default Values")]
-        [SerializeField] private float movementSpeed = 5f;
-        [SerializeField] private float airControlRate = 2f;
-        [SerializeField] private float jumpSpeed = 10f;
-        [SerializeField] private float jumpForce = 5f;
-        [SerializeField] private float airFriction = 0.5f;
-        [SerializeField] private float groundFriction = 100f;
-        [SerializeField] private float gravity = 30f;
-        [SerializeField] private float slideGravity = 5f;
-
-        private const float RotationFallOffAngle = 90f;
+        [Header("Collider Settings:")] 
+        [field: SerializeField] public ResizableCapsuleCollider ResizableCapsuleCollider { get; private set; }
+        [field: SerializeField] public LayerData LayerData { get; private set; }
         
-        private RigidbodyMover _mover;
+        [field: SerializeField] public RigidbodyData RigidbodyData { get; private set; }
+        
+        [field: SerializeField] public RotationData RotationData { get; private set; }
+        
+        [field: SerializeField] public StatData StatData { get; private set; }
+        [field: SerializeField] public StateData StateData { get; private set; }
+        
+        public Rigidbody Rb { get; private set; }
+        private AnimationControllerBase _animator;
+        
         private LocoStateMachine _locoStateMachine;
         private ActionStateMachine _actionStateMachine;
-        private AnimationControllerBase _animator;
         
         private BaseLocoStateSO _currentLocoState;
         private BaseActionStateSO _currentActionState;
@@ -44,6 +44,7 @@ namespace SpellBound.Controller.PlayerController {
                 StateHelper.DefaultFallingStateSO,
                 StateHelper.DefaultJumpingStateSO,
                 StateHelper.DefaultLandingStateSO,
+                StateHelper.DefaultSlidingStateSO
         };
 
         private readonly List<string> _defaultActionStatesList = new() {
@@ -54,16 +55,7 @@ namespace SpellBound.Controller.PlayerController {
         
         private Transform _tr;
         private Vector3 _horizontalVelocity;
-        private Vector3 _planarUp;
-        
-        // #######################################
-        // State Polling --Condensed Value Types--
-        // #######################################
-        public float horizontalSpeed;
-        public bool jumpFlag;
-        public bool GroundFlag => _mover.IsGrounded();
-        public bool hotkeyOneFlagged;
-        public bool interactFlagged;
+        public Vector3 planarUp { get; private set; }
         
         /// <summary>
         /// Derived classes must provide the correct animation controller.
@@ -72,13 +64,28 @@ namespace SpellBound.Controller.PlayerController {
         
         private void Awake() {
             _tr = transform;
-            _planarUp = _tr.up;
+            planarUp = _tr.up;
             
             if (input == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
             
-            _mover = GetComponent<RigidbodyMover>();
+            Rb = GetComponent<Rigidbody>();
+            Rb.freezeRotation = true;
+            Rb.useGravity = true;
+            Rb.interpolation = RigidbodyInterpolation.Interpolate;
+            
+            ResizableCapsuleCollider.Initialize(gameObject);
+            ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
+        
+#if UNITY_EDITOR
+        private void OnValidate() {
+            _tr = transform;
+            
+            ResizableCapsuleCollider.Initialize(gameObject);
+            ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
+        }
+#endif
         
         private void OnEnable() {
             StateHelper.OnLocoStateChange += HandleLocoStateChanged;
@@ -125,94 +132,33 @@ namespace SpellBound.Controller.PlayerController {
         }
         
         private void FixedUpdate() {
-            // Drives the ground sensor and states will read the result.
-            _mover.RunGroundSensor();
-            
             _locoStateMachine.CurrentLocoStateDriver.FixedUpdateState();
             _actionStateMachine.CurrentActionStateDriver.FixedUpdateState();
-            
-            HandleCharacterTurnTowardsHorizontalVelocity();
         }
         
         private void HandleLocoStateChanged(BaseLocoStateSO state) => _currentLocoState = state;
         private void HandleActionStateChanged(BaseActionStateSO state) => _currentActionState = state;
         
-        public void HandleInput(float hSpeedModifier, float vSpeedModifier) {
-            var inputDesired = CalculateCameraRelativeMovementFromInput();
-            var weightForce = _mover.GetMass() * gravity;
-            
-            var currentHorizontalVelocity = _mover.GetRigidbodyVelocity();
-            currentHorizontalVelocity.y = 0;
-            
-            _horizontalVelocity = hSpeedModifier * movementSpeed * inputDesired - currentHorizontalVelocity;
-            _mover.ApplyForce(_horizontalVelocity);
-            
-            // Calculate the actual horizontal speed at the end so that we can send to animator.
-            horizontalSpeed = Vector3.ProjectOnPlane(currentHorizontalVelocity, _planarUp).magnitude;
-        }
-
-        public void HandleHorizontalForceInput() {
-            _mover.RunGroundSensor();
-
-            _mover.SetLinearDampening(_mover.IsGrounded() 
-                    ? 10 
-                    : 0);
-
-            var direction = CalculateCameraRelativeMovementFromInput();
-            
-            _mover.ApplyForce(direction * 80f);
-        }
+        
 
         private void HandleCharacterTurnTowardsHorizontalVelocity() {
-            var planarVelocity = Vector3.ProjectOnPlane(
-                    _mover.GetRigidbodyVelocity(), _planarUp);
-
-            if (planarVelocity.sqrMagnitude < 1e-6f)
-                return;
-
-            var desiredDir = planarVelocity.normalized;
-            var targetRotation = Quaternion.LookRotation(desiredDir, _planarUp);
-            var angleDiff = Quaternion.Angle(_mover.GetRigidbodyRotation(), targetRotation);
-            var speedFactor = Mathf.InverseLerp(0f, RotationFallOffAngle, angleDiff);
             
-            var maxStepDeg = turnTowardsInputSpeed * speedFactor * Time.fixedDeltaTime;
-
-            var nextRotation = Quaternion.RotateTowards(
-                    _mover.GetRigidbodyRotation(), targetRotation, maxStepDeg);
-            
-            _mover.SetRigidbodyRotation(nextRotation);
         }
         
-        /// <summary>
-        /// Returns a horizontal movement vector from camera-relative input.
-        /// </summary>
-        private Vector3 CalculateCameraRelativeMovementFromInput() {
-            // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
-            var direction =
-                    Vector3.ProjectOnPlane(
-                              referenceTransform.right, _planarUp).normalized * 
-                      input.Direction.x + 
-                      Vector3.ProjectOnPlane(
-                              referenceTransform.forward, _planarUp).normalized * 
-                      input.Direction.y;
-            
-            return direction.magnitude > 1f 
-                    ? direction.normalized 
-                    : direction;
-        }
+        
         
         public Transform GetReferenceTransform() => referenceTransform;
         
         public void SetSensorRange(Helper.RaycastLength sensorLength) {
             switch (sensorLength) {
                 case Helper.RaycastLength.Normal:
-                    _mover.SetSensorRange(1);
+                    
                     break;
                 case Helper.RaycastLength.Extended:
-                    _mover.SetSensorRange(1.1f);
+                    
                     break;
                 case Helper.RaycastLength.Retracted:
-                    _mover.SetSensorRange(0.5f);
+                    
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sensorLength), sensorLength, null);
@@ -221,32 +167,29 @@ namespace SpellBound.Controller.PlayerController {
 
         #region StateEvaluaters
         private void HandleJumpPressed() {
-            if (!_mover.IsGrounded())
+            if (!StateData.Grounded)
                 return;
 
             if (!ResourceCheck())
                 return;
             
-            jumpFlag = true;
+            //jumpFlag = true;
         }
-
-        public void Jump() {
-            _mover.ApplyJumpForce(jumpForce);
-        }
+        
 
         private bool ResourceCheck() {
             return true;
         }
         
         private void HandleInteractPressed() {
-            if (interactFlagged)
+            /*if (interactFlagged)
                 return;
             
-            interactFlagged = true;
+            interactFlagged = true;*/
         }
 
         private void HandleHotkeyOnePressed() {
-            if (hotkeyOneFlagged)
+            /*if (hotkeyOneFlagged)
                 return;
             
             if (!Physics.Raycast(
@@ -258,7 +201,7 @@ namespace SpellBound.Controller.PlayerController {
                         QueryTriggerInteraction.Ignore))
                 return;
 
-            hotkeyOneFlagged = true;
+            hotkeyOneFlagged = true;*/
         }
         #endregion
 
@@ -277,25 +220,35 @@ namespace SpellBound.Controller.PlayerController {
             });
             
             hud.Field("Controller.HorizontalSpeed", () => {
-                if (_mover == null) 
+                if (Rb == null) 
                     return "-";
                 
-                var v = _mover.GetRigidbodyVelocity();
-                var hMag = Vector3.ProjectOnPlane(v, _planarUp).magnitude;
+                var v = Rb.linearVelocity;
+                var hMag = Vector3.ProjectOnPlane(v, planarUp).magnitude;
                 return hMag.ToString("F2");
             });
             
             hud.Field("Controller.VerticalSpeed", () => {
-                if (_mover == null) 
+                if (Rb == null) 
                     return "-";
                 
-                var v = _mover.GetRigidbodyVelocity();
-                var vMag = Vector3.Dot(v, _planarUp);
+                var v = Rb.linearVelocity;
+                var vMag = Vector3.Dot(v, planarUp);
                 return vMag.ToString("F2");
             });
 
             // Jump force (current configured value)
-            hud.Field("Controller.JumpForce", () => jumpForce.ToString("F2"));
+            hud.Field("Controller.JumpForce", () => StatData.jumpForce.ToString("F2"));
+            
+            hud.Gizmo(() => {
+                var origin = ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+                var dir = -planarUp;
+
+                var rayLen = ResizableCapsuleCollider.SlopeData.RayDistance;
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(origin, origin + dir * rayLen);
+                Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
+            });
         }
     }
 }

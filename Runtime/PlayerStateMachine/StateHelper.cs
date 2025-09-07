@@ -13,6 +13,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public const string DefaultFallingStateSO = "FallingState";
         public const string DefaultLandingStateSO = "LandingState";
         public const string DefaultJumpingStateSO = "JumpingState";
+        public const string DefaultSlidingStateSO = "SlidingState";
 
         public const string DefaultReadyStateSO = "ReadyState";
         public const string DefaultGCDStateSO = "GCDState";

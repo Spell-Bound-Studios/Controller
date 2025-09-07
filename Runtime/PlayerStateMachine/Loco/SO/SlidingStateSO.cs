@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
-    [CreateAssetMenu(fileName = "GroundState", menuName = "Spellbound/LocoStates/GroundState")]
-    public class GroundStateSO : BaseLocoStateSO {
+    [CreateAssetMenu(fileName = "SlidingState", menuName = "Spellbound/LocoStates/SlidingState")]
+    public class SlidingStateSO : BaseLocoStateSO{
         public override void EnterStateLogic(LocoStateMachine stateMachine) {
             StateMachine = stateMachine;
             
             StateHelper.NotifyLocoStateChange(this);
             StateHelper.NotifyLocoAnimationChange(StateHelper.States.Grounded);
-            Cc.input.OnJumpInput += HandleJumpInput;
+            
+            Cc.ResizableCapsuleCollider.SlopeData.ClearStepHeightPercentage();
         }
         
         public override void UpdateStateLogic() {
@@ -26,20 +27,16 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (!Cc.StateData.Grounded)
                 StateMachine.ChangeState(StateMachine.FallingStateDriver);
             
-            if (Cc.StatData.slopeSpeedModifier == 0)
-                StateMachine.ChangeState(StateMachine.SlidingStateDriver);
+            if (Cc.StatData.slopeSpeedModifier != 0)
+                StateMachine.ChangeState(StateMachine.GroundStateDriver);
         }
         
         public override void ExitStateLogic() {
-            Cc.input.OnJumpInput -= HandleJumpInput;
+            Cc.ResizableCapsuleCollider.SlopeData.RevertStepHeightPercentage();
         }
 
         protected override void HandleAnimation() {
             StateHelper.NotifyLocoAnimationSpeedChange(GetHorizontalSpeed());
-        }
-
-        private void HandleJumpInput() {
-            StateMachine.ChangeState(StateMachine.JumpingStateDriver);
         }
     }
 }

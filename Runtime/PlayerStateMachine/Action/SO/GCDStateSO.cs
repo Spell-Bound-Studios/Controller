@@ -38,8 +38,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (_gcdRoutine != null) 
                 Cc.StopCoroutine(_gcdRoutine);
 
-            Cc.hotkeyOneFlagged = false;
-            Cc.interactFlagged = false;
+            //Cc.hotkeyOneFlagged = false;
+            //Cc.interactFlagged = false;
         }
         
         private IEnumerator GCDRoutine() {

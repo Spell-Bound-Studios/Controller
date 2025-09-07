@@ -1,4 +1,5 @@
 ﻿using SpellBound.Core;
+using SpellBound.CorsairsWorld;
 using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
@@ -10,6 +11,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             StateMachine = stateMachine;
             
             StateHelper.NotifyActionStateChange(this);
+            Cc.input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
+            Cc.input.OnInteractPressed += TemporaryEcsBandAidInteractPressed;
         }
         
         public override void UpdateStateLogic() {
@@ -18,15 +21,26 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public override void FixedUpdateStateLogic() { }
         
-        public override void CheckSwitchStateLogic() {
-            if (Cc.hotkeyOneFlagged)
-                StateMachine.ChangeState(StateMachine.GCDStateDriver);
+        public override void CheckSwitchStateLogic() { }
 
-            if (Cc.interactFlagged)
-                TemporaryEcsBandAidInteractPressed(); // Temporary
+        public override void ExitStateLogic() {
+            Cc.input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
+            Cc.input.OnInteractPressed -= TemporaryEcsBandAidInteractPressed;
         }
-        
-        public override void ExitStateLogic() { }
+
+        private void HandleHotkeyOnePressed() {
+            if (!Physics.Raycast(
+                        Cc.referenceTransform.position,
+                        Cc.referenceTransform.forward,
+                        out var hit,
+                        10f,
+                        1 << 6
+                ))
+                return;
+            
+            ClientChunkManager.Instance.DigSphere(hit.point, 5f, 255);
+            StateMachine.ChangeState(StateMachine.GCDStateDriver);
+        }
         
         /// <summary>
         /// This is a placeholder method for once we solve ECS/Gameobject interoperability.

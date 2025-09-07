@@ -4,9 +4,6 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "LandingState", menuName = "Spellbound/LocoStates/LandingState")]
     public class LandingStateSO : BaseLocoStateSO {
-        private const float HSpeedModifier = 1f;
-        private const float VSpeedModifer = 1f;
-        
         // Landing Thresholds
         private readonly WaitForSeconds _landingDuration = new(0.15f);
         private Coroutine _landRoutine;
@@ -26,7 +23,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleInput(HSpeedModifier, VSpeedModifer);
+            GroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
         }
         
         public override void CheckSwitchStateLogic() {
@@ -43,5 +42,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             yield return _landingDuration;
             _landRoutine = null;
         }
+
+        protected override void HandleAnimation() { }
     }
 }

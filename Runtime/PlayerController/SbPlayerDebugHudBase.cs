@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -29,9 +28,6 @@ namespace SpellBound.Controller.PlayerController {
         private readonly List<Action> _gizmos = new();
         private readonly Dictionary<string, FieldOption> _toggleIndex = new();
         
-        private RigidbodyMover _mover;
-        private SbCharacterControllerBase _controller;
-        private RaycastSensor _sensor;
         private RectTransform _container;
 
         private bool _togglesDirty;
@@ -64,12 +60,6 @@ namespace SpellBound.Controller.PlayerController {
         }
 
         private void OnEnable() {
-            _mover = GetComponent<RigidbodyMover>();
-            if (_mover)
-                _sensor = _mover.GetRaycastSensor();
-            
-            _controller = GetComponent<SbCharacterControllerBase>();
-
             RegisterAllProviders();
             ApplyToggleVisibility();
         }
@@ -207,9 +197,6 @@ namespace SpellBound.Controller.PlayerController {
             var comps = GetComponents<IDebuggingInfo>();
             foreach (var t in comps)
                 t.RegisterDebugInfo(this);
-            
-            if (_sensor is IDebuggingInfo dbg) 
-                dbg.RegisterDebugInfo(this);
         }
         
         public void Field(string key, Func<string> getter) {
