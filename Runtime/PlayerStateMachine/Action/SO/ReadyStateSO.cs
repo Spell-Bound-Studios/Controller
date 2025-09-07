@@ -13,8 +13,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             
             StateHelper.NotifyActionStateChange(this);
             Cc.input.OnHotkeyOnePressed += HandleHotkeyOnePressed;
-            Cc.input.OnHotkeyOnePressed += HandleHotkeyTwoPressed;
-            Cc.input.OnHotkeyOnePressed += HandleHotkeyThreePressed;
+            Cc.input.OnHotkeyTwoPressed += HandleHotkeyTwoPressed;
+            Cc.input.OnHotkeyThreePressed += HandleHotkeyThreePressed;
             Cc.input.OnInteractPressed += TemporaryEcsBandAidInteractPressed;
         }
         
@@ -28,8 +28,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
 
         public override void ExitStateLogic() {
             Cc.input.OnHotkeyOnePressed -= HandleHotkeyOnePressed;
-            Cc.input.OnHotkeyOnePressed -= HandleHotkeyTwoPressed;
-            Cc.input.OnHotkeyOnePressed -= HandleHotkeyThreePressed;
+            Cc.input.OnHotkeyTwoPressed -= HandleHotkeyTwoPressed;
+            Cc.input.OnHotkeyThreePressed -= HandleHotkeyThreePressed;
             Cc.input.OnInteractPressed -= TemporaryEcsBandAidInteractPressed;
         }
 
@@ -57,23 +57,23 @@ namespace SpellBound.Controller.PlayerStateMachine {
                 ))
                 return;
             
-            ClientChunkManager.Instance.DigSphere(hit.point, 3f, -255);
+            ClientChunkManager.Instance.DigSphere(hit.point, 2f, -255);
             StateMachine.ChangeState(StateMachine.GCDStateDriver);
         }
         
         private void HandleHotkeyThreePressed() {
-                    if (!Physics.Raycast(
-                                SyncTransform.Instance.transform.position,
-                                Cc.referenceTransform.forward,
-                                out var hit,
-                                6f,
-                                1 << 6
-                        ))
-                        return;
-                    
-                    ClientChunkManager.Instance.DigSphere(hit.point, 10f, -255);
-                    StateMachine.ChangeState(StateMachine.GCDStateDriver);
-                }
+            if (!Physics.Raycast(
+                        SyncTransform.Instance.transform.position,
+                        Cc.referenceTransform.forward,
+                        out var hit,
+                        6f,
+                        1 << 6
+                ))
+                return;
+            
+            ClientChunkManager.Instance.DigSphere(hit.point, 3f, -255);
+            StateMachine.ChangeState(StateMachine.GCDStateDriver);
+        }
         
         /// <summary>
         /// This is a placeholder method for once we solve ECS/Gameobject interoperability.
