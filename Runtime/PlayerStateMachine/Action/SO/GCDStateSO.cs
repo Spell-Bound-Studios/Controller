@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SpellBound.Controller.PlayerStateMachine {
     [CreateAssetMenu(fileName = "GCDState", menuName = "Spellbound/ActionStates/GCDState")]
     public class GCDStateSO : BaseActionStateSO {
-        private const float DefaultDelay = 0.5f;
+        private const float DefaultDelay = 0.0f;
         
         [SerializeField] private float delay;
         [SerializeField] private StateHelper.States defaultGcdAnimation;
@@ -38,8 +38,8 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (_gcdRoutine != null) 
                 Cc.StopCoroutine(_gcdRoutine);
 
-            Cc.hotkeyOneFlagged = false;
-            Cc.interactFlagged = false;
+            //Cc.hotkeyOneFlagged = false;
+            //Cc.interactFlagged = false;
         }
         
         private IEnumerator GCDRoutine() {

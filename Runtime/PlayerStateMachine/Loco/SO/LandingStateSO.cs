@@ -23,7 +23,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            GroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
         }
         
         public override void CheckSwitchStateLogic() {
@@ -40,5 +42,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             yield return _landingDuration;
             _landRoutine = null;
         }
+
+        protected override void HandleAnimation() { }
     }
 }

@@ -18,7 +18,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             _jumpMinRoutine = Cc.StartCoroutine(JumpMinRoutine());
             _jumpMaxRoutine = Cc.StartCoroutine(JumpMaxRoutine());
 
-            Cc.Jump();
+            Jump();
         }
         
         public override void UpdateStateLogic() {
@@ -26,14 +26,15 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            HandleInput();
+            HandleCharacterRotation();
         }
         
         public override void CheckSwitchStateLogic() {
             // If the minimum time expires
             if (_jumpMinRoutine == null) {
                 // Check grounded and exit ground state.
-                if (Cc.GroundFlag)
+                if (Cc.StateData.Grounded)
                     StateMachine.ChangeState(StateMachine.LandingStateDriver);
             }
             // If maximum time expires
@@ -45,9 +46,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public override void ExitStateLogic() {
             if (_jumpMaxRoutine != null)
                 StateMachine.CharController.StopCoroutine(_jumpMaxRoutine);
-
-            Cc.jumpFlag = false;
         }
+        
+        protected override void HandleAnimation() { }
         
         private IEnumerator JumpMinRoutine() {
             // Prevents immediate transition back to GroundedState.
@@ -58,6 +59,10 @@ namespace SpellBound.Controller.PlayerStateMachine {
         private IEnumerator JumpMaxRoutine() {
             yield return _maxJumpDuration;
             _jumpMaxRoutine = null;
+        }
+
+        private void Jump() {
+            Cc.Rb.AddForce(Cc.StatData.jumpForce * Cc.StatData.JumpMultiplier * Cc.planarUp, Cc.RigidbodyData.verticalForceMode);
         }
     }
 }

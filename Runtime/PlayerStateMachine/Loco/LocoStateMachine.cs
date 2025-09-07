@@ -20,6 +20,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
         public JumpingStateDriver JumpingStateDriver;
         public JumpingStateSO JumpingState;
         
+        public SlidingStateDriver SlidingStateDriver;
+        public SlidingStateSO SlidingState;
+        
         public LocoStateMachine(SbCharacterControllerBase cc, List<string> defaultStatesList) {
             CharController = cc;
             
@@ -27,6 +30,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
             FallingStateDriver = new FallingStateDriver(this);
             LandingStateDriver = new LandingStateDriver(this);
             JumpingStateDriver =  new JumpingStateDriver(this);
+            SlidingStateDriver = new SlidingStateDriver(this);
             
             var defaultStates = StateHelper.GetDefaultLocoStatesFromDB(defaultStatesList);
 
@@ -43,6 +47,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
                         break;
                     case JumpingStateSO jso:
                         JumpingState = jso;
+                        break;
+                    case SlidingStateSO sso:
+                        SlidingState = sso;
                         break;
                 }
             }

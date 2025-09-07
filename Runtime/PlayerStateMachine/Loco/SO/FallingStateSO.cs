@@ -18,16 +18,20 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         public override void FixedUpdateStateLogic() {
-            Cc.HandleHorizontalVelocityInput();
+            GroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
         }
         
         public override void CheckSwitchStateLogic() {
-            if (Cc.GroundFlag)
+            if (Cc.StateData.Grounded)
                 StateMachine.ChangeState(StateMachine.LandingStateDriver);
         }
         
         public override void ExitStateLogic() {
             Cc.SetSensorRange(ControllerHelper.RaycastLength.Normal);
         }
+        
+        protected override void HandleAnimation() { }
     }
 }

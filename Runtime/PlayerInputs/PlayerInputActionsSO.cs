@@ -13,6 +13,9 @@ namespace SpellBound.Controller.PlayerInputs {
         public event Action OnInteractPressed = delegate { };
         public event Action OnInventoryPressed = delegate { };
         public event Action OnHotkeyOnePressed = delegate { };
+        public event Action OnHotkeyTwoPressed = delegate { };
+        public event Action OnHotkeyThreePressed = delegate { };
+        public event Action OnHotkeyFourPressed = delegate { };
         public event Action OnEscPressed = delegate { };
         public event Action OnCharacterMenuPressed = delegate { };
 
@@ -48,10 +51,21 @@ namespace SpellBound.Controller.PlayerInputs {
             if (context.performed)
                 OnHotkeyOnePressed.Invoke();
         }
-        
-        public void OnHotkeyTwo(InputAction.CallbackContext context) { }
-        public void OnHotkeyThree(InputAction.CallbackContext context) { }
-        public void OnHotkeyFour(InputAction.CallbackContext context) { }
+
+        public void OnHotkeyTwo(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnHotkeyTwoPressed.Invoke();
+        }
+
+        public void OnHotkeyThree(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnHotkeyThreePressed.Invoke();
+        }
+
+        public void OnHotkeyFour(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnHotkeyFourPressed.Invoke();
+        }
 
         public void OnCharacterMenu(InputAction.CallbackContext context) {
             if (context.performed)
