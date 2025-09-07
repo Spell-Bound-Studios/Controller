@@ -38,7 +38,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
                 ))
                 return;
             
-            ClientChunkManager.Instance.DigSphere(hit.point, 5f, 255);
+            ClientChunkManager.Instance.DigSphere(hit.point, 5f, -255);
             StateMachine.ChangeState(StateMachine.GCDStateDriver);
         }
         
