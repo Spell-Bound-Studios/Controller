@@ -6,7 +6,7 @@ using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
-    public class PlayerControllerExample : ControllerBase, IDebuggingInfo {
+    public sealed class PlayerControllerExample : ControllerBase, IDebuggingInfo {
         [Header("Input Reference:")]
         [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
         [Header("Camera Follow Reference:")]
@@ -33,8 +33,8 @@ namespace SpellBound.Controller.Samples {
         [SerializeField] private BaseSoState locoInitial;
 
         [Header("Action States")]
-        [SerializeField] private List<BaseSoState> actionStates;
-        [SerializeField] private BaseSoState actionInitial;
+        /*[SerializeField] private List<BaseSoState> actionStates;
+        [SerializeField] private BaseSoState actionInitial;*/
         
         [Header("Animator")]
         [SerializeField] private Animator animator;

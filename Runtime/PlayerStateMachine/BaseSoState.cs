@@ -1,4 +1,6 @@
-﻿using SpellBound.Controller.PlayerController;
+﻿using System;
+using SpellBound.Controller.PlayerController;
+using SpellBound.Core;
 using Unity.Collections;
 using UnityEngine;
 
@@ -8,8 +10,9 @@ namespace SpellBound.Controller.PlayerStateMachine {
     /// but it contains no game logic. (Keep UnityEditor bits behind #if UNITY_EDITOR as you have done.)
     /// </summary>
     public abstract class BaseSoState : ScriptableObject, IState {
-        [SerializeField, ReadOnly] private string id;
-        [SerializeField, ReadOnly] private string assetName;
+        [SerializeField, ReadOnly, Immutable] private string id;
+        [SerializeField, ReadOnly, Immutable] private string assetName;
+
         protected ControllerBase Ctx { get; private set; }
         public string Id => id;
         public string AssetName => assetName;
@@ -35,6 +38,20 @@ namespace SpellBound.Controller.PlayerStateMachine {
             var assetGuid = UnityEditor.AssetDatabase.GUIDFromAssetPath(assetPath).ToString();
             if (string.IsNullOrEmpty(id) || id != assetGuid) {
                 id = assetGuid;
+            }
+            
+            var interfaces = GetType().GetInterfaces();
+            var hasStateType = false;
+            foreach (var state in interfaces) {
+                if (!state.IsGenericType || state.GetGenericTypeDefinition() != typeof(IStateType<>)) 
+                    continue;
+
+                hasStateType = true;
+                break;
+            }
+            if (!hasStateType) {
+                Debug.LogError($"{name}: state must implement IStateType<TEnum> and expose a serialized enum field.", 
+                        this);
             }
         }
 #endif
