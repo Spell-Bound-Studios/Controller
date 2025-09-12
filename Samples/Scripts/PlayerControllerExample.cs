@@ -83,7 +83,7 @@ namespace SpellBound.Controller.Samples {
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
-            // Initialize a state by changing state.
+            // Initialize a state by calling the ChangeState method to get the machine going.
             locoStateMachine.ChangeState(LocoStateTypes.Grounded);
 
             /*actionStateMachine ??= StateMachine<ActionStateTypes>.CreateFromStates(

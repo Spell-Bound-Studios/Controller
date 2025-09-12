@@ -3,6 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpellBound.Controller.PlayerStateMachine {
+    /// <summary>
+    /// This state machine is intended to be driven by a MonoBehaviour and offer simple public methods to change states
+    /// and state variants. Additional information on the difference between "drivers", "states" and "variants" can be
+    /// found in the read me.
+    /// </summary>
+    /// <typeparam name="TContext">
+    /// TContext is expected to be a class of some kind that the user defines. We find that often times the controller
+    /// is the context required to run the state machine... however, we wanted to give the user complete flexibility
+    /// and allow them to containerize their own context should they choose.
+    /// </typeparam>
+    /// <typeparam name="TStateEnum">
+    /// TStateEnum is a user-defined enum. The state machine will instantiate one BaseStateDriver class per item in the
+    /// enum. We chose an enum because we find that it simplifies readability and allows the user to conceptualize
+    /// what it is that they are trying to make.
+    /// </typeparam>
+    /// Usage:
+    /// var myStateMachine = new StateMachine<MyContextClass, MyEnum>(myContext);
+    /// myStateMachine.SetInitialVariant(MyEnum.Item, myBaseStateSo);
+    /// myStateMachine.ChangeState(MyEnum.Item);
     public sealed class StateMachine<TContext, TStateEnum> where TContext : class where TStateEnum : Enum {
         public BaseStateDriver CurrentActiveDriver { get; private set; }
         public TContext ctx { get; }
