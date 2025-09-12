@@ -32,11 +32,12 @@ namespace SpellBound.Controller.Samples {
         
         [Header("Locomotion States")]
         [SerializeField] private List<BaseSoState> locoStates;
-        [SerializeField] private BaseSoState locoInitial;
+
+        [SerializeField] private LocoStateTypes initialLocoState = LocoStateTypes.Grounded;
 
         [Header("Action States")]
-        /*[SerializeField] private List<BaseSoState> actionStates;
-        [SerializeField] private BaseSoState actionInitial;*/
+        [SerializeField] private List<BaseSoState> actionStates;
+        [SerializeField] private ActionStateTypes initialActionState = ActionStateTypes.Ready;
         
         [Header("Animator")]
         [SerializeField] private Animator animator;
@@ -84,14 +85,11 @@ namespace SpellBound.Controller.Samples {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
             // Initialize a state by calling the ChangeState method to get the machine going.
-            locoStateMachine.ChangeState(LocoStateTypes.Grounded);
+            locoStateMachine.ChangeState(initialLocoState);
 
-            /*actionStateMachine ??= StateMachine<ActionStateTypes>.CreateFromStates(
-             ctx, 
-             actionStates, 
-             actionInitial);
-            
-            machines.Add(actionStateMachine);*/
+            actionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
+            actionStateMachine.SetInitialVariant(ActionStateTypes.Ready, actionStates[0]);
+            actionStateMachine.ChangeState(initialActionState);
         }
 
         public enum LocoStateTypes {
@@ -106,7 +104,7 @@ namespace SpellBound.Controller.Samples {
 
         public void RegisterDebugInfo(SbPlayerDebugHudBase debugHud) {
             // Show which ScriptableObject state is currently running
-            debugHud.Field("Current Loco State: ", () => {
+            debugHud.Field("Current Loco State", () => {
                 var currentStateVariant = locoStateMachine.GetCurrentRunningState();
                 return currentStateVariant != null 
                         ? currentStateVariant.AssetName 
@@ -115,8 +113,25 @@ namespace SpellBound.Controller.Samples {
             
             // Show each driver (enum value) and what variant it's pointing to
             foreach (LocoStateTypes stateType in Enum.GetValues(typeof(LocoStateTypes))) {
-                debugHud.Field($"Driver: {stateType}", () => {
+                debugHud.Field($"{stateType}", () => {
                     var currentVariant = locoStateMachine.GetCurrentVariant(stateType);
+                    return currentVariant != null 
+                            ? currentVariant.name 
+                            : "Not Assigned";
+                });
+            }
+            
+            // Repeat for action state machine.
+            debugHud.Field("Current Action State", () => {
+                var currentStateVariant = actionStateMachine.GetCurrentRunningState();
+                return currentStateVariant != null 
+                        ? currentStateVariant.AssetName 
+                        : "None";
+            });
+            
+            foreach (ActionStateTypes stateType in Enum.GetValues(typeof(ActionStateTypes))) {
+                debugHud.Field($"{stateType}", () => {
+                    var currentVariant = actionStateMachine.GetCurrentVariant(stateType);
                     return currentVariant != null 
                             ? currentVariant.name 
                             : "Not Assigned";

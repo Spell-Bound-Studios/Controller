@@ -63,3 +63,17 @@ MonoBehaviour:
     enabled: 1
   - key: 'Current Loco State: '
     enabled: 1
+  - key: 'Current Action State: '
+    enabled: 1
+  - key: 'Driver: Ready'
+    enabled: 1
+  - key: Grounded
+    enabled: 1
+  - key: Falling
+    enabled: 1
+  - key: Swimming
+    enabled: 1
+  - key: Current Action State
+    enabled: 1
+  - key: Ready
+    enabled: 1

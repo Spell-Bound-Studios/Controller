@@ -319,7 +319,10 @@ MonoBehaviour:
   locoStates:
   - {fileID: 11400000, guid: 8bc6e6c30705ef446853c20571975a4c, type: 2}
   - {fileID: 11400000, guid: 6feeed4ebacccbe46a99a1ff5299e921, type: 2}
-  locoInitial: {fileID: 11400000, guid: 8bc6e6c30705ef446853c20571975a4c, type: 2}
+  initialLocoState: 0
+  actionStates:
+  - {fileID: 11400000, guid: f74e86fc5b8d42c4099c063fc8fe07d4, type: 2}
+  initialActionState: 0
   animator: {fileID: 0}
 --- !u!114 &818432367506289426
 MonoBehaviour:

@@ -16050,7 +16050,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLayers:
-    serializedVersion: 2
     m_Bits: 4294967295
   rehitCooldownSeconds: 0.15
   impulseMultiplier: 100
@@ -16070,6 +16069,8 @@ MonoBehaviour:
   motorTargetVelocityDeg: 180
   motorForce: 2000
   motorFreeSpin: 0
+  _rb: {fileID: 0}
+  _col: {fileID: 0}
 --- !u!54 &1007107532
 Rigidbody:
   m_ObjectHideFlags: 0
