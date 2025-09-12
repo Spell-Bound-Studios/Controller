@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
-    [CreateAssetMenu(fileName = "ModifiedGroundStateExample", menuName = "Spellbound/StateMachine/ModifiedGroundStateExample")]
-    public class ModifiedGroundStateExample : GroundStateExample {
+    [CreateAssetMenu(fileName = "DrunkenGroundStateExample", menuName = "Spellbound/StateMachine/DrunkenGroundStateExample")]
+    public class DrunkenGroundStateExample : GroundStateExample {
         protected override Vector3 GetInputDirectionRelativeToCamera() {
             // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
             var direction =

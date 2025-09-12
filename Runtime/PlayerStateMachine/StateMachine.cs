@@ -24,7 +24,7 @@ namespace SpellBound.Controller.PlayerStateMachine {
     /// myStateMachine.ChangeState(MyEnum.Item);
     public sealed class StateMachine<TContext, TStateEnum> where TContext : class where TStateEnum : Enum {
         public BaseStateDriver CurrentActiveDriver { get; private set; }
-        public TContext ctx { get; }
+        public TContext ctx { get; private set; }
         
         private readonly Dictionary<TStateEnum, BaseStateDriver> _stateDrivers;
 

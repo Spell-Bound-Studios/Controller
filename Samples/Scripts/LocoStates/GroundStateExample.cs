@@ -18,7 +18,8 @@ namespace SpellBound.Controller.Samples {
         }
 
         protected override void UpdateStateLogic() {
-            
+            if (!Ctx.StateData.Grounded)
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
 
         protected override void FixedUpdateStateLogic() {
@@ -64,8 +65,13 @@ namespace SpellBound.Controller.Samples {
         
         protected float GetVerticalSpeed() => Vector3.Dot(Ctx.Rb.linearVelocity, Ctx.planarUp);
         
+        /// <summary>
+        /// This is just an example. Personally, I would put something like this in a lower level of abstraction or
+        /// access because I think that all loco states should likely be checking for ground.
+        /// </summary>
         private void GroundCheck() {
-            var colliderOriginInWorldSpace = Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+            var colliderOriginInWorldSpace = 
+                    Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
 
             if (!Physics.Raycast(
                         origin: colliderOriginInWorldSpace,

@@ -8,6 +8,22 @@ using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
+    /// <summary>
+    /// This example is meant to be a semi-complete game ready drop in or rubric for any aspiring game dev to use as
+    /// a reference or copy and paste. Our intention is to give you an idea of how to structure your MonoBehaviour to
+    /// have it interact and direct a state machine based on your player's actions in-game. Please note that the getters
+    /// and setters you see below are just preferences and inspired by Indie Wafflus. We make no claim to this being the
+    /// best or a one-size-fit-all controller. However, we do think it will give you a good foundation to stand on and
+    /// grow from whether you're looking to make a highly custom controller or just a controller that feels good.
+    ///
+    /// This example is also meant to show you how to create n-number of semi-orthogonal state machines that can
+    /// compliment and react to one another. This really provides the user with a lot of control and allows the user to
+    /// encapsulate states or expose them however they want to. For instance, I could make it so that the swimming state
+    /// makes it so that the player can't do any combat or do a specific type of combat - the choice is yours!
+    ///
+    /// Please reference the documentation for additional details, or please feel free to use the discord and use this
+    /// as a reference to see how others leverage these tools and solve game-specific challenges.
+    /// </summary>
     public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
         [Header("Input Reference:")]
         [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
@@ -122,10 +138,12 @@ namespace SpellBound.Controller.Samples {
             }
         }
     }
+    
     public enum LocoStateTypes {
         Grounded,
+        Jumping,
         Falling,
-        Swimming
+        Landing
     }
 
     public enum ActionStateTypes {
