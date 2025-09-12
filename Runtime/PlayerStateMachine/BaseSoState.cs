@@ -13,7 +13,6 @@ namespace SpellBound.Controller.PlayerStateMachine {
         
         public string Id => id;
         public string AssetName => assetName;
-        
         public object Ctx;
         
 #if UNITY_EDITOR

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpellBound.Controller.ManagersAndStatics;
 using Spellbound.Controller.PlayerController;
 using SpellBound.Controller.PlayerController;
 using SpellBound.Controller.PlayerInputs;
@@ -31,12 +32,11 @@ namespace SpellBound.Controller.Samples {
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
         
         [Header("Locomotion States")]
-        [SerializeField] private List<BaseSoState> locoStates;
-
+        public List<BaseSoState> locoStates;
         [SerializeField] private LocoStateTypes initialLocoState = LocoStateTypes.Grounded;
 
         [Header("Action States")]
-        [SerializeField] private List<BaseSoState> actionStates;
+        public List<BaseSoState> actionStates;
         [SerializeField] private ActionStateTypes initialActionState = ActionStateTypes.Ready;
         
         [Header("Animator")]
@@ -61,6 +61,8 @@ namespace SpellBound.Controller.Samples {
         }
 
         private void Start() {
+            // Get your current camera from our built in CameraRig or get your own custom camera and assign it here.
+            referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
         }
 
@@ -70,15 +72,6 @@ namespace SpellBound.Controller.Samples {
 
         public void FixedUpdate() {
             locoStateMachine.FixedUpdateStateMachine();
-            
-            if (input.Direction == Vector3.zero)
-                return;
-
-            UseGroundModifiedVariant();
-        }
-        
-        public void UseGroundModifiedVariant() {
-            locoStateMachine?.ChangeVariant(LocoStateTypes.Grounded, locoStates[1]);
         }
         
         private void ConfigureStateMachines() {
@@ -90,16 +83,6 @@ namespace SpellBound.Controller.Samples {
             actionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
             actionStateMachine.SetInitialVariant(ActionStateTypes.Ready, actionStates[0]);
             actionStateMachine.ChangeState(initialActionState);
-        }
-
-        public enum LocoStateTypes {
-            Grounded,
-            Falling,
-            Swimming
-        }
-
-        public enum ActionStateTypes {
-            Ready
         }
 
         public void RegisterDebugInfo(SbPlayerDebugHudBase debugHud) {
@@ -138,5 +121,14 @@ namespace SpellBound.Controller.Samples {
                 });
             }
         }
+    }
+    public enum LocoStateTypes {
+        Grounded,
+        Falling,
+        Swimming
+    }
+
+    public enum ActionStateTypes {
+        Ready
     }
 }
