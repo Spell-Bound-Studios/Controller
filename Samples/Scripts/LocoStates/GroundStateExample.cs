@@ -15,6 +15,7 @@ namespace SpellBound.Controller.Samples {
         
         protected override void EnterStateLogic() {
             Ctx.input.OnInteractPressed += HandleInteractPressed;
+            Ctx.input.OnJumpInput += HandleJumpPressed;
         }
 
         protected override void UpdateStateLogic() {
@@ -30,6 +31,7 @@ namespace SpellBound.Controller.Samples {
 
         protected override void ExitStateLogic() {
             Ctx.input.OnInteractPressed -= HandleInteractPressed;
+            Ctx.input.OnJumpInput -= HandleJumpPressed;
         }
 
         protected virtual void HandleInput() {
@@ -123,6 +125,10 @@ namespace SpellBound.Controller.Samples {
 
         protected virtual void HandleInteractPressed() {
             Ctx.locoStateMachine.ChangeVariant(LocoStateTypes.Grounded, Ctx.locoStates[1]);
+        }
+        
+        private void HandleJumpPressed() {
+            Ctx.locoStateMachine.ChangeState(LocoStateTypes.Jumping);
         }
     }
 }
