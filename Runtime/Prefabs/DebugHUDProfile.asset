@@ -43,3 +43,23 @@ MonoBehaviour:
     enabled: 1
   - key: Controller.ActionState
     enabled: 1
+  - key: Current Loco State
+    enabled: 1
+  - key: Grounded Variant
+    enabled: 1
+  - key: Falling Variant
+    enabled: 1
+  - key: Swimming Variant
+    enabled: 1
+  - key: State Active
+    enabled: 1
+  - key: Locomotion Running State
+    enabled: 1
+  - key: 'Driver: Grounded'
+    enabled: 1
+  - key: 'Driver: Falling'
+    enabled: 1
+  - key: 'Driver: Swimming'
+    enabled: 1
+  - key: 'Current Loco State: '
+    enabled: 1

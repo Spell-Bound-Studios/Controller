@@ -1,6 +1,4 @@
-﻿using System;
-using SpellBound.Controller.PlayerController;
-using SpellBound.Core;
+﻿using SpellBound.Core;
 using Unity.Collections;
 using UnityEngine;
 
@@ -9,13 +7,14 @@ namespace SpellBound.Controller.PlayerStateMachine {
     /// An abstract base ScriptableObject that implements IState. This lives in the Controller, so games can inherit it,
     /// but it contains no game logic. (Keep UnityEditor bits behind #if UNITY_EDITOR as you have done.)
     /// </summary>
-    public abstract class BaseSoState : ScriptableObject, IState {
+    public abstract class BaseSoState : ScriptableObject {
         [SerializeField, ReadOnly, Immutable] private string id;
         [SerializeField, ReadOnly, Immutable] private string assetName;
-
-        protected ControllerBase Ctx { get; private set; }
+        
         public string Id => id;
         public string AssetName => assetName;
+        
+        public object Ctx;
         
 #if UNITY_EDITOR
         /// <summary>
@@ -39,28 +38,23 @@ namespace SpellBound.Controller.PlayerStateMachine {
             if (string.IsNullOrEmpty(id) || id != assetGuid) {
                 id = assetGuid;
             }
-            
-            var interfaces = GetType().GetInterfaces();
-            var hasStateType = false;
-            foreach (var state in interfaces) {
-                if (!state.IsGenericType || state.GetGenericTypeDefinition() != typeof(IStateType<>)) 
-                    continue;
-
-                hasStateType = true;
-                break;
-            }
-            if (!hasStateType) {
-                Debug.LogError($"{name}: state must implement IStateType<TEnum> and expose a serialized enum field.", 
-                        this);
-            }
         }
 #endif
 
-        public void OnEnter(ControllerBase ctx) {
-            Ctx = ctx; 
-            EnterStateLogic();
+        /// <summary>
+        /// Called once when the state machine initializes to cache the context.
+        /// </summary>
+        public virtual void InitializeWithContext(object ctx) {
+            Ctx = ctx;
+            OnCtxInitialized();
         }
         
+        /// <summary>
+        /// Override this to handle context caching setup (like casting to your specific context type).
+        /// </summary>
+        protected virtual void OnCtxInitialized() { }
+        
+        public void OnEnter() => EnterStateLogic();
         public void OnUpdate() => UpdateStateLogic();
         public void OnFixedUpdate() => FixedUpdateStateLogic();
         public void OnExit() => ExitStateLogic();

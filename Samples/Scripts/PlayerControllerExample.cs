@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Spellbound.Controller.PlayerController;
 using SpellBound.Controller.PlayerController;
 using SpellBound.Controller.PlayerInputs;
@@ -6,7 +7,7 @@ using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
-    public sealed class PlayerControllerExample : ControllerBase, IDebuggingInfo {
+    public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
         [Header("Input Reference:")]
         [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
         [Header("Camera Follow Reference:")]
@@ -26,7 +27,8 @@ namespace SpellBound.Controller.Samples {
         [Header("State Settings:")] 
         [field: SerializeField] public StateData StateData { get; private set; }
         
-        public StateMachine<LocoStateTypes> locoStateMachine { get; private set; }
+        public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
+        public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
         
         [Header("Locomotion States")]
         [SerializeField] private List<BaseSoState> locoStates;
@@ -57,44 +59,69 @@ namespace SpellBound.Controller.Samples {
             ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
 
+        private void Start() {
+            ConfigureStateMachines();
+        }
+
+        public void Update() {
+            locoStateMachine.UpdateStateMachine();
+        }
+
         public void FixedUpdate() {
+            locoStateMachine.FixedUpdateStateMachine();
+            
             if (input.Direction == Vector3.zero)
                 return;
 
-            UseGroundModifiedVariant(false);
+            UseGroundModifiedVariant();
         }
         
-        public void UseGroundModifiedVariant(bool reenterIfActive) {
-            locoStateMachine?.SwapToVariantState(locoStates[1]);
+        public void UseGroundModifiedVariant() {
+            locoStateMachine?.ChangeVariant(LocoStateTypes.Grounded, locoStates[1]);
         }
         
-        protected override void ConfigureStateMachines(ControllerBase ctx, IList<IStateMachineRunner> machines) {
-            locoStateMachine ??= StateMachine<LocoStateTypes>.CreateFromStates(
-                    ctx, 
-                    locoStates, 
-                    LocoStateTypes.Grounded);
-            
-                machines.Add(locoStateMachine);
+        private void ConfigureStateMachines() {
+            locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
+            locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
+            // Initialize a state by changing state.
+            locoStateMachine.ChangeState(LocoStateTypes.Grounded);
 
-            /*var action = StateMachine.CreateFromStates(ctx, actionStates, actionInitial);
-            if (action != null) 
-                machines.Add(action);*/
+            /*actionStateMachine ??= StateMachine<ActionStateTypes>.CreateFromStates(
+             ctx, 
+             actionStates, 
+             actionInitial);
+            
+            machines.Add(actionStateMachine);*/
         }
 
         public enum LocoStateTypes {
             Grounded,
-            Falling
+            Falling,
+            Swimming
         }
 
-        public void RegisterDebugInfo(SbPlayerDebugHudBase hud) {
-            hud.Field("Controller.LocoState", () => {
-                var n = locoStateMachine != null 
-                        && locoStateMachine.CurrentDriver != null 
-                        && locoStateMachine.CurrentDriver.State != null
-                        ? locoStateMachine.CurrentDriver.State.AssetName
-                        : "-";
-                return n;
+        public enum ActionStateTypes {
+            Ready
+        }
+
+        public void RegisterDebugInfo(SbPlayerDebugHudBase debugHud) {
+            // Show which ScriptableObject state is currently running
+            debugHud.Field("Current Loco State: ", () => {
+                var currentStateVariant = locoStateMachine.GetCurrentRunningState();
+                return currentStateVariant != null 
+                        ? currentStateVariant.AssetName 
+                        : "None";
             });
+            
+            // Show each driver (enum value) and what variant it's pointing to
+            foreach (LocoStateTypes stateType in Enum.GetValues(typeof(LocoStateTypes))) {
+                debugHud.Field($"Driver: {stateType}", () => {
+                    var currentVariant = locoStateMachine.GetCurrentVariant(stateType);
+                    return currentVariant != null 
+                            ? currentVariant.name 
+                            : "Not Assigned";
+                });
+            }
         }
     }
 }
