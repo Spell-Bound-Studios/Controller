@@ -37,6 +37,9 @@ namespace SpellBound.Controller.Samples {
             
         }
 
+        /// <summary>
+        /// The actual jump method that adds a force of some kind.
+        /// </summary>
         protected virtual void Jump() {
             Ctx.Rb.AddForce(Ctx.StatData.jumpForce * Ctx.StatData.JumpMultiplier * DefaultJumpMultiplier * Ctx.planarUp, 
                     Ctx.RigidbodyData.verticalForceMode);

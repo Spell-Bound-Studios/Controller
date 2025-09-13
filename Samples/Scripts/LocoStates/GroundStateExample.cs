@@ -9,8 +9,8 @@ namespace SpellBound.Controller.Samples {
         }
 
         protected override void UpdateStateLogic() {
-            /*if (!Ctx.StateData.Grounded)
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);*/
+            if (!Ctx.StateData.Grounded)
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
 
         protected override void FixedUpdateStateLogic() {

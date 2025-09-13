@@ -101,6 +101,12 @@ namespace SpellBound.Controller.Samples {
             actionStateMachine.ChangeState(initialActionState);
         }
 
+        /// <summary>
+        /// Optional.
+        /// This method comes from the IDebuggingInfo interface that we implemented. It allows the user to add or remove
+        /// the debugging component at runtime should they choose to. It will simply allow you to print things to canvas
+        /// in an easy and convenient way.
+        /// </summary>
         public void RegisterDebugInfo(SbPlayerDebugHudBase debugHud) {
             // Show which ScriptableObject state is currently running
             debugHud.Field("Current Loco State", () => {
@@ -139,6 +145,11 @@ namespace SpellBound.Controller.Samples {
         }
     }
     
+    /// <summary>
+    /// These are the enums belonging to our state machine example. You can put these anywhere - I chose to put them
+    /// here as easy reference but feel free to put them anywhere in your game as long as they are accessible by the
+    /// state machine and states you create.
+    /// </summary>
     public enum LocoStateTypes {
         Grounded,
         Jumping,
