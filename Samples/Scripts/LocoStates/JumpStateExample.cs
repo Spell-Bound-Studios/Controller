@@ -1,25 +1,20 @@
 ﻿using System.Collections;
-using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     /// <summary>
     /// I partitioned this state to be the in-between of the ground state before it and falling or landing in the event
-    /// you wanted to play a sound or play an animation.
+    /// you wanted to play a sound or play an animation. It is meant to show how easy it is to create lockouts or small
+    /// states for animations to play.
     /// </summary>
     [CreateAssetMenu(fileName = "JumpStateExample", menuName = "Spellbound/StateMachine/JumpStateExample")]
-    public class JumpStateExample : BaseSoState {
-        protected new PlayerControllerExample Ctx;
+    public class JumpStateExample : BaseLocoStateExample {
         protected float DefaultJumpMultiplier = 1.0f;
         
         private readonly WaitForSeconds _minJumpDuration = new(0.3f);
         private readonly WaitForSeconds _maxJumpDuration = new(2f);
         private Coroutine _jumpMinRoutine;
         private Coroutine _jumpMaxRoutine;
-        
-        protected override void OnCtxInitialized() {
-            Ctx = base.Ctx as PlayerControllerExample;
-        }
 
         protected override void EnterStateLogic() {
             _jumpMinRoutine = Ctx.StartCoroutine(JumpMinRoutine());
@@ -27,14 +22,22 @@ namespace SpellBound.Controller.Samples {
             
             Jump();
         }
+
         protected override void UpdateStateLogic() {
+            // If the minimum time expires
+            if (_jumpMinRoutine == null) {
+                // Check grounded and exit ground state.
+                if (Ctx.StateData.Grounded)
+                    Ctx.locoStateMachine.ChangeState(LocoStateTypes.Landing);
+            }
             
-        }
-        protected override void FixedUpdateStateLogic() {
-            
+            // If maximum time expires
+            if (_jumpMaxRoutine == null)
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
         protected override void ExitStateLogic() {
-            
+            if (_jumpMaxRoutine != null)
+                Ctx.StopCoroutine(_jumpMaxRoutine);
         }
 
         /// <summary>

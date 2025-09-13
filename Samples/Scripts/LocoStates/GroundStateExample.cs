@@ -13,12 +13,6 @@ namespace SpellBound.Controller.Samples {
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
 
-        protected override void FixedUpdateStateLogic() {
-            PerformGroundCheck();
-            HandleInput();
-            HandleCharacterRotation();
-        }
-
         protected override void ExitStateLogic() {
             Ctx.input.OnInteractPressed -= HandleInteractPressed;
             Ctx.input.OnJumpInput -= HandleJumpPressed;

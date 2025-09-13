@@ -1,20 +1,16 @@
-﻿using SpellBound.Controller.PlayerStateMachine;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     /// <summary>
-    /// 
+    /// This method is supposed to demonstrate how easy it is to make a new falling state that can alter the behavior
+    /// of how this state interprets movement compared to the ground state examples.
     /// </summary>
-    [CreateAssetMenu(fileName = "GroundStateExample", menuName = "Spellbound/StateMachine/GroundStateExample")]
-    public class FallingStateExample : BaseSoState {
-        protected new PlayerControllerExample Ctx;
-        
-        protected override void OnCtxInitialized() {
-            Ctx = base.Ctx as PlayerControllerExample;
-        }
-        
+    [CreateAssetMenu(fileName = "FallingStateExample", menuName = "Spellbound/StateMachine/FallingStateExample")]
+    public class FallingStateExample : BaseLocoStateExample {
         protected override void EnterStateLogic() {
-            
+            // Here we show that it's as simple as changing a protected variable in this state to impact player movement
+            // that will only apply in this state. We could override the handle input as well.
+            HSpeedModifier = 0.3f;
         }
 
         protected override void UpdateStateLogic() {
@@ -23,11 +19,14 @@ namespace SpellBound.Controller.Samples {
         }
 
         protected override void FixedUpdateStateLogic() {
-            
+            PerformGroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
         }
 
         protected override void ExitStateLogic() {
-            
+            // Then just change it back.
+            HSpeedModifier = 1.0f;
         }
     }
 }

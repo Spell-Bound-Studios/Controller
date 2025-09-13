@@ -7,8 +7,16 @@ namespace SpellBound.Controller.Samples {
         protected new PlayerControllerExample Ctx;
         protected float HSpeedModifier = 1f;
         
+        // All inheritors will have access to this Ctx.
         protected override void OnCtxInitialized() {
             Ctx = base.Ctx as PlayerControllerExample;
+        }
+        
+        // All inheritors will automatically run this FixedUpdateStateLogic unless they override it.
+        protected override void FixedUpdateStateLogic() {
+            PerformGroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
         }
 
         protected virtual void HandleInput() {
@@ -30,8 +38,12 @@ namespace SpellBound.Controller.Samples {
         }
         
         /// <summary>
+        /// This method checks for ground and controls the Ctx.StateData.Grounded bool by flipping it if it hits the
+        /// ground with its raycast. It also provides a lift force to enable stepping up or down.
+        /// <remarks>
         /// This is just an example. Personally, I would put something like this in a lower level of abstraction or
         /// access because I think that all loco states should likely be checking for ground.
+        /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
             Debug.Log("Checking ground");

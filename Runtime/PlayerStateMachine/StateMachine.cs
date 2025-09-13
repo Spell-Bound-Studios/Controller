@@ -108,18 +108,6 @@ namespace SpellBound.Controller.PlayerStateMachine {
         }
         
         /// <summary>
-        /// Initializes all registered state variants with the context.
-        /// Call this after registering all drivers and setting initial variants.
-        /// </summary>
-        public void InitializeAllStates() {
-            foreach (var driverPair in _stateDrivers) {
-                if (driverPair.Value.CurrentVariant != null) {
-                    driverPair.Value.CurrentVariant.InitializeWithContext(ctx);
-                }
-            }
-        }
-        
-        /// <summary>
         /// Call this from your MonoBehaviour's Update method.
         /// </summary>
         public void UpdateStateMachine() {
