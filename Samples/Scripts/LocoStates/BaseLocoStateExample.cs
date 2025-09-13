@@ -46,7 +46,6 @@ namespace SpellBound.Controller.Samples {
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
-            Debug.Log("Checking ground");
             var colliderOriginInWorldSpace = 
                     Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;

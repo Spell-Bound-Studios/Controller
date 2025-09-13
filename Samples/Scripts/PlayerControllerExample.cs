@@ -73,7 +73,7 @@ namespace SpellBound.Controller.Samples {
             Rb.interpolation = RigidbodyInterpolation.Interpolate;
             
             ResizableCapsuleCollider.Initialize(gameObject);
-            ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
+            ResizableCapsuleCollider.AutoResizeToMesh();
         }
 
         private void Start() {
@@ -84,10 +84,12 @@ namespace SpellBound.Controller.Samples {
 
         public void Update() {
             locoStateMachine.UpdateStateMachine();
+            actionStateMachine.UpdateStateMachine();
         }
 
         public void FixedUpdate() {
             locoStateMachine.FixedUpdateStateMachine();
+            actionStateMachine.FixedUpdateStateMachine();
         }
         
         private void ConfigureStateMachines() {
