@@ -16076,8 +16076,8 @@ GameObject:
   - component: {fileID: 1007107529}
   - component: {fileID: 1007107528}
   - component: {fileID: 1007107532}
-  - component: {fileID: 1007107531}
   - component: {fileID: 1007107533}
+  - component: {fileID: 1007107534}
   m_Layer: 0
   m_Name: Club
   m_TagString: Untagged
@@ -16174,18 +16174,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1007107526}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1007107531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1007107526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccb4ed934078430586bac03c03900827, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &1007107532
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -16252,6 +16240,39 @@ HingeJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &1007107534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007107526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5ff3a718b025d468a0a6251391569c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  rehitCooldownSeconds: 0.15
+  impulseMultiplier: 10
+  minApproachSpeed: 0.5
+  useForceAtPoint: 1
+  pivot: {fileID: 87020174}
+  autoSetupHinge: 1
+  axisSpace: 1
+  swingAxis: 1
+  initialAngularSpeedDeg: 0
+  rbMass: 40
+  rbLinearDampening: 0
+  rbAngularDampening: 0.05
+  solverIterations: 12
+  solverVelocityIterations: 12
+  useMotor: 1
+  motorTargetVelocityDeg: 180
+  motorForce: 2000
+  motorFreeSpin: 0
 --- !u!1 &1023702647
 GameObject:
   m_ObjectHideFlags: 0
