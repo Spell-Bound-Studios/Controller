@@ -77,7 +77,7 @@ namespace SpellBound.Controller.Samples {
         }
 
         private void Start() {
-            // Get your current camera from our built in CameraRig or get your own custom camera and assign it here.
+            // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
         }

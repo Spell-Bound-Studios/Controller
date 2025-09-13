@@ -1,9 +1,9 @@
 ﻿using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples.ActionStates {
-    [CreateAssetMenu(fileName = "ActionStateExample", menuName = "Spellbound/StateMachine/ActionStateExample")]
-    public class ActionStateExample : BaseSoState {
+namespace SpellBound.Controller.Samples {
+    [CreateAssetMenu(fileName = "ReadyStateExample", menuName = "Spellbound/StateMachine/ReadyStateExample")]
+    public class ReadyStateExample : BaseSoState {
         protected override void EnterStateLogic() {
             
         }

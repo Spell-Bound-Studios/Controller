@@ -9,9 +9,6 @@ namespace SpellBound.Controller.ManagersAndStatics {
     /// in the base state and either implement or wrap one of these methods.
     /// </summary>
     public static class ControllerHelper {
-        public const float YAngleMax = 90;
-        public const float YAngleMin = -90;
-        
         public enum CameraCouplingMode {
             Coupled, 
             CoupledWhenMoving, 
@@ -113,6 +110,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
         /// </summary>
         public static bool CheckGroundRaycast(
                 Vector3 origin, Vector3 downDirection, float maxDistance, LayerMask groundLayers, out RaycastHit hitInfo) {
+            
             return Physics.Raycast(
                 origin: origin,
                 direction: downDirection,
@@ -128,6 +126,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
         /// </summary>
         public static bool CheckGroundSphereCast(
                 Vector3 origin, float radius, Vector3 downDirection, float maxDistance, LayerMask groundLayers, out RaycastHit hitInfo) {
+            
             return Physics.SphereCast(
                 origin: origin,
                 radius: radius,
@@ -148,6 +147,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
         /// </summary>
         public static Quaternion RotateTowardsDirection(
                 Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection, float rotationSpeed, float deltaTime) {
+            
             if (targetDirection.sqrMagnitude < 1e-6f) 
                 return currentRotation;
             
@@ -162,6 +162,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
         /// </summary>
         public static float GetRotationAngleDifference(
                 Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection) {
+            
             if (targetDirection.sqrMagnitude < 1e-6f) 
                 return 0f;
             
@@ -174,10 +175,35 @@ namespace SpellBound.Controller.ManagersAndStatics {
         // ###############
         
         /// <summary>
+        /// Handles character rotation with angle-based speed falloff.
+        /// This is the preferred rotation method for standard player-based character controllers.
+        /// </summary>
+        public static void HandleCharacterRotation(
+                Rigidbody rb, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle, float deltaTime) {
+            
+            var planarVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, planarUp);
+
+            if (planarVelocity.sqrMagnitude < 1e-6f)
+                return;
+
+            var desiredDir = planarVelocity.normalized;
+            var targetRotation = Quaternion.LookRotation(desiredDir, planarUp);
+            var angleDiff = Quaternion.Angle(rb.rotation, targetRotation);
+            var speedFactor = Mathf.InverseLerp(0f, rotationFallOffAngle, angleDiff);
+            
+            var maxStepDeg = turnSpeed * speedFactor * deltaTime;
+
+            var nextRotation = Quaternion.RotateTowards(rb.rotation, targetRotation, maxStepDeg);
+            
+            rb.MoveRotation(nextRotation);
+        }
+        
+        /// <summary>
         /// Applies force to achieve a target horizontal velocity.
         /// </summary>
         public static void ApplyHorizontalMovementForce(
                 Rigidbody rb, Vector3 targetVelocity, float forceMultiplier, ForceMode forceMode) {
+            
             var currentHorizontalVelocity = GetHorizontalVelocity(rb);
             var velocityDifference = targetVelocity - currentHorizontalVelocity;
             var force = velocityDifference * forceMultiplier;
@@ -209,6 +235,7 @@ namespace SpellBound.Controller.ManagersAndStatics {
         /// </summary>
         public static Collider[] GetOverlappingColliders(
                 Vector3 position, float radius, LayerMask layers, int maxResults = 10) {
+            
             var results = new Collider[maxResults];
             var count = Physics.OverlapSphereNonAlloc(position, radius, results, layers, QueryTriggerInteraction.Ignore);
             
