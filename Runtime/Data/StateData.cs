@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Spellbound.Controller.PlayerController {
+namespace SpellBound.Controller.PlayerController {
     [Serializable]
     public class StateData {
         [field: SerializeField] public bool Grounded { get; set; }

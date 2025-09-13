@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Spellbound.Controller.PlayerController {
+namespace SpellBound.Controller.PlayerController {
     [Serializable]
     public class RotationData {
         [Header("Rotation Settings")]

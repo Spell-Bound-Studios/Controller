@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpellBound.Controller.ManagersAndStatics;
-using Spellbound.Controller.PlayerController;
 using SpellBound.Controller.PlayerController;
 using SpellBound.Controller.PlayerInputs;
 using SpellBound.Controller.PlayerStateMachine;
