@@ -41,8 +41,8 @@ namespace SpellBound.Controller.Samples {
         /// This method checks for ground and controls the Ctx.StateData.Grounded bool by flipping it if it hits the
         /// ground with its raycast. It also provides a lift force to enable stepping up or down.
         /// <remarks>
-        /// This is just an example. Personally, I would put something like this in a lower level of abstraction or
-        /// access because I think that all loco states should likely be checking for ground.
+        /// This is just an example. But we wanted to show how you could put this in a lower level of abstraction, or
+        /// we think that this is potentially something that all loco states could use.
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
