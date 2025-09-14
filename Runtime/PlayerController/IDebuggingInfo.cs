@@ -1,5 +1,5 @@
-﻿namespace SpellBound.Controller.PlayerController {
+﻿namespace SpellBound.Controller {
     public interface IDebuggingInfo {
-        void RegisterDebugInfo(SbPlayerDebugHudBase hud);
+        void RegisterDebugInfo(ControllerDebugging hud);
     }
 }

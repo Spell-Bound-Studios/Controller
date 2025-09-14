@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
     /// <summary>
     /// 
     /// </summary>

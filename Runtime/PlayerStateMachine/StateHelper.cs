@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerStateMachine {
+namespace SpellBound.Controller {
     public static class StateHelper {
         /*public static event Action<BaseLocoStateSO> OnLocoStateChange = delegate { };
         public static event Action<BaseActionStateSO> OnActionStateChange = delegate { };

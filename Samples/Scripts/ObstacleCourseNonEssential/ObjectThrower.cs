@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using SpellBound.Controller.PlayerInputs;
 
 namespace SpellBound.Controller.Samples {
     public class ObjectThrower : MonoBehaviour {

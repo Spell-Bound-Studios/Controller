@@ -1,6 +1,4 @@
-﻿using SpellBound.Controller.ManagersAndStatics;
-using SpellBound.Controller.PlayerStateMachine;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     public abstract class BaseLocoStateExample : BaseSoState {

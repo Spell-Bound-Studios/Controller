@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
     /// <summary>
     /// This script should only be attached if you're interested in debugging to canvas. It is purely for debugging
     /// purposes and does not use the best practices for performance.
     /// </summary>
-    public class SbPlayerDebugHudBase : MonoBehaviour {
-        public static SbPlayerDebugHudBase Instance;
-        
-        [Header("References"), Description("Drag and drop the prefab here"), Tooltip("Drag and drop it!")] 
-        [SerializeField] private Canvas debuggingCanvasPrefab;
-        
-        [Header("HUD Settings")]
+    public class ControllerDebugging : MonoBehaviour {
+        public static ControllerDebugging Instance;
+
+        [Header("HUD Settings")] 
+        [SerializeField] private float fontSize = 20f;
+        [SerializeField] private Color fontColor = Color.white;
         [SerializeField] private DebugHudProfile profile;
         [SerializeField] private List<FieldOption> fieldToggles = new();
         
@@ -27,7 +25,8 @@ namespace SpellBound.Controller.PlayerController {
         private readonly Dictionary<string, TMP_Text> _labels = new();
         private readonly List<Action> _gizmos = new();
         private readonly Dictionary<string, FieldOption> _toggleIndex = new();
-        
+
+        private Canvas _debugCanvas;
         private RectTransform _container;
 
         private bool _togglesDirty;
@@ -45,15 +44,9 @@ namespace SpellBound.Controller.PlayerController {
             if (!profile)
                 Debug.LogError("Profile object is missing. Please locate in prefab folder and drag and drop.", 
                         this);
-            
-            if (!debuggingCanvasPrefab) {
-                Debug.LogError("Debug HUD: missing Canvas prefab.", this);
-                enabled = false;
-                return;
-            }
-            
-            var canvas = Instantiate(debuggingCanvasPrefab);
-            _container = EnsureContainer(canvas.transform);
+
+            CreateCanvas();
+            _container = EnsureContainer(_debugCanvas.transform);
             
             SyncFromProfile();
             RebuildToggleIndex();
@@ -94,6 +87,13 @@ namespace SpellBound.Controller.PlayerController {
                 }
                 
                 label.text = $"{kv.Key}: {value}";
+
+                if (Mathf.Approximately(label.fontSize, fontSize) && label.color == fontColor) 
+                    continue;
+
+                label.fontSize = fontSize;
+                label.color = fontColor;
+                _layoutDirty = true;
             }
         }
         
@@ -115,6 +115,33 @@ namespace SpellBound.Controller.PlayerController {
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(_container);
             Canvas.ForceUpdateCanvases();
+        }
+        
+        private void CreateCanvas() {
+            var canvasGo = new GameObject("DebugCanvas");
+            
+            _debugCanvas = canvasGo.AddComponent<Canvas>();
+            _debugCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            
+            var canvasScaler = canvasGo.AddComponent<CanvasScaler>();
+            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            canvasScaler.referenceResolution = new Vector2(1920, 1080);
+            canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            canvasScaler.matchWidthOrHeight = 0.5f;
+            
+            // Make it persist across scenes (optional)
+            DontDestroyOnLoad(canvasGo);
+
+            EnsureEventSystem();
+        }
+        
+        private static void EnsureEventSystem() {
+            if (FindObjectsByType<UnityEngine.EventSystems.EventSystem>(sortMode: FindObjectsSortMode.None) != null) 
+                return;
+
+            var eventSystemGo = new GameObject("EventSystem");
+            eventSystemGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
         #region Debugging Backend
@@ -152,36 +179,45 @@ namespace SpellBound.Controller.PlayerController {
             
             var v = panel.GetComponent<VerticalLayoutGroup>();
             v.childAlignment = TextAnchor.UpperLeft;
-            v.childForceExpandWidth  = false;
+            v.childForceExpandWidth = false;
             v.childForceExpandHeight = false;
             v.padding = new RectOffset(8, 8, 8, 8);
             v.spacing = 4f;
             
             var fit = panel.GetComponent<ContentSizeFitter>();
             fit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-            fit.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+            fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             return rt;
         }
         
         private TMP_Text CreateRow(string key) {
-            var go = new GameObject($"{key}", typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
+            var go = new GameObject(
+                    $"{key}", 
+                    typeof(RectTransform), 
+                    typeof(TextMeshProUGUI), 
+                    typeof(LayoutElement));
             go.transform.SetParent(_container, false);
             
             var le = go.GetComponent<LayoutElement>();
-            le.preferredHeight = 22f;
-            le.flexibleHeight = 0f;
+            le.minHeight = fontSize + 4f;
+            le.preferredHeight = -1;
+            le.flexibleHeight = 1f;
             le.flexibleWidth = 0f;
 
             var tmp = go.GetComponent<TextMeshProUGUI>();
-            tmp.fontSize = 16;
+            tmp.fontSize = fontSize;
+            tmp.color = fontColor;
             tmp.alignment = TextAlignmentOptions.TopLeft;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.raycastTarget = false;
             tmp.text = $"{key}:";
             
+            tmp.enableAutoSizing = false;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            
             var rt = (RectTransform)go.transform;
-            rt.sizeDelta = new Vector2(0f, 22f);
+            rt.sizeDelta = new Vector2(0f, fontSize + 4f);
 
             return tmp;
         }
@@ -194,13 +230,43 @@ namespace SpellBound.Controller.PlayerController {
             foreach (Transform child in _container) 
                 Destroy(child.gameObject);
             
+            var activeFields = new HashSet<string>();
+            
             var comps = GetComponents<IDebuggingInfo>();
             foreach (var t in comps)
                 t.RegisterDebugInfo(this);
+            
+            foreach (var key in _getters.Keys) {
+                activeFields.Add(key);
+            }
+            
+            CleanupProfile(activeFields);
+        }
+        
+        /// <summary>
+        /// Removes stale entries from the profile that are no longer active.
+        /// </summary>
+        private void CleanupProfile(HashSet<string> activeFields) {
+            if (!profile) 
+                return;
+            
+            var removedCount = profile.RemoveInactiveFields(activeFields);
+
+            if (removedCount <= 0) 
+                return;
+            
+            SyncFromProfile();
+            RebuildToggleIndex();
+        
+#if UNITY_EDITOR
+            _profileDirty = true;
+            Debug.Log($"[DebugHUD] Removed {removedCount} stale debug field(s) from profile");
+#endif
         }
         
         public void Field(string key, Func<string> getter) {
-            if (string.IsNullOrEmpty(key) || getter == null) return;
+            if (string.IsNullOrEmpty(key) || getter == null) 
+                return;
             
             _getters[key] = getter;
 
@@ -277,18 +343,17 @@ namespace SpellBound.Controller.PlayerController {
             if (!profile) 
                 return;
 
-            var existing = new Dictionary<string, FieldOption>(fieldToggles.Count);
+            fieldToggles.Clear();
             
-            foreach (var fo in fieldToggles) 
-                if (fo != null && !string.IsNullOrEmpty(fo.key)) 
-                    existing[fo.key] = fo;
-
-            foreach (var kv in profile.Index) {
-                if (!existing.TryGetValue(kv.Key, out var value))
-                    fieldToggles.Add(new FieldOption { key = kv.Key, enabled = kv.Value.enabled });
-                else
-                    value.enabled = kv.Value.enabled;
+            foreach (var profileField in profile.fieldToggles) {
+                if (profileField != null && !string.IsNullOrEmpty(profileField.key)) {
+                    fieldToggles.Add(new FieldOption { 
+                            key = profileField.key, 
+                            enabled = profileField.enabled 
+                    });
+                }
             }
+            
             RebuildToggleIndex();
         }
         

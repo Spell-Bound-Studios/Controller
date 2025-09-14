@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerStateMachine {
+namespace SpellBound.Controller {
     public class StateDatabase : MonoBehaviour {
         /*public static StateDatabase Instance;
         private readonly Dictionary<string, BaseLocoStateSO> _locoStatePresets = new();

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
     public class CapsuleColliderData {
         public CapsuleCollider Collider { get; private set; }
         public Vector3 ColliderCenterInLocalSpace { get; private set; }

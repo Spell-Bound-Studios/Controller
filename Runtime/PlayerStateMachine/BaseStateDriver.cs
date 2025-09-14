@@ -1,4 +1,4 @@
-﻿namespace SpellBound.Controller.PlayerStateMachine {
+﻿namespace SpellBound.Controller {
     /// <summary>
     /// The constant "driver" that points to and drives a ScriptableObject state variant.
     /// </summary>

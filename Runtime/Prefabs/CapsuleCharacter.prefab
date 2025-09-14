@@ -326,10 +326,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f3d2de77669c7344aa3ef7fbc9b9a5f2, type: 2}
   - {fileID: 11400000, guid: d77276bd9c4719645a191117ec0dd31c, type: 2}
   - {fileID: 11400000, guid: 607165397872b4546b1c883577803163, type: 2}
-  initialLocoState: 0
   actionStates:
   - {fileID: 11400000, guid: f74e86fc5b8d42c4099c063fc8fe07d4, type: 2}
-  initialActionState: 0
   animator: {fileID: 0}
 --- !u!114 &818432367506289426
 MonoBehaviour:
@@ -368,7 +366,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc53b4567fa64459a15fe129510e4bf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debuggingCanvasPrefab: {fileID: 9177738118118135308, guid: fc46b5e8f91bcf44880476f3bd43d72e, type: 3}
+  fontSize: 20
+  fontColor: {r: 1, g: 1, b: 1, a: 1}
   profile: {fileID: 11400000, guid: 291e84c3cbc27ab4a88681f8791eee07, type: 2}
   fieldToggles: []
   showRaycastGizmos: 1

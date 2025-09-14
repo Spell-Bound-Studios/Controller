@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SpellBound.Controller.PlayerInputs {
+namespace SpellBound.Controller {
     public class InputManager : MonoBehaviour {
         public static InputManager Instance;
         [SerializeField] private PlayerInputActionsSO playerInputActionsSO;

@@ -1,5 +1,4 @@
-﻿using SpellBound.Controller.PlayerStateMachine;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     [CreateAssetMenu(fileName = "ReadyStateExample", menuName = "Spellbound/StateMachine/ReadyStateExample")]

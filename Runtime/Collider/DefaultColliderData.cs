@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
     [Serializable]
     public class DefaultColliderData {
         [field: SerializeField] public float Height { get; private set; } = 1.8f;

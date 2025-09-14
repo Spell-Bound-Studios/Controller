@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SpellBound.Controller.ManagersAndStatics;
-using SpellBound.Controller.PlayerController;
-using SpellBound.Controller.PlayerInputs;
-using SpellBound.Controller.PlayerStateMachine;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
@@ -109,7 +105,7 @@ namespace SpellBound.Controller.Samples {
         /// the debugging component at runtime should they choose to. It will simply allow you to print things to canvas
         /// in an easy and convenient way.
         /// </summary>
-        public void RegisterDebugInfo(SbPlayerDebugHudBase debugHud) {
+        public void RegisterDebugInfo(ControllerDebugging debugHud) {
             // Show which ScriptableObject state is currently running
             debugHud.Field("Current Loco State", () => {
                 var currentStateVariant = locoStateMachine.GetCurrentRunningState();
@@ -144,6 +140,16 @@ namespace SpellBound.Controller.Samples {
                             : "Not Assigned";
                 });
             }
+            
+            debugHud.Gizmo(() => {
+                var origin = ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+                var dir = -planarUp;
+
+                var rayLen = ResizableCapsuleCollider.SlopeData.RayDistance;
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(origin, origin + dir * rayLen);
+                Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
+            });
         }
     }
     
