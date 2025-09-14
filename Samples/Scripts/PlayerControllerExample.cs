@@ -48,11 +48,9 @@ namespace SpellBound.Controller.Samples {
         
         [Header("Locomotion States")]
         public List<BaseSoState> locoStates;
-        [SerializeField] private LocoStateTypes initialLocoState = LocoStateTypes.Grounded;
 
         [Header("Action States")]
         public List<BaseSoState> actionStates;
-        [SerializeField] private ActionStateTypes initialActionState = ActionStateTypes.Ready;
         
         [Header("Animator")]
         [SerializeField] private Animator animator;
@@ -98,11 +96,11 @@ namespace SpellBound.Controller.Samples {
             locoStateMachine.SetInitialVariant(LocoStateTypes.Jumping, locoStates[3]);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Landing, locoStates[4]);
             // Initialize a state by calling the ChangeState method to get the machine going.
-            locoStateMachine.ChangeState(initialLocoState);
+            locoStateMachine.ChangeState(LocoStateTypes.Grounded);
 
             actionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
             actionStateMachine.SetInitialVariant(ActionStateTypes.Ready, actionStates[0]);
-            actionStateMachine.ChangeState(initialActionState);
+            actionStateMachine.ChangeState(ActionStateTypes.Ready);
         }
 
         /// <summary>
