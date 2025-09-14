@@ -66,7 +66,7 @@ namespace SpellBound.Controller.Samples {
             Rb.interpolation = RigidbodyInterpolation.Interpolate;
             
             ResizableCapsuleCollider.Initialize(gameObject);
-            ResizableCapsuleCollider.AutoResizeToMesh();
+            ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
 
         private void Start() {
@@ -84,6 +84,16 @@ namespace SpellBound.Controller.Samples {
             locoStateMachine.FixedUpdateStateMachine();
             actionStateMachine.FixedUpdateStateMachine();
         }
+        
+#if UNITY_EDITOR
+        private void OnValidate() {
+            if (ResizableCapsuleCollider.CapsuleColliderData?.Collider == null) 
+                return;
+
+            ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
+            ResizableCapsuleCollider.CapsuleColliderData.UpdateColliderData();
+        }
+#endif
         
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
@@ -146,8 +156,10 @@ namespace SpellBound.Controller.Samples {
                 var dir = -planarUp;
 
                 var rayLen = ResizableCapsuleCollider.SlopeData.RayDistance;
-                Gizmos.color = Color.red;
+                Gizmos.color = Color.green;
                 Gizmos.DrawLine(origin, origin + dir * rayLen);
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(origin, 0.06f);
                 Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
             });
         }

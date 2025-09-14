@@ -22,7 +22,7 @@ namespace SpellBound.Controller.Samples {
         
             var horizontalVelocity = 
                     Ctx.StatData.slopeSpeedModifier * HSpeedModifier * Ctx.StatData.movementSpeed * inputDesired - 
-                    GetHorizontalVelocity();
+                    ControllerHelper.GetHorizontalVelocity(Ctx.Rb);
             
             Ctx.Rb.AddForce(horizontalVelocity, Ctx.RigidbodyData.horizontalForceMode);
         }
@@ -44,13 +44,14 @@ namespace SpellBound.Controller.Samples {
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
-            var colliderOriginInWorldSpace = 
+            var rayOrigin = 
                     Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
-
+            var upDirection = Ctx.planarUp;
+            
             if (!ControllerHelper.CheckGroundRaycast(
-                        colliderOriginInWorldSpace,
-                        -Ctx.planarUp,
+                        rayOrigin,
+                        -upDirection,
                         rayDistance,
                         Ctx.LayerData.GroundLayer,
                         out var hit
@@ -60,7 +61,7 @@ namespace SpellBound.Controller.Samples {
             }
             
             Ctx.StateData.Grounded = true;
-                
+            
             var distanceToGround =
                     Ctx.ResizableCapsuleCollider.CapsuleColliderData.ColliderCenterInLocalSpace.y * 
                     Ctx.gameObject.transform.localScale.y - hit.distance;
@@ -70,9 +71,13 @@ namespace SpellBound.Controller.Samples {
                 return;
 
             var liftDistance = distanceToGround * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce -
-                               GetVerticalSpeed();
+                               ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.planarUp);
 
             var liftForce = new Vector3(0f, liftDistance, 0f);
+            
+            Debug.Log($"The hit distance: {hit.distance}");
+            Debug.Log($"Distance to ground: {distanceToGround}");
+            Debug.Log($"Lift force: {liftForce}");
                 
             Ctx.Rb.AddForce(liftForce, Ctx.RigidbodyData.horizontalForceMode);
         }
@@ -85,9 +90,5 @@ namespace SpellBound.Controller.Samples {
                     Ctx.RotationData.RotationFallOffAngle, 
                     Time.fixedDeltaTime);
         }
-        
-        protected virtual Vector3 GetHorizontalVelocity() => ControllerHelper.GetHorizontalVelocity(Ctx.Rb);
-        
-        protected virtual float GetVerticalSpeed() => ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.planarUp);
     }
 }
