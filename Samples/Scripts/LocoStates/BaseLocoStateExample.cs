@@ -44,7 +44,7 @@ namespace SpellBound.Controller.Samples {
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
-            var rayOrigin = Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+            var rayOrigin = Ctx.ResizableCapsuleCollider.collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
             var upDirection = Ctx.planarUp;
     

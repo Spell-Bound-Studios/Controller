@@ -149,7 +149,7 @@ namespace SpellBound.Controller.Samples {
             }
             
             debugHud.Gizmo(() => {
-                var origin = ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+                var origin = ResizableCapsuleCollider.collider.bounds.center;
                 var dir = -planarUp;
 
                 var rayLen = ResizableCapsuleCollider.SlopeData.RayDistance;

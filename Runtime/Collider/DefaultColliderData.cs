@@ -6,17 +6,15 @@ namespace SpellBound.Controller {
     public class DefaultColliderData {
         [Header("Collider Configuration")]
         [field: SerializeField] public float Height { get; private set; }
-        [field: SerializeField] public float CenterY { get; private set; }
+        public float CenterY { get; private set; }
         [field: SerializeField] public float Radius { get; private set; }
         
         // If the user doesn't want to automatically calculate based on mesh bounds then set to true.
         [Header("Override Settings")]
         [SerializeField] private bool overrideHeight;
-        [SerializeField] private bool overrideCenter;
         [SerializeField] private bool overrideRadius;
 
         public bool OverrideHeight => overrideHeight;
-        public bool OverrideCenter => overrideCenter;
         public bool OverrideRadius => overrideRadius;
         
         [Header("Fallback Values")]
@@ -79,14 +77,13 @@ namespace SpellBound.Controller {
                 ValidateAndClampHeight();
             }
             
-            if (!OverrideCenter)
-                CenterY = Height * 0.5f;
-            
             if (!OverrideRadius) {
                 var meshRadius = Mathf.Max(bounds.size.x, bounds.size.z) * 0.5f;
                 Radius = meshRadius;
                 ValidateAndClampRadius();
             }
+            
+            CenterY = Height * 0.5f;
 
             ValidateConfiguration();
         }
@@ -96,14 +93,13 @@ namespace SpellBound.Controller {
                 Height = FallbackHeight;
                 ValidateAndClampHeight();
             }
-            
-            if (!OverrideCenter)
-                CenterY = Height * 0.5f;
 
             if (!OverrideRadius) {
                 Radius = FallbackRadius;
                 ValidateAndClampRadius();
             }
+            
+            CenterY = Height * 0.5f;
         }
     
         private void ValidateAndClampHeight() {
@@ -144,7 +140,7 @@ namespace SpellBound.Controller {
         /// Call this when values are changed in inspector to re-validate
         /// </summary>
         public void HandleValidation() {
-            if (!OverrideCenter && Height > 0)
+            if (Height > 0)
                 CenterY = Height * 0.5f;
             
             ValidateAndClampHeight();
