@@ -295,6 +295,10 @@ MonoBehaviour:
       <StepHeightPercentage>k__BackingField: 0.25
       <RayDistance>k__BackingField: 2
       <StepReachForce>k__BackingField: 25
+    <CapsuleFloatData>k__BackingField:
+      <DesiredFloatDistance>k__BackingField: 0
+      <CalculatedFloatDistance>k__BackingField: 0
+      <OverrideCalculatedDistance>k__BackingField: 0
   <LayerData>k__BackingField:
     <GroundLayer>k__BackingField:
       serializedVersion: 2
