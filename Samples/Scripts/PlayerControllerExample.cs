@@ -87,11 +87,8 @@ namespace SpellBound.Controller.Samples {
         
 #if UNITY_EDITOR
         private void OnValidate() {
-            if (ResizableCapsuleCollider.CapsuleColliderData?.Collider == null) 
-                return;
-
+            ResizableCapsuleCollider.Initialize(gameObject);
             ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
-            ResizableCapsuleCollider.CapsuleColliderData.UpdateColliderData();
         }
 #endif
         

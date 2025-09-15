@@ -44,27 +44,28 @@ namespace SpellBound.Controller.Samples {
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
-            var rayOrigin = 
-                    Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
+            // This is the center of the capsule in world space.
+            var rayOrigin = Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
             var upDirection = Ctx.planarUp;
             
-            if (!ControllerHelper.CheckGroundRaycast(
-                        rayOrigin,
-                        -upDirection,
-                        rayDistance,
-                        Ctx.LayerData.GroundLayer,
-                        out var hit
-                )) {
+            
+            if (!Physics.Raycast(
+                        origin: rayOrigin,
+                        direction: -upDirection,
+                        hitInfo: out var hit,
+                        maxDistance: rayDistance,
+                        layerMask: Ctx.LayerData.GroundLayer,
+                        queryTriggerInteraction: QueryTriggerInteraction.Ignore)) {
                 Ctx.StateData.Grounded = false;
                 return;
             }
             
             Ctx.StateData.Grounded = true;
             
-            var distanceToGround =
-                    Ctx.ResizableCapsuleCollider.CapsuleColliderData.ColliderCenterInLocalSpace.y * 
-                    Ctx.gameObject.transform.localScale.y - hit.distance;
+            var distanceToGround = 
+                    Ctx.ResizableCapsuleCollider.CapsuleColliderData.ColliderCenterInLocalSpace.y * Ctx.gameObject.transform.localScale.y -
+                                   hit.distance;
             
             // Base case and should rarely happen.
             if (distanceToGround == 0)
@@ -74,10 +75,6 @@ namespace SpellBound.Controller.Samples {
                                ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.planarUp);
 
             var liftForce = new Vector3(0f, liftDistance, 0f);
-            
-            Debug.Log($"The hit distance: {hit.distance}");
-            Debug.Log($"Distance to ground: {distanceToGround}");
-            Debug.Log($"Lift force: {liftForce}");
                 
             Ctx.Rb.AddForce(liftForce, Ctx.RigidbodyData.horizontalForceMode);
         }

@@ -233,7 +233,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.55
+  m_Radius: 0.5
   m_Height: 1.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.25, z: 0}
@@ -283,15 +283,11 @@ MonoBehaviour:
     <DefaultColliderData>k__BackingField:
       <Height>k__BackingField: 2
       <CenterY>k__BackingField: 0
-      <Radius>k__BackingField: 0.55
+      <Radius>k__BackingField: 0.5
     <SlopeData>k__BackingField:
       <StepHeightPercentage>k__BackingField: 0.25
       <RayDistance>k__BackingField: 2
       <StepReachForce>k__BackingField: 25
-    <AutoResizeData>k__BackingField:
-      <EnableAutoResize>k__BackingField: 1
-      <MeshHeightScale>k__BackingField: 1
-      <MeshRadiusScale>k__BackingField: 1
   <LayerData>k__BackingField:
     <GroundLayer>k__BackingField:
       serializedVersion: 2

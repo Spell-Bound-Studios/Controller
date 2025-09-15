@@ -100,44 +100,6 @@ namespace SpellBound.Controller {
                     : inputDirection;
         }
         
-        // #######################
-        // GROUND CHECKING HELPERS
-        // #######################
-        
-        /// <summary>
-        /// Performs a basic ground check raycast from the specified origin.
-        /// Returns true if ground is detected within the specified distance.
-        /// </summary>
-        public static bool CheckGroundRaycast(
-                Vector3 origin, Vector3 downDirection, float maxDistance, LayerMask groundLayers, out RaycastHit hitInfo) {
-            
-            return Physics.Raycast(
-                origin: origin,
-                direction: downDirection,
-                hitInfo: out hitInfo,
-                maxDistance: maxDistance,
-                layerMask: groundLayers,
-                queryTriggerInteraction: QueryTriggerInteraction.Ignore
-            );
-        }
-        
-        /// <summary>
-        /// Checks ground using a sphere cast for more reliable detection.
-        /// </summary>
-        public static bool CheckGroundSphereCast(
-                Vector3 origin, float radius, Vector3 downDirection, float maxDistance, LayerMask groundLayers, out RaycastHit hitInfo) {
-            
-            return Physics.SphereCast(
-                origin: origin,
-                radius: radius,
-                direction: downDirection,
-                hitInfo: out hitInfo,
-                maxDistance: maxDistance,
-                layerMask: groundLayers,
-                queryTriggerInteraction: QueryTriggerInteraction.Ignore
-            );
-        }
-        
         // ################
         // ROTATION HELPERS
         // ################
