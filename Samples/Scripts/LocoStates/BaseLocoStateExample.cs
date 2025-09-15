@@ -44,12 +44,10 @@ namespace SpellBound.Controller.Samples {
         /// </remarks>
         /// </summary>
         protected virtual void PerformGroundCheck() {
-            // This is the center of the capsule in world space.
             var rayOrigin = Ctx.ResizableCapsuleCollider.CapsuleColliderData.Collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
             var upDirection = Ctx.planarUp;
-            
-            
+    
             if (!Physics.Raycast(
                         origin: rayOrigin,
                         direction: -upDirection,
@@ -60,23 +58,25 @@ namespace SpellBound.Controller.Samples {
                 Ctx.StateData.Grounded = false;
                 return;
             }
-            
+    
             Ctx.StateData.Grounded = true;
+    
+            var targetDistance = Ctx.ResizableCapsuleCollider.CalculateTargetFloatingDistance(Ctx.transform);
+            var actualDistance = hit.distance;
+    
+            var distanceToFloatingPoint = targetDistance - actualDistance;
             
-            var distanceToGround = 
-                    Ctx.ResizableCapsuleCollider.CapsuleColliderData.ColliderCenterInLocalSpace.y * Ctx.gameObject.transform.localScale.y -
-                                   hit.distance;
-            
-            // Base case and should rarely happen.
-            if (distanceToGround == 0)
+            if (Mathf.Approximately(distanceToFloatingPoint, 0f))
                 return;
 
-            var liftDistance = distanceToGround * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce -
-                               ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.planarUp);
+            var amountToLift = 
+                    distanceToFloatingPoint * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce - Ctx.Rb.linearVelocity.y;
+            
 
-            var liftForce = new Vector3(0f, liftDistance, 0f);
-                
-            Ctx.Rb.AddForce(liftForce, Ctx.RigidbodyData.horizontalForceMode);
+    
+            if (!Mathf.Approximately(amountToLift, 0f)) {
+                Ctx.Rb.AddForce(Vector3.up * amountToLift, ForceMode.VelocityChange);
+            }
         }
         
         protected virtual void HandleCharacterRotation() {
