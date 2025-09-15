@@ -284,6 +284,13 @@ MonoBehaviour:
       <Height>k__BackingField: 2
       <CenterY>k__BackingField: 1
       <Radius>k__BackingField: 0.5
+      overrideHeight: 0
+      overrideCenter: 0
+      overrideRadius: 0
+      <FallbackHeight>k__BackingField: 1.8
+      <FallbackRadius>k__BackingField: 0.3
+      <SuppressWarnings>k__BackingField: 0
+      <SuppressConsole>k__BackingField: 1
     <SlopeData>k__BackingField:
       <StepHeightPercentage>k__BackingField: 0.25
       <RayDistance>k__BackingField: 2

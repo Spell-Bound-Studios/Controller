@@ -71,8 +71,6 @@ namespace SpellBound.Controller.Samples {
 
             var amountToLift = 
                     distanceToFloatingPoint * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce - Ctx.Rb.linearVelocity.y;
-            
-
     
             if (!Mathf.Approximately(amountToLift, 0f)) {
                 Ctx.Rb.AddForce(Vector3.up * amountToLift, ForceMode.VelocityChange);

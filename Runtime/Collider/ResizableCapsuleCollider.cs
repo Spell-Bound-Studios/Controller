@@ -8,15 +8,18 @@ namespace SpellBound.Controller {
     [Serializable]
     public class ResizableCapsuleCollider {
         public CapsuleColliderData CapsuleColliderData { get; private set; }
-        [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; }
+        [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
         [field: SerializeField] public SlopeData SlopeData { get; private set; }
+        [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; }
         
         public void Initialize(GameObject go) {
             if (CapsuleColliderData != null)
                 return;
-
+            
             CapsuleColliderData = new CapsuleColliderData();
             CapsuleColliderData.Initialize(go);
+            
+            DefaultColliderData.Initialize(go);
         }
         
         /// <summary>
@@ -26,7 +29,7 @@ namespace SpellBound.Controller {
         public void CalculateCapsuleColliderDimensions() {
             SetCapsuleColliderRadius(DefaultColliderData.Radius);
             SetCapsuleColliderHeight(DefaultColliderData.Height * (1f - SlopeData.StepHeightPercentage));
-
+            
             RecalculateCapsuleColliderCenter();
             RecalculateColliderRadius();
             
