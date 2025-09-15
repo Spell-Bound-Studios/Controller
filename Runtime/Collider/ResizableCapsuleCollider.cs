@@ -23,41 +23,30 @@ namespace SpellBound.Controller {
             CapsuleColliderData = new CapsuleColliderData();
             CapsuleColliderData.Initialize(go);
             
+            // This will calculate all the base default data.
             DefaultColliderData.Initialize(go);
         }
         
         /// <summary>
-        /// Recalculates capsule dimensions based on current settings.
+        /// Recalculates capsule dimensions based on current settings - keep separate from Initialize to avoid rewriting
+        /// objects at runtime.
         /// Call this when you need to update the collider size.
         /// </summary>
         public void CalculateCapsuleColliderDimensions() {
+            // The first thing it should do is calculate the center.
+            CapsuleColliderData.Collider.center = 
+                    new Vector3(0f, DefaultColliderData.Height * (1f + SlopeData.StepHeightPercentage) * 0.5f, 0f);
+            
+            Debug.Log($"CapsuleCollider Center: {CapsuleColliderData.Collider.center}");
+            Debug.Log($"Default Collider Height: {DefaultColliderData.Height}");
+            Debug.Log($"StepHeightPercentage: {SlopeData.StepHeightPercentage}");
+            
             SetCapsuleColliderRadius(DefaultColliderData.Radius);
-            SetCapsuleColliderHeight(DefaultColliderData.Height * (1f - SlopeData.StepHeightPercentage));
-            
-            RecalculateCapsuleColliderCenter();
-            RecalculateColliderRadius();
-            
-            CapsuleColliderData.UpdateColliderData();
-        }
-        
-        /// <summary>
-        /// This is the new capsule that has been "stepped up". Therefore, its center should...  
-        /// </summary>
-        public void RecalculateCapsuleColliderCenter() {
-            // Old collider vs. new height. (2 - 1.5) = 0.5
-            var colliderHeightDiff = DefaultColliderData.Height - CapsuleColliderData.Collider.height;
-            // Centers are local... So this should simply shift in the direction of the difference by half.
-            var newColliderCenter = new Vector3(0f, DefaultColliderData.CenterY + colliderHeightDiff * 0.5f, 0f);
-            CapsuleColliderData.Collider.center = newColliderCenter;
-        }
-        
-        public void RecalculateColliderRadius() {
-            var halfColliderHeight = CapsuleColliderData.Collider.height * 0.5f;
-
-            if (halfColliderHeight >= CapsuleColliderData.Collider.radius)
-                return;
-
-            SetCapsuleColliderRadius(halfColliderHeight);
+            SetCapsuleColliderHeight((DefaultColliderData.Height - CapsuleColliderData.Collider.center.y) * 2f);
+            Debug.Log("...");
+            Debug.Log($"Default Collider Height: {DefaultColliderData.Height}");
+            Debug.Log($"CapsuleCollider Center.y: {CapsuleColliderData.Collider.center.y}");
+            Debug.Log("...");
         }
         
         public void SetCapsuleColliderRadius(float r) => CapsuleColliderData.Collider.radius = r;
