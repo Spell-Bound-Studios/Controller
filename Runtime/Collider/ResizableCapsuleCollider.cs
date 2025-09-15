@@ -7,9 +7,13 @@ namespace SpellBound.Controller {
     /// </summary>
     [Serializable]
     public class ResizableCapsuleCollider {
+        // This is the literal capsule that is being modified.
         public CapsuleColliderData CapsuleColliderData { get; private set; }
+        // This is the "old" capsule that is not being modified. It's essentially the player visual.
         [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
+        // This is where step height percentage, raycasts, and force data will live.
         [field: SerializeField] public SlopeData SlopeData { get; private set; }
+        // This is where floating info will live.
         [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; }
         
         public void Initialize(GameObject go) {
