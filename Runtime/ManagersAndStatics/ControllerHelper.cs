@@ -45,6 +45,10 @@ namespace SpellBound.Controller {
             velocity.y = 0;
             return velocity;
         }
+
+        public static float GetHorizontalSpeed(Rigidbody rb, Vector3 projectionPlane) {
+            return Vector3.ProjectOnPlane(rb.linearVelocity, projectionPlane).magnitude;
+        }
         
         /// <summary>
         /// Returns the vertical speed relative to the specified up direction.

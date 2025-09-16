@@ -20,7 +20,7 @@ namespace SpellBound.Controller {
             if (collider != null)
                 return;
             
-            collider = go.AddComponent<CapsuleCollider>();
+            collider = go.GetComponent<CapsuleCollider>();
             
             // This will calculate all the base default data.
             DefaultColliderData.Initialize(go);

@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace SpellBound.Controller {
     public static class StateHelper {
-        /*public static event Action<BaseLocoStateSO> OnLocoStateChange = delegate { };
-        public static event Action<BaseActionStateSO> OnActionStateChange = delegate { };
+        /*public static event Action<BaseSoState> OnLocoStateChange = delegate { };
+        public static event Action<BaseSoState> OnActionStateChange = delegate { };
         public static event Action<States> OnStateChanged = delegate { };
         public static event Action<float> OnAnimationSpeedChanged = delegate { };
         

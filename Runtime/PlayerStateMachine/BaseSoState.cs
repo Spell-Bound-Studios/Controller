@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace SpellBound.Controller {
     /// <summary>
-    /// An abstract base ScriptableObject that implements IState. This lives in the Controller, so games can inherit it,
-    /// but it contains no game logic. (Keep UnityEditor bits behind #if UNITY_EDITOR as you have done.)
+    /// asdf
     /// </summary>
     public abstract class BaseSoState : ScriptableObject {
         [SerializeField, ReadOnly, Immutable] private string id;
