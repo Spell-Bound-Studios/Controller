@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerStateMachine {
+namespace SpellBound.Controller {
     public class StateDatabase : MonoBehaviour {
-        public static StateDatabase Instance;
+        /*public static StateDatabase Instance;
         private readonly Dictionary<string, BaseLocoStateSO> _locoStatePresets = new();
         private readonly Dictionary<string, BaseActionStateSO> _actionStatePresets = new();
 
@@ -54,6 +54,6 @@ namespace SpellBound.Controller.PlayerStateMachine {
             
             preset = null;
             return false;
-        }
+        }*/
     }
 }

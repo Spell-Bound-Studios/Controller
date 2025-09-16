@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel;
 using Unity.Cinemachine;
 using UnityEngine;
-using SpellBound.Controller.ManagersAndStatics;
-using SpellBound.Controller.PlayerInputs;
-using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
+using Helper = SpellBound.Controller.ControllerHelper;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
     /// <summary>
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>

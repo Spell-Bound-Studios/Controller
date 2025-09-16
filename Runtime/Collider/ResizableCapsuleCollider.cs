@@ -1,46 +1,51 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SpellBound.Controller.PlayerController {
+namespace SpellBound.Controller {
+    /// <summary>
+    /// WARNING! Please ensure that your player visual, wherever it might be, has its feet at y=0. If you do not do this
+    /// your collider and visual be mismatched.
+    /// </summary>
     [Serializable]
     public class ResizableCapsuleCollider {
-        public CapsuleColliderData CapsuleColliderData { get; private set; }
-        [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; }
+        public CapsuleCollider collider;
+        // This is the "old" capsule that is not being modified. It's essentially the player visual.
+        [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
+        // This is where step height percentage, raycasts, and force data will live.
         [field: SerializeField] public SlopeData SlopeData { get; private set; }
+        // This is where floating info will live.
+        [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; }
         
         public void Initialize(GameObject go) {
-            if (CapsuleColliderData != null)
+            if (collider != null)
                 return;
             
-            CapsuleColliderData = new CapsuleColliderData();
-            CapsuleColliderData.Initialize(go);
+            collider = go.GetComponent<CapsuleCollider>();
+            
+            // This will calculate all the base default data.
+            DefaultColliderData.Initialize(go);
         }
         
+        /// <summary>
+        /// Recalculates capsule dimensions based on current settings - keep separate from Initialize to avoid rewriting
+        /// objects at runtime.
+        /// Call this when you need to update the collider size.
+        /// </summary>
         public void CalculateCapsuleColliderDimensions() {
+            // The first thing it should do is calculate the center.
+            collider.center = 
+                    new Vector3(0f, DefaultColliderData.Height * (1f + SlopeData.StepHeightPercentage) * 0.5f, 0f);
+            
             SetCapsuleColliderRadius(DefaultColliderData.Radius);
-            SetCapsuleColliderHeight(DefaultColliderData.Height * (1f - SlopeData.StepHeightPercentage));
-            RecalculateCapsuleColliderCenter();
-            RecalculateColliderRadius();
-            CapsuleColliderData.UpdateColliderData();
-        }
+            SetCapsuleColliderHeight((DefaultColliderData.Height - collider.center.y) * 2f);
 
-        public void SetCapsuleColliderRadius(float r) => CapsuleColliderData.Collider.radius = r;
-        public void SetCapsuleColliderHeight(float h) => CapsuleColliderData.Collider.height = h;
-        
-        public void RecalculateCapsuleColliderCenter() {
-            var colliderHeightDiff = DefaultColliderData.Height - CapsuleColliderData.Collider.height;
-            var newColliderCenter = new Vector3(0f, DefaultColliderData.CenterY + colliderHeightDiff * 0.5f, 0f);
-            CapsuleColliderData.Collider.center = newColliderCenter;
         }
         
-        public void RecalculateColliderRadius() {
-            var halfColliderHeight = CapsuleColliderData.Collider.height * 0.5f;
-
-            if (halfColliderHeight >= CapsuleColliderData.Collider.radius) {
-                return;
-            }
-
-            SetCapsuleColliderRadius(halfColliderHeight);
+        public void SetCapsuleColliderRadius(float r) => collider.radius = r;
+        public void SetCapsuleColliderHeight(float h) => collider.height = h;
+        
+        public float CalculateTargetFloatingDistance(Transform transform) {
+            return collider.center.y * transform.localScale.y;
         }
     }
 }

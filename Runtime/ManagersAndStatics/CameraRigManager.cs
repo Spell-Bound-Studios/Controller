@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using SpellBound.Controller.PlayerController;
 using Unity.Cinemachine;
 using UnityEngine;
-using Helper = SpellBound.Controller.ManagersAndStatics.ControllerHelper;
+using Helper = SpellBound.Controller.ControllerHelper;
 
-namespace SpellBound.Controller.ManagersAndStatics {
+namespace SpellBound.Controller {
     public class CameraRigManager : CinemachineCameraManagerBase {
         public static CameraRigManager Instance;
         

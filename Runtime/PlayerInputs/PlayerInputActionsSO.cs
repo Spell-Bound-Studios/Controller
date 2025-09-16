@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static InputActions;
 
-namespace SpellBound.Controller.PlayerInputs {
+namespace SpellBound.Controller {
     [CreateAssetMenu(fileName = "PlayerInputs", menuName = "Spellbound/PlayerInputs/PlayerInputs")]
     public class PlayerInputActionsSO : ScriptableObject, IPlayerInputActions {
         private InputActions _inputActions;

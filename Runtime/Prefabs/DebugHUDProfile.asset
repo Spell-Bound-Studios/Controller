@@ -13,33 +13,17 @@ MonoBehaviour:
   m_Name: DebugHUDProfile
   m_EditorClassIdentifier: 
   fieldToggles:
-  - key: Ray.CastLength
+  - key: Current Loco State
     enabled: 1
-  - key: Ray.SphereLength
-    enabled: 0
-  - key: Ray.SphereRadius
-    enabled: 0
-  - key: Ray.HasHit
-    enabled: 0
-  - key: Ray.HitDist
-    enabled: 0
-  - key: Ray.HitNormal
+  - key: Grounded
     enabled: 1
-  - key: Ray.HitPoint
-    enabled: 0
-  - key: Ray.HasSphereHit
-    enabled: 0
-  - key: Ray.SphereHitDist
-    enabled: 0
-  - key: Ray.SphereHitPoint
-    enabled: 0
-  - key: Controller.HorizontalSpeed
+  - key: Falling
     enabled: 1
-  - key: Controller.VerticalSpeed
+  - key: Current Action State
     enabled: 1
-  - key: Controller.JumpForce
-    enabled: 0
-  - key: Controller.LocoState
+  - key: Ready
     enabled: 1
-  - key: Controller.ActionState
+  - key: Jumping
+    enabled: 1
+  - key: Landing
     enabled: 1
