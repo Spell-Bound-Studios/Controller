@@ -292,7 +292,7 @@ MonoBehaviour:
       <SuppressConsole>k__BackingField: 1
     <SlopeData>k__BackingField:
       <StepHeightPercentage>k__BackingField: 0.254
-      <RayDistance>k__BackingField: 2
+      <RayDistance>k__BackingField: 1.5
       <StepReachForce>k__BackingField: 25
     <CapsuleFloatData>k__BackingField:
       <DesiredFloatDistance>k__BackingField: 0
@@ -309,8 +309,8 @@ MonoBehaviour:
     <turnTowardsInputSpeed>k__BackingField: 500
     <RotationFallOffAngle>k__BackingField: 90
   <StatData>k__BackingField:
-    <movementSpeed>k__BackingField: 5
-    <jumpForce>k__BackingField: 5
+    <movementSpeed>k__BackingField: 7
+    <jumpForce>k__BackingField: 7
     <JumpMultiplier>k__BackingField: 1
     <gravity>k__BackingField: -20
     <slopeSpeedModifier>k__BackingField: 1

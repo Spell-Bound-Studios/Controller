@@ -43,9 +43,5 @@ namespace SpellBound.Controller {
         
         public void SetCapsuleColliderRadius(float r) => collider.radius = r;
         public void SetCapsuleColliderHeight(float h) => collider.height = h;
-        
-        public float CalculateTargetFloatingDistance(Transform transform) {
-            return collider.center.y * transform.localScale.y;
-        }
     }
 }
