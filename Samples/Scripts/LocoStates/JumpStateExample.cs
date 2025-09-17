@@ -8,7 +8,7 @@ namespace SpellBound.Controller.Samples {
     /// states for animations to play.
     /// </summary>
     [CreateAssetMenu(fileName = "JumpStateExample", menuName = "Spellbound/StateMachine/JumpStateExample")]
-    public class JumpStateExample : BaseLocoStateExample {
+    public class JumpStateExample : BaseLocomotionStateExample {
         protected float DefaultJumpMultiplier = 1.0f;
         
         private readonly WaitForSeconds _minJumpDuration = new(0.3f);
@@ -35,6 +35,24 @@ namespace SpellBound.Controller.Samples {
             if (_jumpMaxRoutine == null)
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
+        
+        /// <summary>
+        /// Physics update override.
+        /// </summary>
+        /// <remarks>
+        /// Note: we didn't include KeepCapsuleFloating(); in this override because we felt that the capsule should be
+        /// free to "lift off" from the ground without restriction. Feel free to experiment here, and you will see that
+        /// if you do include it, you likely won't jump in the way that you expected. However, by removing it, you ignore
+        /// the correction force entirely, resulting in a smooth jump (no matter the value so long as it's greater than
+        /// 0). This is a great example of how this state machine gives you freedom and flexibility to choose what code
+        /// should run and when.
+        /// </remarks>
+        protected override void FixedUpdateStateLogic() {
+            PerformGroundCheck();
+            HandleInput();
+            HandleCharacterRotation();
+        }
+        
         protected override void ExitStateLogic() {
             if (_jumpMaxRoutine != null)
                 Ctx.StopCoroutine(_jumpMaxRoutine);

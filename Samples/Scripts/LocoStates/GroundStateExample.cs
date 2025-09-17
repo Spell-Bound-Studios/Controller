@@ -2,7 +2,7 @@
 
 namespace SpellBound.Controller.Samples {
     [CreateAssetMenu(fileName = "GroundStateExample", menuName = "Spellbound/StateMachine/GroundStateExample")]
-    public class GroundStateExample : BaseLocoStateExample {
+    public class GroundStateExample : BaseLocomotionStateExample {
         protected override void EnterStateLogic() {
             Ctx.input.OnInteractPressed += HandleInteractPressed;
             Ctx.input.OnJumpInput += HandleJumpPressed;
@@ -11,6 +11,13 @@ namespace SpellBound.Controller.Samples {
         protected override void UpdateStateLogic() {
             if (!Ctx.StateData.Grounded)
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+        }
+        
+        protected override void FixedUpdateStateLogic() {
+            PerformGroundCheck();
+            KeepCapsuleFloating();
+            HandleInput();
+            HandleCharacterRotation();
         }
 
         protected override void ExitStateLogic() {

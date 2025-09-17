@@ -1,20 +1,14 @@
 ﻿using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
-    public abstract class BaseLocoStateExample : BaseSoState {
+    public abstract class BaseLocomotionStateExample : BaseSoState {
         protected new PlayerControllerExample Ctx;
         protected float HSpeedModifier = 1f;
+        protected RaycastHit Hit;
         
         // All inheritors will have access to this Ctx.
         protected override void OnCtxInitialized() {
             Ctx = base.Ctx as PlayerControllerExample;
-        }
-        
-        // All inheritors will automatically run this FixedUpdateStateLogic unless they override it.
-        protected override void FixedUpdateStateLogic() {
-            PerformGroundCheck();
-            HandleInput();
-            HandleCharacterRotation();
         }
 
         protected virtual void HandleInput() {
@@ -51,7 +45,7 @@ namespace SpellBound.Controller.Samples {
             if (!Physics.Raycast(
                         origin: rayOrigin,
                         direction: -upDirection,
-                        hitInfo: out var hit,
+                        hitInfo: out Hit,
                         maxDistance: rayDistance,
                         layerMask: Ctx.LayerData.GroundLayer,
                         queryTriggerInteraction: QueryTriggerInteraction.Ignore)) {
@@ -60,21 +54,21 @@ namespace SpellBound.Controller.Samples {
             }
     
             Ctx.StateData.Grounded = true;
-    
-            var targetDistance = Ctx.ResizableCapsuleCollider.CalculateTargetFloatingDistance(Ctx.transform);
-            var actualDistance = hit.distance;
-    
-            var distanceToFloatingPoint = targetDistance - actualDistance;
+        }
+        
+        protected virtual void KeepCapsuleFloating() {
+            var distanceToGround =
+                    Ctx.ResizableCapsuleCollider.collider.center.y * Ctx.gameObject.transform.localScale.y -
+                    Hit.distance;
             
-            if (Mathf.Approximately(distanceToFloatingPoint, 0f))
-                return;
-
+            if (Mathf.Approximately(distanceToGround, 0f)) 
+                return; 
+            
             var amountToLift = 
-                    distanceToFloatingPoint * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce - Ctx.Rb.linearVelocity.y;
-    
-            if (!Mathf.Approximately(amountToLift, 0f)) {
+                    distanceToGround * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce - Ctx.Rb.linearVelocity.y;
+
+            if (!Mathf.Approximately(amountToLift, 0f))
                 Ctx.Rb.AddForce(Vector3.up * amountToLift, ForceMode.VelocityChange);
-            }
         }
         
         protected virtual void HandleCharacterRotation() {
