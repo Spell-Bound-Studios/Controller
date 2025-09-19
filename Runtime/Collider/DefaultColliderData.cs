@@ -11,16 +11,13 @@ namespace SpellBound.Controller {
         
         // If the user doesn't want to automatically calculate based on mesh bounds then set to true.
         [Header("Override Settings")]
-        [SerializeField] private bool overrideHeight;
-        [SerializeField] private bool overrideRadius;
-
-        public bool OverrideHeight => overrideHeight;
-        public bool OverrideRadius => overrideRadius;
+        [field: SerializeField] public bool OverrideHeight { get; private set; }
+        [field: SerializeField] public bool OverrideRadius { get; private set; }
         
-        [Header("Fallback Values")]
-        [field: SerializeField, Range(0.1f, 10f)] public float FallbackHeight { get; private set; } = 1.8f;
-        [field: SerializeField, Range(0.05f, 2f)] public float FallbackRadius { get; private set; } = 0.3f;
+        private const float FallbackHeight = 1.8f;
+        private const float FallbackRadius = 0.3f;
         
+        [Header("Log Suppression")]
         [field: SerializeField] public bool SuppressWarnings { get; private set; }
         [field: SerializeField] public bool SuppressConsole { get; private set; } = true;
         

@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace SpellBound.Controller {
     /// <summary>
-    /// WARNING! Please ensure that your player visual, wherever it might be, has its feet at y=0. If you do not do this
-    /// your collider and visual be mismatched.
+    /// WARNING! Please ensure that your player visual, wherever it might be, has its feet at y=0. If you do not do this,
+    /// your collider and visual may be mismatched, resulting in strange behavior or appearance.
     /// </summary>
     [Serializable]
     public class ResizableCapsuleCollider {
-        public CapsuleCollider collider;
+        [field: HideInInspector] public CapsuleCollider collider;
         // This is the "old" capsule that is not being modified. It's essentially the player visual.
         [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
         // This is where step height percentage, raycasts, and force data will live.
