@@ -27,6 +27,7 @@ namespace SpellBound.Controller {
         public TContext ctx { get; private set; }
         
         private readonly Dictionary<TStateEnum, BaseStateDriver> _stateDrivers;
+        private readonly Dictionary<Type, BaseSoState> _statesByType = new();
 
         public StateMachine(TContext ctx) {
             this.ctx = ctx;
@@ -39,9 +40,8 @@ namespace SpellBound.Controller {
         /// Automatically creates a state driver for each value in the enum.
         /// </summary>
         private void InitializeStateDrivers() {
-            foreach (TStateEnum stateType in Enum.GetValues(typeof(TStateEnum))) {
+            foreach (TStateEnum stateType in Enum.GetValues(typeof(TStateEnum)))
                 _stateDrivers[stateType] = new BaseStateDriver();
-            }
         }
         
         /// <summary>
@@ -59,6 +59,22 @@ namespace SpellBound.Controller {
 
             initialVariant.InitializeWithContext(ctx);
             driver.ChangeVariant(initialVariant);
+        }
+
+        public void RegisterState(BaseSoState state) {
+            if (state == null) {
+                Debug.LogError($"The state: {state.AssetName} that you're trying to register is null.");
+                return;
+            }
+            
+            var stateType = state.GetType();
+            
+            if (!_statesByType.TryAdd(stateType, state)) {
+                Debug.LogError($"The state dictionary already contains {stateType}.");
+                return;
+            }
+
+            state.InitializeWithContext(ctx);
         }
         
         /// <summary>
@@ -79,7 +95,12 @@ namespace SpellBound.Controller {
         }
         
         /// <summary>
-        /// Changes the variant of a specific state type without changing the active state.
+        /// Helper method to get a registered state.
+        /// </summary>
+        public BaseSoState GetRegisteredState<T>() where T : BaseSoState => _statesByType.GetValueOrDefault(typeof(T));
+        
+        /// <summary>
+        /// 
         /// </summary>
         public void ChangeVariant(TStateEnum stateType, BaseSoState newVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
@@ -87,9 +108,8 @@ namespace SpellBound.Controller {
                 return;
             }
             
-            if (newVariant.Ctx == null) {
+            if (newVariant.Ctx == null)
                 newVariant.InitializeWithContext(ctx);
-            }
             
             driver.ChangeVariant(newVariant);
         }
@@ -103,9 +123,7 @@ namespace SpellBound.Controller {
                 : null;
         }
 
-        public BaseSoState GetCurrentRunningState() {
-            return CurrentActiveDriver?.CurrentVariant;
-        }
+        public BaseSoState GetCurrentRunningState() => CurrentActiveDriver?.CurrentVariant;
         
         /// <summary>
         /// Call this from your MonoBehaviour's Update method.
@@ -122,7 +140,7 @@ namespace SpellBound.Controller {
         }
         
         /// <summary>
-        /// Registers a state driver for a specific state type if the user wishes to create a custom state driver.
+        /// Registers a state driver for a specific state type if the user wants to create a custom state driver.
         /// This will likely go unused except for advanced users.
         /// </summary>
         public void RegisterStateDriver(TStateEnum stateType, BaseStateDriver stateDriver) {
