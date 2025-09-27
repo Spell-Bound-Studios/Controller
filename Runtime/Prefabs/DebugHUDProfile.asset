@@ -27,7 +27,3 @@ MonoBehaviour:
     enabled: 1
   - key: Landing
     enabled: 1
-  - key: GCD
-    enabled: 1
-  - key: Interacting
-    enabled: 1
