@@ -9,7 +9,6 @@ namespace SpellBound.Controller {
     public abstract class BaseSoState : ScriptableObject {
         [SerializeField, ReadOnly, Immutable] private string id;
         [SerializeField, ReadOnly, Immutable] private string assetName;
-        
         public string Id => id;
         public string AssetName => assetName;
         public object Ctx;
@@ -33,9 +32,9 @@ namespace SpellBound.Controller {
             }
             
             var assetGuid = UnityEditor.AssetDatabase.GUIDFromAssetPath(assetPath).ToString();
-            if (string.IsNullOrEmpty(id) || id != assetGuid) {
+            
+            if (string.IsNullOrEmpty(id) || id != assetGuid)
                 id = assetGuid;
-            }
         }
 #endif
 
@@ -45,13 +44,16 @@ namespace SpellBound.Controller {
         public virtual void InitializeWithContext(object ctx) {
             Ctx = ctx;
             OnCtxInitialized();
+            OnStateInitialize();
         }
         
         /// <summary>
         /// Override this to handle context caching setup (like casting to your specific context type).
         /// </summary>
         protected virtual void OnCtxInitialized() { }
-        
+
+        protected virtual void OnStateInitialize() { }
+
         public void OnEnter() => EnterStateLogic();
         public void OnUpdate() => UpdateStateLogic();
         public void OnFixedUpdate() => FixedUpdateStateLogic();

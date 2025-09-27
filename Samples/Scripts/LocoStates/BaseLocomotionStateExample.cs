@@ -61,7 +61,7 @@ namespace SpellBound.Controller.Samples {
                     Ctx.ResizableCapsuleCollider.collider.center.y * Ctx.gameObject.transform.localScale.y -
                     Hit.distance;
             
-            if (Mathf.Approximately(distanceToGround, 0f)) 
+            if (Mathf.Approximately(distanceToGround, 0f))
                 return; 
             
             var amountToLift = 
