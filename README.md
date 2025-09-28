@@ -1,4 +1,7 @@
 # Spellbound Controller Library
+
+We are in the process of making our repositories public and conforming to the UPM standards. This library will be coming soon and should be available in the next few weeks. Thanks for your patience! Bookmark this in the meantime.
+
 The Controller library is a third person character controller library for Unity developers. It comes equipped with:
 
 ### API
