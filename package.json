@@ -1,16 +1,21 @@
 {
   "name": "com.spellboundstudios.controller",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "Controller",
-  "description": "Controller for Corsair's Isle",
+  "description": "This is a player controller library that offers modular states and and state machines to give your character the flexibility to do anything you want in your game world.",
   "unity": "6000.0",
-  "unityRelease": "40f1",
-  "dependencies": {
-  },
-
   "author": {
-    "name": "Judsin",
+    "name": "Spellbound Studios",
     "email": "Judsin1349@gmail.com",
-    "url": "https://github.com/Spell-Bound-Studios/CharacterController"
-  }
+    "url": "https://github.com/Spell-Bound-Studios"
+  },
+  "keywords": [],
+  "samples": 
+    [
+      {
+        "displayName": "Example Scene",
+        "description": "A third person character controller example scene to show you the responsiveness and state flexibility and overrides you can perform with ease.",
+        "path": "Samples"
+      }
+    ]
 }
