@@ -14,8 +14,8 @@ namespace SpellBound.Controller.Samples {
         }
         
         protected override void FixedUpdateStateLogic() {
-            PerformGroundCheck();
-            KeepCapsuleFloating();
+            if (PerformGroundCheck())
+                KeepCapsuleFloating();
             HandleInput();
             HandleCharacterRotation();
         }

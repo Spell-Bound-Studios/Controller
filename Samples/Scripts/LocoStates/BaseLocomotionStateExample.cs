@@ -37,7 +37,7 @@ namespace SpellBound.Controller.Samples {
         /// we think that this is potentially something that all loco states could use.
         /// </remarks>
         /// </summary>
-        protected virtual void PerformGroundCheck() {
+        protected virtual bool PerformGroundCheck() {
             var rayOrigin = Ctx.ResizableCapsuleCollider.collider.bounds.center;
             var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
             var upDirection = Ctx.planarUp;
@@ -50,10 +50,12 @@ namespace SpellBound.Controller.Samples {
                         layerMask: Ctx.LayerData.GroundLayer,
                         queryTriggerInteraction: QueryTriggerInteraction.Ignore)) {
                 Ctx.StateData.Grounded = false;
-                return;
+                return Ctx.StateData.Grounded;
             }
     
             Ctx.StateData.Grounded = true;
+
+            return Ctx.StateData.Grounded;
         }
         
         protected virtual void KeepCapsuleFloating() {
