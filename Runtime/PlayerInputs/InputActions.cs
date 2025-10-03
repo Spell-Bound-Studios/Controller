@@ -225,6 +225,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""FTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""73f31b83-612c-4b17-acdf-714c80cde47d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -491,6 +500,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""MouseWheel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9fd8b357-65f6-4a6f-94be-9a5b94c8af62"",
+                    ""path"": ""<Keyboard>/f2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -514,6 +534,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
         m_PlayerInput_LookDirection = m_PlayerInput.FindAction("LookDirection", throwIfNotFound: true);
         m_PlayerInput_MouseWheel = m_PlayerInput.FindAction("MouseWheel", throwIfNotFound: true);
+        m_PlayerInput_FTwo = m_PlayerInput.FindAction("FTwo", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -609,6 +630,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Interact;
     private readonly InputAction m_PlayerInput_LookDirection;
     private readonly InputAction m_PlayerInput_MouseWheel;
+    private readonly InputAction m_PlayerInput_FTwo;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -681,6 +703,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @MouseWheel => m_Wrapper.m_PlayerInput_MouseWheel;
         /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/FTwo".
+        /// </summary>
+        public InputAction @FTwo => m_Wrapper.m_PlayerInput_FTwo;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
@@ -751,6 +777,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started += instance.OnMouseWheel;
             @MouseWheel.performed += instance.OnMouseWheel;
             @MouseWheel.canceled += instance.OnMouseWheel;
+            @FTwo.started += instance.OnFTwo;
+            @FTwo.performed += instance.OnFTwo;
+            @FTwo.canceled += instance.OnFTwo;
         }
 
         /// <summary>
@@ -807,6 +836,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started -= instance.OnMouseWheel;
             @MouseWheel.performed -= instance.OnMouseWheel;
             @MouseWheel.canceled -= instance.OnMouseWheel;
+            @FTwo.started -= instance.OnFTwo;
+            @FTwo.performed -= instance.OnFTwo;
+            @FTwo.canceled -= instance.OnFTwo;
         }
 
         /// <summary>
@@ -952,5 +984,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseWheel(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FTwo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFTwo(InputAction.CallbackContext context);
     }
 }

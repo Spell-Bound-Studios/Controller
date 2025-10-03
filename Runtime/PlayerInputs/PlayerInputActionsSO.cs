@@ -18,6 +18,7 @@ namespace SpellBound.Controller {
         public event Action OnHotkeyFourPressed = delegate { };
         public event Action OnEscPressed = delegate { };
         public event Action OnCharacterMenuPressed = delegate { };
+        public event Action OnFTwoPressed = delegate { };
 
 
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
@@ -91,6 +92,11 @@ namespace SpellBound.Controller {
 
         public void OnMouseWheel(InputAction.CallbackContext context) {
             OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
+        }
+
+        public void OnFTwo(InputAction.CallbackContext context) {
+            if (context.performed)
+                OnFTwoPressed.Invoke();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace SpellBound.Controller {
-    public class InputManager : MonoBehaviour {
+    public sealed class InputManager : MonoBehaviour {
         public static InputManager Instance;
         [SerializeField] private PlayerInputActionsSO playerInputActionsSO;
         
@@ -12,6 +12,8 @@ namespace SpellBound.Controller {
             }
             
             Instance = this;
+            
+            DontDestroyOnLoad(gameObject);
         }
 
         public PlayerInputActionsSO GetInputs() => playerInputActionsSO;
