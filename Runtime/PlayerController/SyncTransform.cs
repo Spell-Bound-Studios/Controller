@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SpellBound.Controller {
     /// <summary>
@@ -24,8 +25,17 @@ namespace SpellBound.Controller {
             if (!followThisTransform)
                 enabled = false;
         }
-        
+
+        private void OnDisable() {
+            followThisTransform = null;
+        }
+
         private void LateUpdate() {
+            if (!followThisTransform) {
+                enabled = false;
+                return;
+            }
+            
             _tr.position = followThisTransform.position + offset;
         }
         
