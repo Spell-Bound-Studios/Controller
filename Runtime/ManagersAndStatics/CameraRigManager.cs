@@ -68,6 +68,7 @@ namespace SpellBound.Controller {
         }
         
         public CinemachineCamera GetCurrentCamera() => _currentCinemachineCamera;
+        
         public float GetCurrentCameraZoom() =>
                 _currentThirdPersonCamera != null
                         ? _currentThirdPersonCamera.CameraDistance
