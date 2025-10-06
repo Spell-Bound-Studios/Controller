@@ -43,4 +43,7 @@ jobs:
           done
 
       - name: Verify formatting
-        run: dotnet format TempSolution.sln --verify-no-changes --verbosity minimal
+        run: dotnet format TempSolution.sln --verify-no-changes --severity error --verbosity detailed
+
+      - name: Run analyzers
+        run: dotnet build --no-restore -warnaserror /warnaserror+:IDE*
