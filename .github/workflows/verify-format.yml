@@ -1,0 +1,46 @@
+name: Verify Code Format
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check-formatting:
+    name: Check .NET Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------
+      # 1. Checkout the repository
+      # ---------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------
+      # 2. Setup .NET SDK
+      # ---------------------------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # ---------------------------
+      # 3. Restore the dotnet-format tool
+      # ---------------------------
+      # This restores the version defined in .config/dotnet-tools.json
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      # ---------------------------
+      # 4. Run the format check
+      # ---------------------------
+      - name: Create temporary solution
+        run: |
+          dotnet new sln --name TempSolution
+          for csproj in $(find . -name "*.csproj"); do
+            dotnet sln TempSolution.sln add "$csproj"
+          done
+
+      - name: Verify formatting
+        run: dotnet format TempSolution.sln --verify-no-changes --verbosity minimal
