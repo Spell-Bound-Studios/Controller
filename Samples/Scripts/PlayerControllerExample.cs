@@ -54,6 +54,8 @@ namespace SpellBound.Controller.Samples {
         // What direction is up from the player?
         public Vector3 planarUp { get; private set; }
         
+        public void Foo() {         }
+        
         private void Awake() {
             planarUp = transform.up;
             
