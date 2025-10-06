@@ -1,4 +1,4 @@
-name: Verify Code Format
+name: Super Linter
 
 on:
   pull_request:
@@ -6,44 +6,24 @@ on:
     branches: [main]
 
 jobs:
-  check-formatting:
-    name: Check .NET Formatting
+  lint:
+    name: Lint Code Base
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------------------
-      # 1. Checkout the repository
-      # ---------------------------
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      # ---------------------------
-      # 2. Setup .NET SDK
-      # ---------------------------
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          fetch-depth: 0
 
-      # ---------------------------
-      # 3. Restore the dotnet-format tool
-      # ---------------------------
-      # This restores the version defined in .config/dotnet-tools.json
-      - name: Restore .NET tools
-        run: dotnet tool restore
-
-      # ---------------------------
-      # 4. Run the format check
-      # ---------------------------
-      - name: Create temporary solution
-        run: |
-          dotnet new sln --name TempSolution
-          for csproj in $(find . -name "*.csproj"); do
-            dotnet sln TempSolution.sln add "$csproj"
-          done
-
-      - name: Verify formatting
-        run: dotnet format TempSolution.sln --verify-no-changes --severity error --verbosity detailed
-
-      - name: Run analyzers
-        run: dotnet build --no-restore -warnaserror
+      - name: Run Super Linter
+        uses: github/super-linter/slim@v6
+        env:
+          VALIDATE_ALL_CODEBASE: true        # Lint the entire repo, not just changed files
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_CSHARP: true
+          VALIDATE_YAML: true
+          VALIDATE_JSON: false
+          VALIDATE_MARKDOWN: false
+          SUPPRESS_WARNINGS: false
