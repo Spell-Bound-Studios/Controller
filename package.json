@@ -15,7 +15,8 @@
     "com.unity.physics": "1.3.14",
     "com.unity.entities": "1.3.14",
     "com.unity.mathematics": "1.3.2",
-    "com.unity.collections": "2.5.7"
+    "com.unity.collections": "2.5.7",
+    "com.spellboundstudios.core": "1.0.0"
   },
   "keywords": ["controller", "state-machine", "player", "character"],
   "samples": 
