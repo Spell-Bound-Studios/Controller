@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System;
 using UnityEngine;
 
 namespace SpellBound.Controller {
@@ -10,8 +12,8 @@ namespace SpellBound.Controller {
     /// </summary>
     public static class ControllerHelper {
         public enum CameraCouplingMode {
-            Coupled, 
-            CoupledWhenMoving, 
+            Coupled,
+            CoupledWhenMoving,
             Decoupled
         }
 
@@ -43,110 +45,105 @@ namespace SpellBound.Controller {
         public static Vector3 GetHorizontalVelocity(Rigidbody rb) {
             var velocity = rb.linearVelocity;
             velocity.y = 0;
+
             return velocity;
         }
 
-        public static float GetHorizontalSpeed(Rigidbody rb, Vector3 projectionPlane) {
-            return Vector3.ProjectOnPlane(rb.linearVelocity, projectionPlane).magnitude;
-        }
-        
+        public static float GetHorizontalSpeed(Rigidbody rb, Vector3 projectionPlane) =>
+                Vector3.ProjectOnPlane(rb.linearVelocity, projectionPlane).magnitude;
+
         /// <summary>
         /// Returns the vertical speed relative to the specified up direction.
         /// </summary>
-        public static float GetVerticalSpeed(Rigidbody rb, Vector3 upDirection) {
-            return Vector3.Dot(rb.linearVelocity, upDirection);
-        }
-        
+        public static float GetVerticalSpeed(Rigidbody rb, Vector3 upDirection) =>
+                Vector3.Dot(rb.linearVelocity, upDirection);
+
         /// <summary>
         /// Returns the planar velocity projected onto the specified plane.
         /// </summary>
-        public static Vector3 GetPlanarVelocity(Rigidbody rb, Vector3 planeNormal) {
-            return Vector3.ProjectOnPlane(rb.linearVelocity, planeNormal);
-        }
-        
+        public static Vector3 GetPlanarVelocity(Rigidbody rb, Vector3 planeNormal) =>
+                Vector3.ProjectOnPlane(rb.linearVelocity, planeNormal);
+
         /// <summary>
         /// Returns the current speed of the rigidbody.
         /// </summary>
-        public static float GetCurrentSpeed(Rigidbody rb) {
-            return rb.linearVelocity.magnitude;
-        }
-        
+        public static float GetCurrentSpeed(Rigidbody rb) => rb.linearVelocity.magnitude;
+
         // ########################
         // INPUT PROCESSING HELPERS
         // ########################
-        
+
         /// <summary>
         /// Converts an input direction to world space relative to a reference transform and up direction.
         /// </summary>
         public static Vector3 GetInputDirectionRelativeToCamera(
-                Vector2 inputDirection, Transform referenceTransform, Vector3 upDirection) {
-            if (referenceTransform == null) 
+            Vector2 inputDirection, Transform referenceTransform, Vector3 upDirection) {
+            if (referenceTransform == null)
                 return Vector3.zero;
-            
+
             var rightProjected = Vector3.ProjectOnPlane(
-                    referenceTransform.right, upDirection).normalized;
+                referenceTransform.right, upDirection).normalized;
+
             var forwardProjected = Vector3.ProjectOnPlane(
-                    referenceTransform.forward, upDirection).normalized;
-            
+                referenceTransform.forward, upDirection).normalized;
+
             var direction = rightProjected * inputDirection.x + forwardProjected * inputDirection.y;
-            
-            return direction.magnitude > 1f 
-                    ? direction.normalized 
+
+            return direction.magnitude > 1f
+                    ? direction.normalized
                     : direction;
         }
-        
+
         /// <summary>
         /// Normalizes an input direction if magnitude exceeds 1 (useful for analog stick input).
         /// </summary>
-        public static Vector2 NormalizeInputDirection(Vector2 inputDirection) {
-            return inputDirection.magnitude > 1f 
-                    ? inputDirection.normalized 
-                    : inputDirection;
-        }
-        
+        public static Vector2 NormalizeInputDirection(Vector2 inputDirection) =>
+                inputDirection.magnitude > 1f
+                        ? inputDirection.normalized
+                        : inputDirection;
+
         // ################
         // ROTATION HELPERS
         // ################
-        
+
         /// <summary>
         /// Smoothly rotates towards a target direction using the specified rotation speed.
         /// </summary>
         public static Quaternion RotateTowardsDirection(
-                Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection, float rotationSpeed, float deltaTime) {
-            
-            if (targetDirection.sqrMagnitude < 1e-6f) 
+            Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection, float rotationSpeed,
+            float deltaTime) {
+            if (targetDirection.sqrMagnitude < 1e-6f)
                 return currentRotation;
-            
+
             var targetRotation = Quaternion.LookRotation(targetDirection, upDirection);
             var maxRotationStep = rotationSpeed * deltaTime;
-            
+
             return Quaternion.RotateTowards(currentRotation, targetRotation, maxRotationStep);
         }
-        
+
         /// <summary>
         /// Returns the angle difference between current rotation and target direction.
         /// </summary>
         public static float GetRotationAngleDifference(
-                Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection) {
-            
-            if (targetDirection.sqrMagnitude < 1e-6f) 
+            Quaternion currentRotation, Vector3 targetDirection, Vector3 upDirection) {
+            if (targetDirection.sqrMagnitude < 1e-6f)
                 return 0f;
-            
+
             var targetRotation = Quaternion.LookRotation(targetDirection, upDirection);
+
             return Quaternion.Angle(currentRotation, targetRotation);
         }
-        
+
         // ###############
         // PHYSICS HELPERS
         // ###############
-        
+
         /// <summary>
         /// Handles character rotation with angle-based speed falloff.
         /// This is the preferred rotation method for standard player-based character controllers.
         /// </summary>
         public static void HandleCharacterRotation(
-                Rigidbody rb, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle, float deltaTime) {
-            
+            Rigidbody rb, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle, float deltaTime) {
             var planarVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, planarUp);
 
             if (planarVelocity.sqrMagnitude < 1e-6f)
@@ -156,27 +153,26 @@ namespace SpellBound.Controller {
             var targetRotation = Quaternion.LookRotation(desiredDir, planarUp);
             var angleDiff = Quaternion.Angle(rb.rotation, targetRotation);
             var speedFactor = Mathf.InverseLerp(0f, rotationFallOffAngle, angleDiff);
-            
+
             var maxStepDeg = turnSpeed * speedFactor * deltaTime;
 
             var nextRotation = Quaternion.RotateTowards(rb.rotation, targetRotation, maxStepDeg);
-            
+
             rb.MoveRotation(nextRotation);
         }
-        
+
         /// <summary>
         /// Applies force to achieve a target horizontal velocity.
         /// </summary>
         public static void ApplyHorizontalMovementForce(
-                Rigidbody rb, Vector3 targetVelocity, float forceMultiplier, ForceMode forceMode) {
-            
+            Rigidbody rb, Vector3 targetVelocity, float forceMultiplier, ForceMode forceMode) {
             var currentHorizontalVelocity = GetHorizontalVelocity(rb);
             var velocityDifference = targetVelocity - currentHorizontalVelocity;
             var force = velocityDifference * forceMultiplier;
-            
+
             rb.AddForce(force, forceMode);
         }
-        
+
         /// <summary>
         /// Applies a step-up force to help with ground adherence.
         /// </summary>
@@ -184,39 +180,40 @@ namespace SpellBound.Controller {
             var upForce = upDirection * stepForce;
             rb.AddForce(upForce, forceMode);
         }
-        
+
         // ###########################
         // COLLISION & OVERLAP HELPERS
         // ###########################
-        
+
         /// <summary>
         /// Checks for overlapping colliders within a specified radius.
         /// </summary>
-        public static bool CheckOverlapSphere(Vector3 position, float radius, LayerMask layers) {
-            return Physics.CheckSphere(position, radius, layers, QueryTriggerInteraction.Ignore);
-        }
-        
+        public static bool CheckOverlapSphere(Vector3 position, float radius, LayerMask layers) =>
+                Physics.CheckSphere(position, radius, layers, QueryTriggerInteraction.Ignore);
+
         /// <summary>
         /// Returns all colliders overlapping with a sphere.
         /// </summary>
         public static Collider[] GetOverlappingColliders(
-                Vector3 position, float radius, LayerMask layers, int maxResults = 10) {
-            
+            Vector3 position, float radius, LayerMask layers, int maxResults = 10) {
             var results = new Collider[maxResults];
-            var count = Physics.OverlapSphereNonAlloc(position, radius, results, layers, QueryTriggerInteraction.Ignore);
-            
-            if (count == maxResults) 
+
+            var count = Physics.OverlapSphereNonAlloc(position, radius, results, layers,
+                QueryTriggerInteraction.Ignore);
+
+            if (count == maxResults)
                 return results;
-            
+
             var trimmedResults = new Collider[count];
             Array.Copy(results, trimmedResults, count);
+
             return trimmedResults;
         }
-        
+
         // ####################
         // MATHEMATICAL HELPERS
         // ####################
-        
+
         /// <summary>
         /// Lerps between two values with a speed-based approach rather than time-based.
         /// </summary>
@@ -224,22 +221,24 @@ namespace SpellBound.Controller {
             var maxChange = speed * deltaTime;
             var difference = target - current;
             var clampedChange = Mathf.Clamp(difference, -maxChange, maxChange);
+
             return current + clampedChange;
         }
-        
+
         /// <summary>
         /// Smoothly damps a value towards a target using SmoothDamp.
         /// </summary>
         public static float SmoothDampFloat(
-                float current, float target, ref float velocity, float smoothTime, float deltaTime, float maxSpeed = Mathf.Infinity) {
-            return Mathf.SmoothDamp(current, target, ref velocity, smoothTime, maxSpeed, deltaTime);
-        }
-        
+            float current, float target, ref float velocity, float smoothTime, float deltaTime,
+            float maxSpeed = Mathf.Infinity) =>
+                Mathf.SmoothDamp(current, target, ref velocity, smoothTime, maxSpeed, deltaTime);
+
         /// <summary>
         /// Maps a value from one range to another.
         /// </summary>
         public static float RemapValue(float value, float fromMin, float fromMax, float toMin, float toMax) {
             var normalizedValue = Mathf.InverseLerp(fromMin, fromMax, value);
+
             return Mathf.Lerp(toMin, toMax, normalizedValue);
         }
     }

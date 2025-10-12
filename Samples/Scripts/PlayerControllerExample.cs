@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,50 +23,64 @@ namespace SpellBound.Controller.Samples {
     /// </summary>
     public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
         [Header("Input Reference:")]
-        [field: SerializeField] public PlayerInputActionsSO input { get; private set; }
+        [field: SerializeField]
+        public PlayerInputActionsSO input { get; private set; }
+
         [Header("Camera Follow Reference:")]
-        [field: SerializeField] public Transform referenceTransform { get; private set; }
+        [field: SerializeField]
+        public Transform referenceTransform { get; private set; }
+
         [Header("Rigidbody Reference:")]
-        [field: SerializeField] public Rigidbody Rb { get; private set; }
-        [Header("Collider Settings:")] 
-        [field: SerializeField] public ResizableCapsuleCollider ResizableCapsuleCollider { get; private set; }
-        [Header("Layer Settings:")] 
-        [field: SerializeField] public LayerData LayerData { get; private set; }
-        [Header("Rigidbody Settings:")] 
-        [field: SerializeField] public RigidbodyData RigidbodyData { get; private set; }
-        [Header("Character Rotation Settings:")] 
-        [field: SerializeField] public RotationData RotationData { get; private set; }
-        [Header("Stat Settings:")] 
-        [field: SerializeField] public StatData StatData { get; private set; }
-        [Header("State Settings:")] 
-        [field: SerializeField] public StateData StateData { get; private set; }
-        
+        [field: SerializeField]
+        public Rigidbody Rb { get; private set; }
+
+        [Header("Collider Settings:")]
+        [field: SerializeField]
+        public ResizableCapsuleCollider ResizableCapsuleCollider { get; private set; }
+
+        [Header("Layer Settings:")]
+        [field: SerializeField]
+        public LayerData LayerData { get; private set; }
+
+        [Header("Rigidbody Settings:")]
+        [field: SerializeField]
+        public RigidbodyData RigidbodyData { get; private set; }
+
+        [Header("Character Rotation Settings:")]
+        [field: SerializeField]
+        public RotationData RotationData { get; private set; }
+
+        [Header("Stat Settings:")]
+        [field: SerializeField]
+        public StatData StatData { get; private set; }
+
+        [Header("State Settings:")]
+        [field: SerializeField]
+        public StateData StateData { get; private set; }
+
         public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
-        
-        [Header("Locomotion States")]
-        public List<BaseSoState> locoStates;
 
-        [Header("Action States")]
-        public List<BaseSoState> actionStates;
-        
-        [Header("Animator")]
-        [SerializeField] private Animator animator;
+        [Header("Locomotion States")] public List<BaseSoState> locoStates;
+
+        [Header("Action States")] public List<BaseSoState> actionStates;
+
+        [Header("Animator"), SerializeField] private Animator animator;
 
         // What direction is up from the player?
         public Vector3 planarUp { get; private set; }
-        
+
         private void Awake() {
             planarUp = transform.up;
-            
+
             if (input == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
-            
+
             Rb = GetComponent<Rigidbody>();
             Rb.freezeRotation = true;
             Rb.useGravity = true;
             Rb.interpolation = RigidbodyInterpolation.Interpolate;
-            
+
             ResizableCapsuleCollider.Initialize(gameObject);
             ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
@@ -84,14 +100,14 @@ namespace SpellBound.Controller.Samples {
             locoStateMachine.FixedUpdateStateMachine();
             actionStateMachine.FixedUpdateStateMachine();
         }
-        
+
 #if UNITY_EDITOR
         private void OnValidate() {
             ResizableCapsuleCollider.Initialize(gameObject);
             ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
 #endif
-        
+
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
@@ -116,38 +132,42 @@ namespace SpellBound.Controller.Samples {
             // Show which ScriptableObject state is currently running
             debugHud.Field("Current Loco State", () => {
                 var currentStateVariant = locoStateMachine.GetCurrentRunningState();
-                return currentStateVariant != null 
-                        ? currentStateVariant.AssetName 
+
+                return currentStateVariant != null
+                        ? currentStateVariant.AssetName
                         : "None";
             });
-            
+
             // Show each driver (enum value) and what variant it's pointing to
             foreach (LocoStateTypes stateType in Enum.GetValues(typeof(LocoStateTypes))) {
                 debugHud.Field($"{stateType}", () => {
                     var currentVariant = locoStateMachine.GetCurrentVariant(stateType);
-                    return currentVariant != null 
-                            ? currentVariant.name 
+
+                    return currentVariant != null
+                            ? currentVariant.name
                             : "Not Assigned";
                 });
             }
-            
+
             // Repeat for action state machine.
             debugHud.Field("Current Action State", () => {
                 var currentStateVariant = actionStateMachine.GetCurrentRunningState();
-                return currentStateVariant != null 
-                        ? currentStateVariant.AssetName 
+
+                return currentStateVariant != null
+                        ? currentStateVariant.AssetName
                         : "None";
             });
-            
+
             foreach (ActionStateTypes stateType in Enum.GetValues(typeof(ActionStateTypes))) {
                 debugHud.Field($"{stateType}", () => {
                     var currentVariant = actionStateMachine.GetCurrentVariant(stateType);
-                    return currentVariant != null 
-                            ? currentVariant.name 
+
+                    return currentVariant != null
+                            ? currentVariant.name
                             : "Not Assigned";
                 });
             }
-            
+
             debugHud.Gizmo(() => {
                 var origin = ResizableCapsuleCollider.collider.bounds.center;
                 var dir = -planarUp;
@@ -161,7 +181,7 @@ namespace SpellBound.Controller.Samples {
             });
         }
     }
-    
+
     /// <summary>
     /// These are the enums belonging to our state machine example. You can put these anywhere - I chose to put them
     /// here as easy reference but feel free to put them anywhere in your game as long as they are accessible by the

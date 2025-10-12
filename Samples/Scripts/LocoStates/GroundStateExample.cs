@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     [CreateAssetMenu(fileName = "GroundStateExample", menuName = "Spellbound/StateMachine/GroundStateExample")]
@@ -12,7 +14,7 @@ namespace SpellBound.Controller.Samples {
             if (!Ctx.StateData.Grounded)
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
-        
+
         protected override void FixedUpdateStateLogic() {
             if (PerformGroundCheck())
                 KeepCapsuleFloating();
@@ -25,12 +27,9 @@ namespace SpellBound.Controller.Samples {
             Ctx.input.OnJumpInput -= HandleJumpPressed;
         }
 
-        protected virtual void HandleInteractPressed() {
-            Ctx.locoStateMachine.ChangeVariant(LocoStateTypes.Grounded, Ctx.locoStates[1]);
-        }
-        
-        private void HandleJumpPressed() {
-            Ctx.locoStateMachine.ChangeState(LocoStateTypes.Jumping);
-        }
+        protected virtual void HandleInteractPressed() =>
+                Ctx.locoStateMachine.ChangeVariant(LocoStateTypes.Grounded, Ctx.locoStates[1]);
+
+        private void HandleJumpPressed() => Ctx.locoStateMachine.ChangeState(LocoStateTypes.Jumping);
     }
 }

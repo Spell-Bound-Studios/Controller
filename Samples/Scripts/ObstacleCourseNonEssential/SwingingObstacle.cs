@@ -1,39 +1,52 @@
-﻿using System.Collections.Generic;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
-    public enum AxisSpace { Local, World }
-    public enum Axis { X, Y, Z }
-    
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(Rigidbody))]
+    public enum AxisSpace {
+        Local,
+        World
+    }
+
+    public enum Axis {
+        X,
+        Y,
+        Z
+    }
+
+    [DisallowMultipleComponent, RequireComponent(typeof(Collider)), RequireComponent(typeof(Rigidbody))]
     public class SwingingObstacle : MonoBehaviour {
-        [Header("Target Filter")]
-        [SerializeField] private LayerMask targetLayers = ~0;
+        [Header("Target Filter"), SerializeField]
+        private LayerMask targetLayers = ~0;
+
         [SerializeField] private float rehitCooldownSeconds = 0.15f;
 
-        [Header("Impact Tuning")]
-        [SerializeField] private float impulseMultiplier = 10f;
+        [Header("Impact Tuning"), SerializeField]
+        private float impulseMultiplier = 10f;
+
         [SerializeField] private float minApproachSpeed = 0.5f;
         [SerializeField] private bool useForceAtPoint = true;
 
-        [Header("Swing Setup")]
-        [SerializeField, Tooltip("Drag joint here.")] private Transform pivot;
+        [Header("Swing Setup"), SerializeField, Tooltip("Drag joint here.")]
+        private Transform pivot;
+
         [SerializeField] private bool autoSetupHinge = true;
         [SerializeField] private AxisSpace axisSpace = AxisSpace.World;
         [SerializeField] private Axis swingAxis = Axis.Y;
         [SerializeField] private float initialAngularSpeedDeg;
-        
-        [Header("Rigidbody Defaults")]
-        [SerializeField] private float rbMass = 40f;
+
+        [Header("Rigidbody Defaults"), SerializeField]
+        private float rbMass = 40f;
+
         [SerializeField] private float rbLinearDampening;
         [SerializeField] private float rbAngularDampening = 0.05f;
         [SerializeField] private int solverIterations = 12;
         [SerializeField] private int solverVelocityIterations = 12;
 
-        [Header("Hinge Motor Settings")]
-        [SerializeField] private bool useMotor = true;
+        [Header("Hinge Motor Settings"), SerializeField]
+        private bool useMotor = true;
+
         [SerializeField] private float motorTargetVelocityDeg = 180f;
         [SerializeField] private float motorForce = 2000f;
         [SerializeField] private bool motorFreeSpin;
@@ -67,28 +80,28 @@ namespace SpellBound.Controller.Samples {
                     ? AxisVectorWorld(swingAxis)
                     : transform.TransformDirection(AxisVectorLocal(swingAxis));
             _rb.angularVelocity = axisWorld.normalized * (initialAngularSpeedDeg * Mathf.Deg2Rad);
-            
+
             _rb.sleepThreshold = 0f;
-            
-            var maxDeg = Mathf.Max(Mathf.Abs(initialAngularSpeedDeg), useMotor 
-                    ? Mathf.Abs(motorTargetVelocityDeg) 
+
+            var maxDeg = Mathf.Max(Mathf.Abs(initialAngularSpeedDeg), useMotor
+                    ? Mathf.Abs(motorTargetVelocityDeg)
                     : 0f);
-            
+
             if (maxDeg > 0f)
                 _rb.maxAngularVelocity = Mathf.Max(_rb.maxAngularVelocity, maxDeg * Mathf.Deg2Rad + 1f);
         }
-        
+
         private void FixedUpdate() {
-            if (useMotor) 
+            if (useMotor)
                 return;
-            
-            if (Mathf.Approximately(initialAngularSpeedDeg, 0f)) 
+
+            if (Mathf.Approximately(initialAngularSpeedDeg, 0f))
                 return;
 
             var axisWorld = axisSpace == AxisSpace.World
                     ? AxisVectorWorld(swingAxis)
                     : transform.TransformDirection(AxisVectorLocal(swingAxis));
-            
+
             var axis = axisWorld.normalized;
             var target = initialAngularSpeedDeg * Mathf.Deg2Rad;
             var current = Vector3.Dot(_rb.angularVelocity, axis);
@@ -109,23 +122,25 @@ namespace SpellBound.Controller.Samples {
             joint.anchor = transform.InverseTransformPoint(pivot.position);
 
             var pivotRb = pivot.GetComponent<Rigidbody>();
+
             if (pivotRb == null) {
                 pivotRb = pivot.gameObject.AddComponent<Rigidbody>();
                 pivotRb.isKinematic = true;
                 pivotRb.useGravity = false;
                 pivotRb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
+
             joint.connectedBody = pivotRb;
             joint.connectedAnchor = Vector3.zero;
 
             joint.useLimits = !(useMotor || Mathf.Abs(initialAngularSpeedDeg) > 0.01f);
-            var limits = joint.limits; 
-            limits.min = -170f; 
-            limits.max = 170f; 
+            var limits = joint.limits;
+            limits.min = -170f;
+            limits.max = 170f;
             joint.limits = limits;
             joint.enablePreprocessing = false;
 
-            if (!useMotor) 
+            if (!useMotor)
                 return;
 
             var m = joint.motor;
@@ -138,13 +153,14 @@ namespace SpellBound.Controller.Samples {
 
         private void OnCollisionEnter(Collision collision) {
             var otherRb = collision.rigidbody;
-            if (otherRb == null) 
-                return;
-            
-            if ((targetLayers.value & (1 << otherRb.gameObject.layer)) == 0) 
+
+            if (otherRb == null)
                 return;
 
-            if (_lastHitTime.TryGetValue(otherRb, out var tLast) && Time.time - tLast < rehitCooldownSeconds) 
+            if ((targetLayers.value & (1 << otherRb.gameObject.layer)) == 0)
+                return;
+
+            if (_lastHitTime.TryGetValue(otherRb, out var tLast) && Time.time - tLast < rehitCooldownSeconds)
                 return;
 
             var contact = collision.GetContact(0);
@@ -156,7 +172,8 @@ namespace SpellBound.Controller.Samples {
             var relative = vLog - vOther;
 
             var relativeSpeed = relative.magnitude;
-            if (relativeSpeed <= minApproachSpeed) 
+
+            if (relativeSpeed <= minApproachSpeed)
                 return;
 
             var deltaV = relativeSpeed * impulseMultiplier;
@@ -170,21 +187,19 @@ namespace SpellBound.Controller.Samples {
 
             _lastHitTime[otherRb] = Time.time;
         }
-        
-        private static Vector3 AxisVectorWorld(Axis a) {
-            return a switch {
+
+        private static Vector3 AxisVectorWorld(Axis a) =>
+                a switch {
                     Axis.X => Vector3.right,
                     Axis.Y => Vector3.up,
                     _ => Vector3.forward
-            };
-        }
-        
-        private static Vector3 AxisVectorLocal(Axis a) {
-            return a switch {
+                };
+
+        private static Vector3 AxisVectorLocal(Axis a) =>
+                a switch {
                     Axis.X => Vector3.right,
                     Axis.Y => Vector3.up,
                     _ => Vector3.forward
-            };
-        }
+                };
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     public class Launcher : MonoBehaviour {
@@ -10,25 +12,26 @@ namespace SpellBound.Controller.Samples {
 
         private void Awake() {
             var col = GetComponent<Collider>();
-            if (col.isTrigger) {
-                Debug.LogWarning("Launcher: Collider is a trigger. Collision normals are unavailable. Set Is Trigger = false.");
-            }
+
+            if (col.isTrigger)
+                Debug.LogWarning(
+                    "Launcher: Collider is a trigger. Collision normals are unavailable. Set Is Trigger = false.");
         }
-        
+
         private void OnCollisionEnter(Collision collision) {
             var rb = collision.rigidbody;
-            
-            if (rb == null) 
+
+            if (rb == null)
                 return;
-            
-            if ((layerMask.value & (1 << rb.gameObject.layer)) == 0) 
+
+            if ((layerMask.value & (1 << rb.gameObject.layer)) == 0)
                 return;
-            
+
             var contact = collision.GetContact(0);
             var n = contact.normal;
             var p = contact.point;
             var explosionPos = p - n * offsetFromSurface;
-            
+
             rb.AddExplosionForce(explosiveForce, explosionPos, explosiveRadius, 0f, forceMode);
         }
     }

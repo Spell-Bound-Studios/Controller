@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System.Collections;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
@@ -10,7 +12,7 @@ namespace SpellBound.Controller.Samples {
     [CreateAssetMenu(fileName = "JumpStateExample", menuName = "Spellbound/StateMachine/JumpStateExample")]
     public class JumpStateExample : BaseLocomotionStateExample {
         protected float DefaultJumpMultiplier = 1.0f;
-        
+
         private readonly WaitForSeconds _minJumpDuration = new(0.3f);
         private readonly WaitForSeconds _maxJumpDuration = new(2f);
         private Coroutine _jumpMinRoutine;
@@ -19,7 +21,7 @@ namespace SpellBound.Controller.Samples {
         protected override void EnterStateLogic() {
             _jumpMinRoutine = Ctx.StartCoroutine(JumpMinRoutine());
             _jumpMaxRoutine = Ctx.StartCoroutine(JumpMaxRoutine());
-            
+
             Jump();
         }
 
@@ -30,12 +32,12 @@ namespace SpellBound.Controller.Samples {
                 if (Ctx.StateData.Grounded)
                     Ctx.locoStateMachine.ChangeState(LocoStateTypes.Landing);
             }
-            
+
             // If maximum time expires
             if (_jumpMaxRoutine == null)
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
         }
-        
+
         /// <summary>
         /// Physics update override.
         /// </summary>
@@ -52,7 +54,7 @@ namespace SpellBound.Controller.Samples {
             HandleInput();
             HandleCharacterRotation();
         }
-        
+
         protected override void ExitStateLogic() {
             if (_jumpMaxRoutine != null)
                 Ctx.StopCoroutine(_jumpMaxRoutine);
@@ -61,25 +63,27 @@ namespace SpellBound.Controller.Samples {
         /// <summary>
         /// The actual jump method that adds a force of some kind.
         /// </summary>
-        protected virtual void Jump() {
-            Ctx.Rb.AddForce(Ctx.StatData.jumpForce * Ctx.StatData.JumpMultiplier * DefaultJumpMultiplier * Ctx.planarUp, 
+        protected virtual void Jump() =>
+                Ctx.Rb.AddForce(
+                    Ctx.StatData.jumpForce * Ctx.StatData.JumpMultiplier * DefaultJumpMultiplier * Ctx.planarUp,
                     Ctx.RigidbodyData.verticalForceMode);
-        }
-        
+
         /// <summary>
         /// Simple coroutine to manage the minimum duration that a player should be locked to this state.
         /// </summary>
         private IEnumerator JumpMinRoutine() {
             // Prevents immediate transition back to GroundedState.
             yield return _minJumpDuration;
+
             _jumpMinRoutine = null;
         }
-        
+
         /// <summary>
         /// Simple coroutines to manage the maximum duration that a player should be locked to this state.
         /// </summary>
         private IEnumerator JumpMaxRoutine() {
             yield return _maxJumpDuration;
+
             _jumpMaxRoutine = null;
         }
     }

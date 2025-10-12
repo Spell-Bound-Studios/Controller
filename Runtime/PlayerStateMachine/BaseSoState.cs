@@ -1,4 +1,6 @@
-﻿using SpellBound.Core;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using SpellBound.Core;
 using Unity.Collections;
 using UnityEngine;
 
@@ -12,7 +14,7 @@ namespace SpellBound.Controller {
         public string Id => id;
         public string AssetName => assetName;
         public object Ctx;
-        
+
 #if UNITY_EDITOR
         /// <summary>
         /// Creates guids based on an asset path for us when something gets updated.
@@ -20,9 +22,10 @@ namespace SpellBound.Controller {
         private void OnValidate() {
             var assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
             var newName = name;
-            
+
             if (assetPath == null) {
                 id = string.Empty;
+
                 return;
             }
 
@@ -30,9 +33,9 @@ namespace SpellBound.Controller {
                 assetName = newName;
                 UnityEditor.EditorUtility.SetDirty(this);
             }
-            
+
             var assetGuid = UnityEditor.AssetDatabase.GUIDFromAssetPath(assetPath).ToString();
-            
+
             if (string.IsNullOrEmpty(id) || id != assetGuid)
                 id = assetGuid;
         }
@@ -46,7 +49,7 @@ namespace SpellBound.Controller {
             OnCtxInitialized();
             OnStateInitialize();
         }
-        
+
         /// <summary>
         /// Override this to handle context caching setup (like casting to your specific context type).
         /// </summary>
@@ -63,6 +66,7 @@ namespace SpellBound.Controller {
         /// Inheritors must override and implement their own logic.
         /// </summary>
         protected abstract void EnterStateLogic();
+
         protected abstract void UpdateStateLogic();
         protected abstract void FixedUpdateStateLogic();
         protected abstract void ExitStateLogic();

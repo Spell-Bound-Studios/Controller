@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
@@ -9,11 +11,11 @@ namespace SpellBound.Controller.Samples {
         [SerializeField] private float spawnForwardOffset = 0.5f;
         private readonly List<GameObject> _templates = new();
         private int _nextIndex;
-        
+
         private void Awake() {
             if (!playerInputActionsSO)
                 Debug.LogError("ObjectThrow is missing playerInputActionsSO. Please drag and drop it.", this);
-            
+
             CollectChildTemplates();
         }
 
@@ -29,20 +31,21 @@ namespace SpellBound.Controller.Samples {
 
         private void CollectChildTemplates() {
             _templates.Clear();
-            
+
             foreach (Transform child in transform) {
                 if (child == null || !child.gameObject.activeSelf)
                     continue;
-                
+
                 _templates.Add(child.gameObject);
             }
 
             if (_templates.Count == 0)
-                Debug.LogWarning("PlaneObjectThrower: No child templates found. Add children under this object to throw.", this);
+                Debug.LogWarning(
+                    "PlaneObjectThrower: No child templates found. Add children under this object to throw.", this);
         }
 
         private void HandleEPressed() {
-            if (_templates.Count == 0) 
+            if (_templates.Count == 0)
                 return;
 
             var template = _templates[_nextIndex];
@@ -50,9 +53,9 @@ namespace SpellBound.Controller.Samples {
 
             LaunchTemplate(template);
         }
-        
+
         private void LaunchTemplate(GameObject template) {
-            if (template == null) 
+            if (template == null)
                 return;
 
             var dir = transform.up.normalized;
@@ -60,16 +63,16 @@ namespace SpellBound.Controller.Samples {
             var rotation = Quaternion.LookRotation(dir, Vector3.up);
 
             var go = Instantiate(template, spawnPos, rotation);
-            
+
             if (!go.TryGetComponent<Rigidbody>(out var rb)) {
                 rb = go.AddComponent<Rigidbody>();
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
                 Debug.LogWarning("PlaneObjectThrower: Template had no Rigidbody; added one at runtime.", go);
             }
-            
+
             rb.AddForce(dir * throwSpeed, ForceMode.VelocityChange);
-            
+
             Destroy(go, timeUntilDestroy);
         }
     }

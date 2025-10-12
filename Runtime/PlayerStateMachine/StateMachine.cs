@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace SpellBound.Controller {
     public sealed class StateMachine<TContext, TStateEnum> where TContext : class where TStateEnum : Enum {
         public BaseStateDriver CurrentActiveDriver { get; private set; }
         public TContext ctx { get; private set; }
-        
+
         private readonly Dictionary<TStateEnum, BaseStateDriver> _stateDrivers;
         private readonly Dictionary<Type, BaseSoState> _statesByType = new();
 
@@ -35,7 +37,7 @@ namespace SpellBound.Controller {
 
             InitializeStateDrivers();
         }
-        
+
         /// <summary>
         /// Automatically creates a state driver for each value in the enum.
         /// </summary>
@@ -43,7 +45,7 @@ namespace SpellBound.Controller {
             foreach (TStateEnum stateType in Enum.GetValues(typeof(TStateEnum)))
                 _stateDrivers[stateType] = new BaseStateDriver();
         }
-        
+
         /// <summary>
         /// Sets the initial state variant for a specific state type.
         /// Call this during setup to assign ScriptableObject states to each state type.
@@ -51,10 +53,11 @@ namespace SpellBound.Controller {
         public void SetInitialVariant(TStateEnum stateType, BaseSoState initialVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
                 Debug.LogError($"No state driver found for state type: {stateType}");
+
                 return;
             }
 
-            if (initialVariant == null) 
+            if (initialVariant == null)
                 return;
 
             initialVariant.InitializeWithContext(ctx);
@@ -64,90 +67,88 @@ namespace SpellBound.Controller {
         public void RegisterState(BaseSoState state) {
             if (state == null) {
                 Debug.LogError($"The state: {state.AssetName} that you're trying to register is null.");
+
                 return;
             }
-            
+
             var stateType = state.GetType();
-            
+
             if (!_statesByType.TryAdd(stateType, state)) {
                 Debug.LogError($"The state dictionary already contains {stateType}.");
+
                 return;
             }
 
             state.InitializeWithContext(ctx);
         }
-        
+
         /// <summary>
         /// Changes to a different state type (different driver).
         /// </summary>
         public void ChangeState(TStateEnum newStateType) {
             if (!_stateDrivers.TryGetValue(newStateType, out var newDriver)) {
                 Debug.LogError($"No state driver registered for state type: {newStateType}");
+
                 return;
             }
-            
-            if (CurrentActiveDriver == newDriver) 
+
+            if (CurrentActiveDriver == newDriver)
                 return;
-            
+
             CurrentActiveDriver?.OnBecomeInactive();
             CurrentActiveDriver = newDriver;
             CurrentActiveDriver.OnBecomeActive();
         }
-        
+
         /// <summary>
         /// Helper method to get a registered state.
         /// </summary>
         public BaseSoState GetRegisteredState<T>() where T : BaseSoState => _statesByType.GetValueOrDefault(typeof(T));
-        
+
         /// <summary>
         /// 
         /// </summary>
         public void ChangeVariant(TStateEnum stateType, BaseSoState newVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
                 Debug.LogError($"No state driver registered for state type: {stateType}");
+
                 return;
             }
-            
+
             if (newVariant.Ctx == null)
                 newVariant.InitializeWithContext(ctx);
-            
+
             driver.ChangeVariant(newVariant);
         }
-        
+
         /// <summary>
         /// Gets the current variant for a specific state type.
         /// </summary>
-        public BaseSoState GetCurrentVariant(TStateEnum stateType) {
-            return _stateDrivers.TryGetValue(stateType, out var driver) 
-                ? driver.CurrentVariant 
-                : null;
-        }
+        public BaseSoState GetCurrentVariant(TStateEnum stateType) =>
+                _stateDrivers.TryGetValue(stateType, out var driver)
+                        ? driver.CurrentVariant
+                        : null;
 
         public BaseSoState GetCurrentRunningState() => CurrentActiveDriver?.CurrentVariant;
-        
+
         /// <summary>
         /// Call this from your MonoBehaviour's Update method.
         /// </summary>
-        public void UpdateStateMachine() {
-            CurrentActiveDriver?.DriveUpdate();
-        }
-        
+        public void UpdateStateMachine() => CurrentActiveDriver?.DriveUpdate();
+
         /// <summary>
         /// Call this from your MonoBehaviour's FixedUpdate method.
         /// </summary>
-        public void FixedUpdateStateMachine() {
-            CurrentActiveDriver?.DriveFixedUpdate();
-        }
-        
+        public void FixedUpdateStateMachine() => CurrentActiveDriver?.DriveFixedUpdate();
+
         /// <summary>
         /// Registers a state driver for a specific state type if the user wants to create a custom state driver.
         /// This will likely go unused except for advanced users.
         /// </summary>
         public void RegisterStateDriver(TStateEnum stateType, BaseStateDriver stateDriver) {
-            if (_stateDrivers.ContainsKey(stateType)) {
+            if (_stateDrivers.ContainsKey(stateType))
                 Debug.LogWarning($"State driver for {stateType} is already registered. Overwriting.");
-            }
-            
+
             _stateDrivers[stateType] = stateDriver;
         }
     }

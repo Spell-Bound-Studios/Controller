@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static InputActions;
@@ -7,7 +9,7 @@ namespace SpellBound.Controller {
     [CreateAssetMenu(fileName = "PlayerInputs", menuName = "Spellbound/PlayerInputs/PlayerInputs")]
     public class PlayerInputActionsSO : ScriptableObject, IPlayerInputActions {
         private InputActions _inputActions;
-        
+
         public event Action<Vector2> OnMouseWheelInput = delegate { };
         public event Action OnJumpInput = delegate { };
         public event Action OnInteractPressed = delegate { };
@@ -20,7 +22,6 @@ namespace SpellBound.Controller {
         public event Action OnCharacterMenuPressed = delegate { };
         public event Action OnFTwoPressed = delegate { };
 
-
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
         public Vector3 LookDirection => _inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
         public float MouseWheelValue => _inputActions.PlayerInput.MouseWheel.ReadValue<float>();
@@ -30,20 +31,19 @@ namespace SpellBound.Controller {
                 _inputActions = new InputActions();
                 _inputActions.PlayerInput.SetCallbacks(this);
             }
-            
+
             _inputActions.Enable();
         }
 
-        private void OnDisable() {
-            _inputActions.Disable();
-        }
-        
+        private void OnDisable() => _inputActions.Disable();
+
         public void OnMovement(InputAction.CallbackContext context) { }
 
         public void OnJump(InputAction.CallbackContext context) {
             if (context.performed)
                 OnJumpInput.Invoke();
         }
+
         public void OnRightClick(InputAction.CallbackContext context) { }
         public void OnLeftClick(InputAction.CallbackContext context) { }
         public void OnSprint(InputAction.CallbackContext context) { }
@@ -90,9 +90,8 @@ namespace SpellBound.Controller {
 
         public void OnLookDirection(InputAction.CallbackContext context) { }
 
-        public void OnMouseWheel(InputAction.CallbackContext context) {
-            OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
-        }
+        public void OnMouseWheel(InputAction.CallbackContext context) =>
+                OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
 
         public void OnFTwo(InputAction.CallbackContext context) {
             if (context.performed)

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using UnityEngine;
 
 namespace SpellBound.Controller {
     public class StateDatabase : MonoBehaviour {
@@ -11,16 +13,16 @@ namespace SpellBound.Controller {
                 Destroy(gameObject);
                 return;
             }
-            
+
             Instance = this;
-        
+
             var locoPresets = Resources.LoadAll<BaseLocoStateSO>("");
             foreach (var preset in locoPresets) {
                 if (!_locoStatePresets.TryAdd(preset.assetName, preset)) {
                     Debug.LogError($"Duplicate uid found {preset.uid}", this);
                 }
             }
-            
+
             var actionPresets = Resources.LoadAll<BaseActionStateSO>("");
             foreach (var preset in actionPresets) {
                 if (!_actionStatePresets.TryAdd(preset.assetName, preset)) {
@@ -37,20 +39,20 @@ namespace SpellBound.Controller {
             if (!string.IsNullOrEmpty(displayName)) {
                 return _locoStatePresets.TryGetValue(displayName, out preset);
             }
-            
+
             Debug.LogError($"Could not find state with name {displayName}", this);
-            
+
             preset = null;
             return false;
         }
-        
+
         public bool TryGetActionState(string displayName, out BaseActionStateSO preset) {
             if (!string.IsNullOrEmpty(displayName)) {
                 return _actionStatePresets.TryGetValue(displayName, out preset);
             }
-            
+
             Debug.LogError($"Could not find state with name {displayName}", this);
-            
+
             preset = null;
             return false;
         }*/

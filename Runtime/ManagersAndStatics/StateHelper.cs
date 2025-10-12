@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
 
 namespace SpellBound.Controller {
     public static class StateHelper {
@@ -8,7 +6,7 @@ namespace SpellBound.Controller {
         public static event Action<BaseSoState> OnActionStateChange = delegate { };
         public static event Action<States> OnStateChanged = delegate { };
         public static event Action<float> OnAnimationSpeedChanged = delegate { };
-        
+
         public const string DefaultGroundStateSO = "GroundState";
         public const string DefaultFallingStateSO = "FallingState";
         public const string DefaultLandingStateSO = "LandingState";
@@ -18,11 +16,11 @@ namespace SpellBound.Controller {
         public const string DefaultReadyStateSO = "ReadyState";
         public const string DefaultGCDStateSO = "GCDState";
         public const string DefaultInteractStateSO = "InteractState";
-        
+
         public static readonly Dictionary<States, int> AnimationStateDict;
 
         public const States DefaultAnimationState = States.Grounded;
-        
+
         [Serializable]
         public enum States {
             Grounded,
@@ -43,10 +41,10 @@ namespace SpellBound.Controller {
                     { States.Attacking, Animator.StringToHash("attacking") },
             };
         }
-        
+
         public static List<BaseLocoStateSO> GetDefaultLocoStatesFromDB(List<string> stateName) {
             var states = new List<BaseLocoStateSO>();
-            
+
             foreach (var s in stateName) {
                 if (!StateDatabase.Instance.TryGetLocoState(s, out var preset)) {
                     Debug.LogError($"No loco state with name {s}.");
@@ -57,10 +55,10 @@ namespace SpellBound.Controller {
             }
             return states;
         }
-        
+
         public static List<BaseActionStateSO> GetDefaultActionStatesFromDB(List<string> stateName) {
             var states = new List<BaseActionStateSO>();
-            
+
             foreach (var s in stateName) {
                 if (!StateDatabase.Instance.TryGetActionState(s, out var preset)) {
                     Debug.LogError($"No action state with name {s}.");
@@ -75,7 +73,7 @@ namespace SpellBound.Controller {
         public static void NotifyLocoStateChange(BaseLocoStateSO state) => OnLocoStateChange.Invoke(state);
         public static void NotifyLocoAnimationChange(States state) => OnStateChanged.Invoke(state);
         public static void NotifyLocoAnimationSpeedChange(float speed) => OnAnimationSpeedChanged.Invoke(speed);
-        
+
         public static void NotifyActionStateChange(BaseActionStateSO state) => OnActionStateChange.Invoke(state);
         public static void NotifyActionAnimationChange(States state) => OnStateChanged.Invoke(state);
         public static void NotifyActionAnimationSpeedChange(float speed) => OnAnimationSpeedChanged.Invoke(speed);*/

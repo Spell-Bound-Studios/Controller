@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System.Collections;
 using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
@@ -11,17 +13,16 @@ namespace SpellBound.Controller.Samples {
         // Landing Thresholds
         private readonly WaitForSeconds _landingDuration = new(0.15f);
         private Coroutine _landRoutine;
-        
-        protected override void EnterStateLogic() {
-            // Coroutines must yield before state checks begin.
-            _landRoutine = Ctx.StartCoroutine(LandRoutine());
-        }
-        
+
+        protected override void EnterStateLogic() =>
+                // Coroutines must yield before state checks begin.
+                _landRoutine = Ctx.StartCoroutine(LandRoutine());
+
         protected override void UpdateStateLogic() {
-            if (_landRoutine == null) 
+            if (_landRoutine == null)
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
         }
-        
+
         protected override void FixedUpdateStateLogic() {
             if (PerformGroundCheck())
                 KeepCapsuleFloating();
@@ -29,13 +30,12 @@ namespace SpellBound.Controller.Samples {
             HandleCharacterRotation();
         }
 
-        protected override void ExitStateLogic() {
-            
-        }
-        
+        protected override void ExitStateLogic() { }
+
         private IEnumerator LandRoutine() {
             // Prevents immediately being able to jump again.
             yield return _landingDuration;
+
             _landRoutine = null;
         }
     }

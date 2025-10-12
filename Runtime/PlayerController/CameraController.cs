@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System.ComponentModel;
 using Unity.Cinemachine;
 using UnityEngine;
 using Helper = SpellBound.Controller.ControllerHelper;
@@ -8,40 +10,50 @@ namespace SpellBound.Controller {
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
     public class CameraController : MonoBehaviour {
-        [Header("Inspector Only Settings")]
-        [SerializeField] private PlayerInputActionsSO input;
+        [Header("Inspector Only Settings"), SerializeField]
+        private PlayerInputActionsSO input;
+
         // What do we want the camera to pivot around?
         [SerializeField] private Transform cameraPivot;
+
         // How high you can move your camera.
         [SerializeField, Range(0f, 90f)] private float upperVerticalLimit = 89f;
+
         // How low you can move your camera.
         [SerializeField, Range(0f, 90f)] private float lowerVerticalLimit = 89f;
+
         // Multiplies the time.deltaTime by this factor.
         [SerializeField, Range(1f, 50f)] private float cameraSmoothingFactor = 25f;
+
         // Controls how fast you zoom in and out.
         [SerializeField] private float zoomIncrement = .2f;
         [SerializeField] private bool cursorLockOnStart = true;
         [SerializeField] private bool cameraFollowMouse = true;
-        [Header("Player Settings")]
-        [SerializeField, Description("How fast you can move your camera.")] private float cameraSpeed = 0.5f;
-        [SerializeField, Description("Optional lerp applied to input.")] private bool smoothCameraRotation;
+
+        [Header("Player Settings"), SerializeField, Description("How fast you can move your camera.")]
+        private float cameraSpeed = 0.5f;
+
+        [SerializeField, Description("Optional lerp applied to input.")]
+        private bool smoothCameraRotation;
+
         [SerializeField, Min(0.1f)] private float minZoomDistance = 1f;
         [SerializeField, Min(1f)] private float maxZoomDistance = 8f;
-        
+
         private CameraRigManager _cameraRig;
         private CinemachineBrain _brain;
+
         private Transform _tr;
+
         // Cached local rotation value X.
         private float _currentXAngle;
+
         // Cached local rotation value Y.
         private float _currentYAngle;
-        
+
         // UNUSED ATM
         [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
-        
-        private void Awake() {
-            _tr = transform;
-        }
+
+        private void Awake() => _tr = transform;
 
         private void OnDisable() {
             if (_cameraRig)
@@ -55,52 +67,52 @@ namespace SpellBound.Controller {
 
             if (input == null)
                 input = InputManager.Instance.GetInputs();
-            
-            if (!_brain && Camera.main) 
+
+            if (!_brain && Camera.main)
                 Camera.main.TryGetComponent(out _brain);
-            
+
             if (!_brain)
                 _brain = FindFirstObjectByType<CinemachineBrain>();
-            
+
             if (!_brain)
                 Debug.LogError("No brain found. CinemachineBrain missing from scene.", this);
-            
+
             _currentXAngle = _tr.localRotation.eulerAngles.x;
             _currentYAngle = _tr.localRotation.eulerAngles.y;
-            
-            if (CameraRigManager.Instance == null)
+
+            if (CameraRigManager.Instance == null) {
                 Debug.LogError("CameraController has a dependency on CameraRigManager. Please ensure the camera rig" +
-                               "prefab is in the scene or the CameraRigManager script is on your custom camera rig.", 
-                        this);
-            
-            if (SyncTransform.Instance == null)
+                               "prefab is in the scene or the CameraRigManager script is on your custom camera rig.",
+                    this);
+            }
+
+            if (SyncTransform.Instance == null) {
                 Debug.LogError("CameraController has a dependency on SyncTransform. Please ensure the CameraFollow" +
-                               "prefab is in the scene or the SyncTransform script is on your custom object.", 
-                        this);
-            
+                               "prefab is in the scene or the SyncTransform script is on your custom object.",
+                    this);
+            }
+
             _cameraRig = CameraRigManager.Instance;
-            
+
             if (input)
                 input.OnMouseWheelInput += ZoomCamera;
-            
+
             CameraSetup();
         }
 
-        private void Update() {
-            RotateCamera(input.LookDirection.x, -input.LookDirection.y);
-        }
+        private void Update() => RotateCamera(input.LookDirection.x, -input.LookDirection.y);
 
         public Vector3 GetUpDirection() => _tr.up;
         public Vector3 GetFacingDirection() => _tr.forward;
-        
+
         /// <summary>
         /// Rotates the camera based on the device horizontal and vertical input about the pivot.
         /// </summary>
         private void RotateCamera(float horizontalInput, float verticalInput) {
             if (!cameraFollowMouse)
                 return;
-            
-            var targetX = _currentXAngle + verticalInput  * cameraSpeed;
+
+            var targetX = _currentXAngle + verticalInput * cameraSpeed;
             var targetY = _currentYAngle + horizontalInput * cameraSpeed;
 
             targetX = Mathf.Clamp(targetX, -upperVerticalLimit, lowerVerticalLimit);
@@ -122,7 +134,7 @@ namespace SpellBound.Controller {
         private void ZoomCamera(Vector2 zoomInput) {
             if (!cameraFollowMouse)
                 return;
-            
+
             var currentZoom = _cameraRig.GetCurrentCameraZoom();
 
             if (float.IsNaN(currentZoom))
@@ -132,7 +144,7 @@ namespace SpellBound.Controller {
             target = Mathf.Clamp(target, minZoomDistance, maxZoomDistance);
             CameraRigManager.Instance.SetCameraZoom(target);
         }
-        
+
         /// <summary>
         /// Sets our cameraRig tracking target.
         /// </summary>
@@ -141,17 +153,18 @@ namespace SpellBound.Controller {
 
             if (!cameraPivot)
                 cameraPivot = SyncTransform.Instance.transform;
-            
+
             _brain.WorldUpOverride = cameraPivot;
 
             if (_cameraRig == null) {
                 Debug.LogError("Camera rig is null and doesn't appear to be in scene.");
+
                 return;
             }
 
             _cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
         }
-        
+
         public void SetCameraFollowMouse(bool follow) => cameraFollowMouse = follow;
         public void SetCameraSpeed(float speed) => cameraSpeed = speed;
         public float GetCameraSpeed() => cameraSpeed;

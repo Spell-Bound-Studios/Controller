@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using UnityEngine;
 using Helper = SpellBound.Controller.ControllerHelper;
 
 namespace SpellBound.Controller {

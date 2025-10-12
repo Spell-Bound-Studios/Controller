@@ -18,13 +18,17 @@
     "com.unity.collections": "2.5.7",
     "com.spellboundstudios.core": "1.0.0"
   },
-  "keywords": ["controller", "state-machine", "player", "character"],
-  "samples": 
-    [
-      {
-        "displayName": "Example Scene",
-        "description": "A third person character controller example scene to show you the responsiveness and state flexibility and overrides you can perform with ease.",
-        "path": "Samples~/"
-      }
-    ]
+  "keywords": [
+    "controller",
+    "state-machine",
+    "player",
+    "character"
+  ],
+  "samples": [
+    {
+      "displayName": "Example Scene",
+      "description": "A third person character controller example scene to show you the responsiveness and state flexibility and overrides you can perform with ease.",
+      "path": "Samples~/"
+    }
+  ]
 }

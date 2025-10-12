@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using UnityEngine;
 
 namespace SpellBound.Controller.Samples {
     /// <summary>
@@ -7,11 +9,10 @@ namespace SpellBound.Controller.Samples {
     /// </summary>
     [CreateAssetMenu(fileName = "FallingStateExample", menuName = "Spellbound/StateMachine/FallingStateExample")]
     public class FallingStateExample : BaseLocomotionStateExample {
-        protected override void EnterStateLogic() {
-            // Here we show that it's as simple as changing a protected variable in this state to impact player movement
-            // that will only apply in this state. We could override the handle input as well.
-            HSpeedModifier = 0.3f;
-        }
+        protected override void EnterStateLogic() =>
+                // Here we show that it's as simple as changing a protected variable in this state to impact player movement
+                // that will only apply in this state. We could override the handle input as well.
+                HSpeedModifier = 0.3f;
 
         protected override void UpdateStateLogic() {
             if (Ctx.StateData.Grounded)
@@ -31,9 +32,8 @@ namespace SpellBound.Controller.Samples {
             HandleCharacterRotation();
         }
 
-        protected override void ExitStateLogic() {
-            // Then just change it back.
-            HSpeedModifier = 1.0f;
-        }
+        protected override void ExitStateLogic() =>
+                // Then just change it back.
+                HSpeedModifier = 1.0f;
     }
 }
