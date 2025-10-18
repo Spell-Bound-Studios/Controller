@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     /// <summary>
     /// This method is supposed to demonstrate how easy it is to make a new falling state that can alter the behavior
     /// of how this state interprets movement compared to the ground state examples.

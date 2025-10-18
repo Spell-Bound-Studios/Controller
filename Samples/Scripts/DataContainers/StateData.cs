@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     [Serializable]
     public class StateData {
         [field: SerializeField] public bool Grounded { get; set; }

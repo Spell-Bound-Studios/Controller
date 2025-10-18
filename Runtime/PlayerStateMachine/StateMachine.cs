@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// This state machine is intended to be driven by a MonoBehaviour and offer simple public methods to change states
     /// and state variants. Additional information on the difference between "drivers", "states" and "variants" can be

@@ -1,10 +1,10 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-using SpellBound.Core;
+using Spellbound.Core;
 using Unity.Collections;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// asdf
     /// </summary>

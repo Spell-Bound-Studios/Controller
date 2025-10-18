@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     [Serializable]
     public class DefaultColliderData {
         [Header("Collider Configuration")]
@@ -143,9 +143,10 @@ namespace SpellBound.Controller {
                 CenterY = 0f;
             }
 
-            if (!SuppressConsole)
+            if (!SuppressConsole) {
                 Debug.Log(
                     $"DefaultColliderData initialized: Height={Height:F2}, CenterY={CenterY:F2}, Radius={Radius:F2}");
+            }
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     public class StateDatabase : MonoBehaviour {
         /*public static StateDatabase Instance;
         private readonly Dictionary<string, BaseLocoStateSO> _locoStatePresets = new();

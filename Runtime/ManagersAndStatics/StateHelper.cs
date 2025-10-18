@@ -1,6 +1,6 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     public static class StateHelper {
         /*public static event Action<BaseSoState> OnLocoStateChange = delegate { };
         public static event Action<BaseSoState> OnActionStateChange = delegate { };

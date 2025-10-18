@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     [Serializable]
     public class CapsuleFloatData {
         [Header("Collider Configuration")]

@@ -3,15 +3,17 @@
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
-using Helper = SpellBound.Controller.ControllerHelper;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     public class CameraRigManager : CinemachineCameraManagerBase {
         public static CameraRigManager Instance;
 
-        private readonly Dictionary<Helper.CameraType, CinemachineCamera> _cinemachineCameras = new();
-        private readonly Dictionary<Helper.CameraType, CinemachineThirdPersonFollow> _thirdPersonCameras = new();
-        private Helper.CameraType _currentType = Helper.CameraType.Default;
+        private readonly Dictionary<ControllerHelper.CameraType, CinemachineCamera> _cinemachineCameras = new();
+
+        private readonly Dictionary<ControllerHelper.CameraType, CinemachineThirdPersonFollow> _thirdPersonCameras =
+                new();
+
+        private ControllerHelper.CameraType _currentType = ControllerHelper.CameraType.Default;
         private CinemachineCamera _currentCinemachineCamera;
         private CinemachineThirdPersonFollow _currentThirdPersonCamera;
 
@@ -52,8 +54,8 @@ namespace SpellBound.Controller {
                 }
             }
 
-            if (_cinemachineCameras.TryGetValue(Helper.CameraType.Default, out var defaultCam)) {
-                _currentType = Helper.CameraType.Default;
+            if (_cinemachineCameras.TryGetValue(ControllerHelper.CameraType.Default, out var defaultCam)) {
+                _currentType = ControllerHelper.CameraType.Default;
                 _currentCinemachineCamera = defaultCam;
                 _thirdPersonCameras.TryGetValue(_currentType, out _currentThirdPersonCamera);
             }
@@ -81,7 +83,7 @@ namespace SpellBound.Controller {
                         ? _currentThirdPersonCamera.CameraDistance
                         : float.NaN;
 
-        public void SwitchCamera(Helper.CameraType cameraType) {
+        public void SwitchCamera(ControllerHelper.CameraType cameraType) {
             if (!_cinemachineCameras.TryGetValue(cameraType, out var cinemachineCamera)) {
                 Debug.LogWarning($"[CameraRigManager] No camera registered for type '{cameraType}'.");
 

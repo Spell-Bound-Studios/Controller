@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static InputActions;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     [CreateAssetMenu(fileName = "PlayerInputs", menuName = "Spellbound/PlayerInputs/PlayerInputs")]
     public class PlayerInputActionsSO : ScriptableObject, IPlayerInputActions {
         private InputActions _inputActions;

@@ -3,7 +3,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     /// <summary>
     /// I partitioned this state to be the in-between of the state before it and grounding in the event you wanted to
     /// play a ground sound or a ground animation or delay the player from being able to jump immediately.

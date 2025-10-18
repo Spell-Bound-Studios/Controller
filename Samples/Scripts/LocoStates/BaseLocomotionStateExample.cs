@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     public abstract class BaseLocomotionStateExample : BaseSoState {
         protected new PlayerControllerExample Ctx;
         protected float HSpeedModifier = 1f;

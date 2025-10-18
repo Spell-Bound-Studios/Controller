@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     public class ObjectThrower : MonoBehaviour {
         [SerializeField] private PlayerInputActionsSO playerInputActionsSO;
         [SerializeField] private float throwSpeed = 15f;
@@ -39,9 +39,10 @@ namespace SpellBound.Controller.Samples {
                 _templates.Add(child.gameObject);
             }
 
-            if (_templates.Count == 0)
+            if (_templates.Count == 0) {
                 Debug.LogWarning(
                     "PlaneObjectThrower: No child templates found. Add children under this object to throw.", this);
+            }
         }
 
         private void HandleEPressed() {

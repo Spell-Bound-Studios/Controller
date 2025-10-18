@@ -3,7 +3,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     /// <summary>
     /// I partitioned this state to be the in-between of the ground state before it and falling or landing in the event
     /// you wanted to play a sound or play an animation. It is meant to show how easy it is to create lockouts or small
