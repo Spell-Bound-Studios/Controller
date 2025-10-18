@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// WARNING! Please ensure that your player visual, wherever it might be, has its feet at y=0. If you do not do this,
     /// your collider and visual may be mismatched, resulting in strange behavior or appearance.

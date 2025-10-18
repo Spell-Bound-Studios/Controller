@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     public class SpawnAndTestExample : MonoBehaviour {
         [SerializeField] private GameObject playerPrefab;
         [SerializeField] private Button spawnPlayerBtn;

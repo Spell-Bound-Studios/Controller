@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     [CreateAssetMenu(fileName = "DrunkenGroundStateExample",
         menuName = "Spellbound/StateMachine/DrunkenGroundStateExample")]
     public class DrunkenGroundStateExample : GroundStateExample {

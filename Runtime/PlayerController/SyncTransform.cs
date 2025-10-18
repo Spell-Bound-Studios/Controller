@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// Place this on a gameobject that you want to 1:1 match the transform with some offset.
     /// </summary>

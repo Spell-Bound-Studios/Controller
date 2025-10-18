@@ -1,11 +1,10 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
 using UnityEngine;
-using Helper = SpellBound.Controller.ControllerHelper;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     public class CameraTypeBehaviour : MonoBehaviour {
-        [SerializeField] private Helper.CameraType cameraType;
-        public Helper.CameraType CameraType => cameraType;
+        [SerializeField] private ControllerHelper.CameraType cameraType;
+        public ControllerHelper.CameraType CameraType => cameraType;
     }
 }

@@ -3,9 +3,8 @@
 using System.ComponentModel;
 using Unity.Cinemachine;
 using UnityEngine;
-using Helper = SpellBound.Controller.ControllerHelper;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
@@ -51,7 +50,7 @@ namespace SpellBound.Controller {
         private float _currentYAngle;
 
         // UNUSED ATM
-        [SerializeField] private Helper.CameraCouplingMode playerRotationMode;
+        [SerializeField] private ControllerHelper.CameraCouplingMode playerRotationMode;
 
         private void Awake() => _tr = transform;
 

@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     public class Launcher : MonoBehaviour {
         [SerializeField] private ForceMode forceMode = ForceMode.Impulse;
         [SerializeField] private LayerMask layerMask;
@@ -13,9 +13,10 @@ namespace SpellBound.Controller.Samples {
         private void Awake() {
             var col = GetComponent<Collider>();
 
-            if (col.isTrigger)
+            if (col.isTrigger) {
                 Debug.LogWarning(
                     "Launcher: Collider is a trigger. Collision normals are unavailable. Set Is Trigger = false.");
+            }
         }
 
         private void OnCollisionEnter(Collision collision) {

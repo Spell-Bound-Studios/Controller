@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     public sealed class InputManager : MonoBehaviour {
         public static InputManager Instance;
         [SerializeField] private PlayerInputActionsSO playerInputActionsSO;

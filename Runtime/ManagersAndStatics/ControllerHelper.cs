@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// This static class is meant to contain optional helpers that a user might want to use as a reference or directly
     /// call. Please note: you cannot override a static method, and therefore, if you're attempting to create state

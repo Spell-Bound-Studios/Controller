@@ -1,6 +1,6 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// The constant "driver" that points to and drives a ScriptableObject state variant.
     /// </summary>

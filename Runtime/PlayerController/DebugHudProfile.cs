@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     [CreateAssetMenu(fileName = "DebugHUDProfile", menuName = "Spellbound/CharacterController/DebugHUDProfile")]
     public class DebugHudProfile : ScriptableObject {
         [Serializable]
@@ -122,9 +122,10 @@ namespace SpellBound.Controller {
         public int GetEnabledFieldCount() {
             var count = 0;
 
-            foreach (var fo in fieldToggles)
+            foreach (var fo in fieldToggles) {
                 if (fo != null && fo.enabled)
                     count++;
+            }
 
             return count;
         }

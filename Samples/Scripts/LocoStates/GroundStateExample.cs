@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     [CreateAssetMenu(fileName = "GroundStateExample", menuName = "Spellbound/StateMachine/GroundStateExample")]
     public class GroundStateExample : BaseLocomotionStateExample {
         protected override void EnterStateLogic() {

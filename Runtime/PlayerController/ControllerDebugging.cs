@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SpellBound.Controller {
+namespace Spellbound.Controller {
     /// <summary>
     /// This script should only be attached if you're interested in debugging to canvas. It is purely for debugging
     /// purposes and does not use the best practices for performance.

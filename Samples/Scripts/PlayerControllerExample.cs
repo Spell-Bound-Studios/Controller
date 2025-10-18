@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpellBound.Controller.Samples {
+namespace Spellbound.Controller.Samples {
     /// <summary>
     /// This example is meant to be a semi-complete game ready drop in or rubric for any aspiring game dev to use as
     /// a reference or copy and paste. Our intention is to give you an idea of how to structure your MonoBehaviour to
