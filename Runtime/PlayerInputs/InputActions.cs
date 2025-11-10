@@ -227,6 +227,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""FOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""5afb9bc6-13f1-4547-8cba-55dd5a0fce14"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""FTwo"",
                     ""type"": ""Button"",
                     ""id"": ""73f31b83-612c-4b17-acdf-714c80cde47d"",
@@ -511,6 +520,105 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""FTwo"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2ca76146-4e33-47ea-9ab5-b58c644fc022"",
+                    ""path"": ""<Keyboard>/f1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""ConsoleInput"",
+            ""id"": ""8cbf8f5b-be7c-48a2-ae3d-744f906eae1f"",
+            ""actions"": [
+                {
+                    ""name"": ""UpArrow"",
+                    ""type"": ""Button"",
+                    ""id"": ""6bdd7602-2eb5-4e9c-bb82-64f5785ec5c9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DownArrow"",
+                    ""type"": ""Button"",
+                    ""id"": ""5859d732-213b-4045-b2c2-2d700cd8b98c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Esc"",
+                    ""type"": ""Button"",
+                    ""id"": ""1310eb4a-cce0-450f-a300-a386cb9ee94b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""F1"",
+                    ""type"": ""Button"",
+                    ""id"": ""f4eb49d0-a9e8-4888-813f-6444a75d87e1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""23592e21-1501-43b2-9831-40b3aa6a541a"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpArrow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3a2dc4d6-3323-40f4-a849-daa3528ed070"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DownArrow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b9fec2c-f3b5-414d-89ec-d2a06c6affd6"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""849842e8-9caf-4ef4-a532-a1744d36ed10"",
+                    ""path"": ""<Keyboard>/f1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""F1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -534,12 +642,20 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
         m_PlayerInput_LookDirection = m_PlayerInput.FindAction("LookDirection", throwIfNotFound: true);
         m_PlayerInput_MouseWheel = m_PlayerInput.FindAction("MouseWheel", throwIfNotFound: true);
+        m_PlayerInput_FOne = m_PlayerInput.FindAction("FOne", throwIfNotFound: true);
         m_PlayerInput_FTwo = m_PlayerInput.FindAction("FTwo", throwIfNotFound: true);
+        // ConsoleInput
+        m_ConsoleInput = asset.FindActionMap("ConsoleInput", throwIfNotFound: true);
+        m_ConsoleInput_UpArrow = m_ConsoleInput.FindAction("UpArrow", throwIfNotFound: true);
+        m_ConsoleInput_DownArrow = m_ConsoleInput.FindAction("DownArrow", throwIfNotFound: true);
+        m_ConsoleInput_Esc = m_ConsoleInput.FindAction("Esc", throwIfNotFound: true);
+        m_ConsoleInput_F1 = m_ConsoleInput.FindAction("F1", throwIfNotFound: true);
     }
 
     ~@InputActions()
     {
         UnityEngine.Debug.Assert(!m_PlayerInput.enabled, "This will cause a leak and performance issues, InputActions.PlayerInput.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_ConsoleInput.enabled, "This will cause a leak and performance issues, InputActions.ConsoleInput.Disable() has not been called.");
     }
 
     /// <summary>
@@ -630,6 +746,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Interact;
     private readonly InputAction m_PlayerInput_LookDirection;
     private readonly InputAction m_PlayerInput_MouseWheel;
+    private readonly InputAction m_PlayerInput_FOne;
     private readonly InputAction m_PlayerInput_FTwo;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
@@ -702,6 +819,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/MouseWheel".
         /// </summary>
         public InputAction @MouseWheel => m_Wrapper.m_PlayerInput_MouseWheel;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/FOne".
+        /// </summary>
+        public InputAction @FOne => m_Wrapper.m_PlayerInput_FOne;
         /// <summary>
         /// Provides access to the underlying input action "PlayerInput/FTwo".
         /// </summary>
@@ -777,6 +898,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started += instance.OnMouseWheel;
             @MouseWheel.performed += instance.OnMouseWheel;
             @MouseWheel.canceled += instance.OnMouseWheel;
+            @FOne.started += instance.OnFOne;
+            @FOne.performed += instance.OnFOne;
+            @FOne.canceled += instance.OnFOne;
             @FTwo.started += instance.OnFTwo;
             @FTwo.performed += instance.OnFTwo;
             @FTwo.canceled += instance.OnFTwo;
@@ -836,6 +960,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started -= instance.OnMouseWheel;
             @MouseWheel.performed -= instance.OnMouseWheel;
             @MouseWheel.canceled -= instance.OnMouseWheel;
+            @FOne.started -= instance.OnFOne;
+            @FOne.performed -= instance.OnFOne;
+            @FOne.canceled -= instance.OnFOne;
             @FTwo.started -= instance.OnFTwo;
             @FTwo.performed -= instance.OnFTwo;
             @FTwo.canceled -= instance.OnFTwo;
@@ -872,6 +999,135 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="PlayerInputActions" /> instance referencing this action map.
     /// </summary>
     public PlayerInputActions @PlayerInput => new PlayerInputActions(this);
+
+    // ConsoleInput
+    private readonly InputActionMap m_ConsoleInput;
+    private List<IConsoleInputActions> m_ConsoleInputActionsCallbackInterfaces = new List<IConsoleInputActions>();
+    private readonly InputAction m_ConsoleInput_UpArrow;
+    private readonly InputAction m_ConsoleInput_DownArrow;
+    private readonly InputAction m_ConsoleInput_Esc;
+    private readonly InputAction m_ConsoleInput_F1;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "ConsoleInput".
+    /// </summary>
+    public struct ConsoleInputActions
+    {
+        private @InputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public ConsoleInputActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/UpArrow".
+        /// </summary>
+        public InputAction @UpArrow => m_Wrapper.m_ConsoleInput_UpArrow;
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/DownArrow".
+        /// </summary>
+        public InputAction @DownArrow => m_Wrapper.m_ConsoleInput_DownArrow;
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/Esc".
+        /// </summary>
+        public InputAction @Esc => m_Wrapper.m_ConsoleInput_Esc;
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/F1".
+        /// </summary>
+        public InputAction @F1 => m_Wrapper.m_ConsoleInput_F1;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_ConsoleInput; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="ConsoleInputActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(ConsoleInputActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="ConsoleInputActions" />
+        public void AddCallbacks(IConsoleInputActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ConsoleInputActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ConsoleInputActionsCallbackInterfaces.Add(instance);
+            @UpArrow.started += instance.OnUpArrow;
+            @UpArrow.performed += instance.OnUpArrow;
+            @UpArrow.canceled += instance.OnUpArrow;
+            @DownArrow.started += instance.OnDownArrow;
+            @DownArrow.performed += instance.OnDownArrow;
+            @DownArrow.canceled += instance.OnDownArrow;
+            @Esc.started += instance.OnEsc;
+            @Esc.performed += instance.OnEsc;
+            @Esc.canceled += instance.OnEsc;
+            @F1.started += instance.OnF1;
+            @F1.performed += instance.OnF1;
+            @F1.canceled += instance.OnF1;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="ConsoleInputActions" />
+        private void UnregisterCallbacks(IConsoleInputActions instance)
+        {
+            @UpArrow.started -= instance.OnUpArrow;
+            @UpArrow.performed -= instance.OnUpArrow;
+            @UpArrow.canceled -= instance.OnUpArrow;
+            @DownArrow.started -= instance.OnDownArrow;
+            @DownArrow.performed -= instance.OnDownArrow;
+            @DownArrow.canceled -= instance.OnDownArrow;
+            @Esc.started -= instance.OnEsc;
+            @Esc.performed -= instance.OnEsc;
+            @Esc.canceled -= instance.OnEsc;
+            @F1.started -= instance.OnF1;
+            @F1.performed -= instance.OnF1;
+            @F1.canceled -= instance.OnF1;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="ConsoleInputActions.UnregisterCallbacks(IConsoleInputActions)" />.
+        /// </summary>
+        /// <seealso cref="ConsoleInputActions.UnregisterCallbacks(IConsoleInputActions)" />
+        public void RemoveCallbacks(IConsoleInputActions instance)
+        {
+            if (m_Wrapper.m_ConsoleInputActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="ConsoleInputActions.AddCallbacks(IConsoleInputActions)" />
+        /// <seealso cref="ConsoleInputActions.RemoveCallbacks(IConsoleInputActions)" />
+        /// <seealso cref="ConsoleInputActions.UnregisterCallbacks(IConsoleInputActions)" />
+        public void SetCallbacks(IConsoleInputActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ConsoleInputActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ConsoleInputActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="ConsoleInputActions" /> instance referencing this action map.
+    /// </summary>
+    public ConsoleInputActions @ConsoleInput => new ConsoleInputActions(this);
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "PlayerInput" which allows adding and removing callbacks.
     /// </summary>
@@ -985,11 +1241,54 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseWheel(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "FOne" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFOne(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "FTwo" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnFTwo(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "ConsoleInput" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="ConsoleInputActions.AddCallbacks(IConsoleInputActions)" />
+    /// <seealso cref="ConsoleInputActions.RemoveCallbacks(IConsoleInputActions)" />
+    public interface IConsoleInputActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "UpArrow" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnUpArrow(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DownArrow" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDownArrow(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Esc" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEsc(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "F1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnF1(InputAction.CallbackContext context);
     }
 }
