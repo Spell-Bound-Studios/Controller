@@ -26,7 +26,7 @@ namespace Spellbound.Controller {
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
         public Vector3 LookDirection => _inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
         public float MouseWheelValue => _inputActions.PlayerInput.MouseWheel.ReadValue<float>();
-
+        
         private void OnEnable() {
             if (_inputActions == null) {
                 _inputActions = new InputActions();

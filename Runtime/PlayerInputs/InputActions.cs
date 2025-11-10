@@ -555,6 +555,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Esc"",
+                    ""type"": ""Button"",
+                    ""id"": ""1310eb4a-cce0-450f-a300-a386cb9ee94b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""F1"",
+                    ""type"": ""Button"",
+                    ""id"": ""f4eb49d0-a9e8-4888-813f-6444a75d87e1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -577,6 +595,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""DownArrow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b9fec2c-f3b5-414d-89ec-d2a06c6affd6"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""849842e8-9caf-4ef4-a532-a1744d36ed10"",
+                    ""path"": ""<Keyboard>/f1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""F1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -608,6 +648,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_ConsoleInput = asset.FindActionMap("ConsoleInput", throwIfNotFound: true);
         m_ConsoleInput_UpArrow = m_ConsoleInput.FindAction("UpArrow", throwIfNotFound: true);
         m_ConsoleInput_DownArrow = m_ConsoleInput.FindAction("DownArrow", throwIfNotFound: true);
+        m_ConsoleInput_Esc = m_ConsoleInput.FindAction("Esc", throwIfNotFound: true);
+        m_ConsoleInput_F1 = m_ConsoleInput.FindAction("F1", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -963,6 +1005,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private List<IConsoleInputActions> m_ConsoleInputActionsCallbackInterfaces = new List<IConsoleInputActions>();
     private readonly InputAction m_ConsoleInput_UpArrow;
     private readonly InputAction m_ConsoleInput_DownArrow;
+    private readonly InputAction m_ConsoleInput_Esc;
+    private readonly InputAction m_ConsoleInput_F1;
     /// <summary>
     /// Provides access to input actions defined in input action map "ConsoleInput".
     /// </summary>
@@ -982,6 +1026,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "ConsoleInput/DownArrow".
         /// </summary>
         public InputAction @DownArrow => m_Wrapper.m_ConsoleInput_DownArrow;
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/Esc".
+        /// </summary>
+        public InputAction @Esc => m_Wrapper.m_ConsoleInput_Esc;
+        /// <summary>
+        /// Provides access to the underlying input action "ConsoleInput/F1".
+        /// </summary>
+        public InputAction @F1 => m_Wrapper.m_ConsoleInput_F1;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1014,6 +1066,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @DownArrow.started += instance.OnDownArrow;
             @DownArrow.performed += instance.OnDownArrow;
             @DownArrow.canceled += instance.OnDownArrow;
+            @Esc.started += instance.OnEsc;
+            @Esc.performed += instance.OnEsc;
+            @Esc.canceled += instance.OnEsc;
+            @F1.started += instance.OnF1;
+            @F1.performed += instance.OnF1;
+            @F1.canceled += instance.OnF1;
         }
 
         /// <summary>
@@ -1031,6 +1089,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @DownArrow.started -= instance.OnDownArrow;
             @DownArrow.performed -= instance.OnDownArrow;
             @DownArrow.canceled -= instance.OnDownArrow;
+            @Esc.started -= instance.OnEsc;
+            @Esc.performed -= instance.OnEsc;
+            @Esc.canceled -= instance.OnEsc;
+            @F1.started -= instance.OnF1;
+            @F1.performed -= instance.OnF1;
+            @F1.canceled -= instance.OnF1;
         }
 
         /// <summary>
@@ -1212,5 +1276,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDownArrow(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Esc" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEsc(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "F1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnF1(InputAction.CallbackContext context);
     }
 }
