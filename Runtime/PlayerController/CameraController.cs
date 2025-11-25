@@ -12,6 +12,8 @@ namespace Spellbound.Controller {
         [Header("Inspector Only Settings"), SerializeField]
         private PlayerInputActionsSO input;
 
+        private ICameraInput _iCameraInput;
+
         // What do we want the camera to pivot around?
         [SerializeField] private Transform cameraPivot;
 
