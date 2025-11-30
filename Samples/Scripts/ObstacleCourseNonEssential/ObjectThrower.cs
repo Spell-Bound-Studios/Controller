@@ -2,10 +2,11 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Spellbound.Controller.Samples {
     public class ObjectThrower : MonoBehaviour {
-        [SerializeField] private PlayerInputActionsSO playerInputActionsSO;
+        [SerializeField] private InputManager inputManager;
         [SerializeField] private float throwSpeed = 15f;
         [SerializeField] private float timeUntilDestroy = 10f;
         [SerializeField] private float spawnForwardOffset = 0.5f;
@@ -13,20 +14,20 @@ namespace Spellbound.Controller.Samples {
         private int _nextIndex;
 
         private void Awake() {
-            if (!playerInputActionsSO)
+            if (!inputManager)
                 Debug.LogError("ObjectThrow is missing playerInputActionsSO. Please drag and drop it.", this);
 
             CollectChildTemplates();
         }
 
         private void OnEnable() {
-            if (playerInputActionsSO != null)
-                playerInputActionsSO.OnInteractPressed += HandleEPressed;
+            if (inputManager != null)
+                inputManager.OnInteractPressed += HandleEPressed;
         }
 
         private void OnDisable() {
-            if (playerInputActionsSO != null)
-                playerInputActionsSO.OnInteractPressed -= HandleEPressed;
+            if (inputManager != null)
+                inputManager.OnInteractPressed -= HandleEPressed;
         }
 
         private void CollectChildTemplates() {

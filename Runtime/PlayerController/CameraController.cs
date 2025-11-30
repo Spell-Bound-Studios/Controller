@@ -9,10 +9,8 @@ namespace Spellbound.Controller {
     /// Interface for how the player inputs drive a camera from the rig.
     /// </summary>
     public class CameraController : MonoBehaviour {
-        [Header("Inspector Only Settings"), SerializeField]
-        private PlayerInputActionsSO input;
-
-        private ICameraInput _iCameraInput;
+        //[Header("Inspector Only Settings"), SerializeField]
+        // Some type of input...
 
         // What do we want the camera to pivot around?
         [SerializeField] private Transform cameraPivot;

@@ -24,7 +24,7 @@ namespace Spellbound.Controller.Samples {
     public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
         [Header("Input Reference:")]
         [field: SerializeField]
-        public PlayerInputActionsSO input { get; private set; }
+        public InputManager input { get; private set; }
 
         [Header("Camera Follow Reference:")]
         [field: SerializeField]
