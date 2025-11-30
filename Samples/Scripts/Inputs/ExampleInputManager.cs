@@ -7,7 +7,7 @@ namespace Spellbound.Controller.Samples
     /// <summary>
     /// The event naming pattern should be: [Context][Action][Suffix]
     /// </summary>
-    public class InputManager : MonoBehaviour, ExampleInputActions.IPlayerInputActions, ExampleInputActions.IConsoleInputActions {
+    public class ExampleInputManager : MonoBehaviour, ExampleInputActions.IPlayerInputActions, ExampleInputActions.IConsoleInputActions {
         private ExampleInputActions _inputActions;
 
         // Player Input Events

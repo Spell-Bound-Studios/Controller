@@ -11,10 +11,10 @@ namespace Spellbound.Controller.Samples {
             var direction =
                     Vector3.ProjectOnPlane(
                         Ctx.referenceTransform.right, Ctx.planarUp).normalized *
-                    Ctx.input.Direction.y +
+                    Ctx.ExampleInput.Direction.y +
                     Vector3.ProjectOnPlane(
                         Ctx.referenceTransform.forward, Ctx.planarUp).normalized *
-                    Ctx.input.Direction.x;
+                    Ctx.ExampleInput.Direction.x;
 
             return direction.magnitude > 1f
                     ? direction.normalized

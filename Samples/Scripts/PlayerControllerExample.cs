@@ -25,7 +25,7 @@ namespace Spellbound.Controller.Samples {
     public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
         [Header("Input Reference:")]
         [field: SerializeField]
-        public InputManager input { get; private set; }
+        public ExampleInputManager ExampleInput { get; private set; }
 
         [Header("Camera References:")]
         [field: SerializeField] public Transform referenceTransform { get; private set; }
@@ -88,7 +88,7 @@ namespace Spellbound.Controller.Samples {
         private void Awake() {
             planarUp = transform.up;
 
-            if (input == null)
+            if (ExampleInput == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
 
             Rb = GetComponent<Rigidbody>();
@@ -108,7 +108,7 @@ namespace Spellbound.Controller.Samples {
         }
 
         public void Update() {
-            RotateCamera(input.LookDirection.x, -input.LookDirection.y);
+            RotateCamera(ExampleInput.LookDirection.x, -ExampleInput.LookDirection.y);
             locoStateMachine.UpdateStateMachine();
             actionStateMachine.UpdateStateMachine();
         }
@@ -131,7 +131,7 @@ namespace Spellbound.Controller.Samples {
                 ? CursorLockMode.Locked
                 : CursorLockMode.None;
 
-            if (input == null)
+            if (ExampleInput == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
 
             if (!_brain && Camera.main)
@@ -160,8 +160,8 @@ namespace Spellbound.Controller.Samples {
 
             _cameraRig = CameraRigManager.Instance;
 
-            if (input)
-                input.OnMouseWheelInput += ZoomCamera;
+            if (ExampleInput)
+                ExampleInput.OnMouseWheelInput += ZoomCamera;
 
             CameraSetup();
         }
