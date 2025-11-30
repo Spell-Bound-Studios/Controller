@@ -6,8 +6,8 @@ namespace Spellbound.Controller.Samples {
     [CreateAssetMenu(fileName = "GroundStateExample", menuName = "Spellbound/StateMachine/GroundStateExample")]
     public class GroundStateExample : BaseLocomotionStateExample {
         protected override void EnterStateLogic() {
-            Ctx.input.OnInteractPressed += HandleInteractPressed;
-            Ctx.input.OnJumpInput += HandleJumpPressed;
+            Ctx.ExampleInput.OnInteractPressed += HandleInteractPressed;
+            Ctx.ExampleInput.OnJumpPressed += HandleJumpPressed;
         }
 
         protected override void UpdateStateLogic() {
@@ -23,8 +23,8 @@ namespace Spellbound.Controller.Samples {
         }
 
         protected override void ExitStateLogic() {
-            Ctx.input.OnInteractPressed -= HandleInteractPressed;
-            Ctx.input.OnJumpInput -= HandleJumpPressed;
+            Ctx.ExampleInput.OnInteractPressed -= HandleInteractPressed;
+            Ctx.ExampleInput.OnJumpPressed -= HandleJumpPressed;
         }
 
         protected virtual void HandleInteractPressed() =>

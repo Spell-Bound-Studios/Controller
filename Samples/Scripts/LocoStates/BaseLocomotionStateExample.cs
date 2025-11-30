@@ -23,7 +23,7 @@ namespace Spellbound.Controller.Samples {
 
         protected virtual Vector3 GetInputDirectionRelativeToCamera() =>
                 ControllerHelper.GetInputDirectionRelativeToCamera(
-                    Ctx.input.Direction,
+                    Ctx.ExampleInput.Direction,
                     Ctx.referenceTransform,
                     Ctx.planarUp
                 );
