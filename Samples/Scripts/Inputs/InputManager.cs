@@ -9,11 +9,11 @@ namespace Spellbound.Controller.Samples
     /// </summary>
     public class InputManager : MonoBehaviour, ExampleInputActions.IPlayerInputActions, ExampleInputActions.IConsoleInputActions {
         private ExampleInputActions _inputActions;
-        private ExampleInputActions.IConsoleInputActions _iConsoleInputActionsImplementation;
 
         // Player Input Events
         public event Action OnJumpPressed = delegate { };
         public event Action OnInteractPressed = delegate { };
+        public event Action<Vector2> OnMouseWheelInput = delegate { };
         
         // Console Input Events
         public event Action OnPreviousCommandPressed = delegate { };
@@ -78,7 +78,8 @@ namespace Spellbound.Controller.Samples
 
         public void OnLookDirection(InputAction.CallbackContext context) { }
 
-        public void OnMouseWheel(InputAction.CallbackContext context) { }
+        public void OnMouseWheel(InputAction.CallbackContext context) =>
+            OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
 
         #endregion
         

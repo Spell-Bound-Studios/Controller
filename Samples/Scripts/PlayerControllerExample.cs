@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
@@ -26,9 +27,20 @@ namespace Spellbound.Controller.Samples {
         [field: SerializeField]
         public InputManager input { get; private set; }
 
-        [Header("Camera Follow Reference:")]
-        [field: SerializeField]
-        public Transform referenceTransform { get; private set; }
+        [Header("Camera References:")]
+        [field: SerializeField] public Transform referenceTransform { get; private set; }
+        [field: SerializeField] private Transform cameraPivot;
+        [field: SerializeField] public CameraData CameraData { get; private set; }
+        private CameraRigManager _cameraRig;
+        private CinemachineBrain _brain;
+
+        private Transform _tr;
+
+        // Cached local rotation value X.
+        private float _currentXAngle;
+
+        // Cached local rotation value Y.
+        private float _currentYAngle;
 
         [Header("Rigidbody Reference:")]
         [field: SerializeField]
@@ -61,11 +73,14 @@ namespace Spellbound.Controller.Samples {
         public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
 
-        [Header("Locomotion States")] public List<BaseSoState> locoStates;
+        [Header("Locomotion States")] 
+        public List<BaseSoState> locoStates;
 
-        [Header("Action States")] public List<BaseSoState> actionStates;
+        [Header("Action States")] 
+        public List<BaseSoState> actionStates;
 
-        [Header("Animator"), SerializeField] private Animator animator;
+        [Header("Animator"), SerializeField] 
+        private Animator animator;
 
         // What direction is up from the player?
         public Vector3 planarUp { get; private set; }
@@ -87,11 +102,13 @@ namespace Spellbound.Controller.Samples {
 
         private void Start() {
             // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
+            CameraInit();
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
         }
 
         public void Update() {
+            RotateCamera(input.LookDirection.x, -input.LookDirection.y);
             locoStateMachine.UpdateStateMachine();
             actionStateMachine.UpdateStateMachine();
         }
@@ -108,6 +125,112 @@ namespace Spellbound.Controller.Samples {
         }
 #endif
 
+        private void CameraInit()
+        {
+            Cursor.lockState = CameraData.cursorLockOnStart
+                ? CursorLockMode.Locked
+                : CursorLockMode.None;
+
+            if (input == null)
+                Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
+
+            if (!_brain && Camera.main)
+                Camera.main.TryGetComponent(out _brain);
+
+            if (!_brain)
+                _brain = FindFirstObjectByType<CinemachineBrain>();
+
+            if (!_brain)
+                Debug.LogError("No brain found. CinemachineBrain missing from scene.", this);
+
+            _currentXAngle = _tr.localRotation.eulerAngles.x;
+            _currentYAngle = _tr.localRotation.eulerAngles.y;
+
+            if (CameraRigManager.Instance == null) {
+                Debug.LogError("CameraController has a dependency on CameraRigManager. Please ensure the camera rig" +
+                               "prefab is in the scene or the CameraRigManager script is on your custom camera rig.",
+                    this);
+            }
+
+            if (SyncTransform.Instance == null) {
+                Debug.LogError("CameraController has a dependency on SyncTransform. Please ensure the CameraFollow" +
+                               "prefab is in the scene or the SyncTransform script is on your custom object.",
+                    this);
+            }
+
+            _cameraRig = CameraRigManager.Instance;
+
+            if (input)
+                input.OnMouseWheelInput += ZoomCamera;
+
+            CameraSetup();
+        }
+        
+        /// <summary>
+        /// Rotates the camera based on the device horizontal and vertical input about the pivot.
+        /// </summary>
+        private void RotateCamera(float horizontalInput, float verticalInput) {
+            if (!CameraData.cameraFollowMouse)
+                return;
+
+            var targetX = _currentXAngle + verticalInput * CameraData.cameraSpeed;
+            var targetY = _currentYAngle + horizontalInput * CameraData.cameraSpeed;
+
+            targetX = Mathf.Clamp(targetX, -CameraData.upperVerticalLimit, CameraData.lowerVerticalLimit);
+
+            if (CameraData.smoothCameraRotation) {
+                var blend = 1f - Mathf.Exp(-CameraData.cameraSmoothingFactor * Time.unscaledDeltaTime);
+                _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, blend);
+                _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, blend);
+            }
+            else {
+                _currentXAngle = targetX;
+                _currentYAngle = targetY;
+            }
+
+            _currentXAngle = Mathf.Clamp(_currentXAngle, -CameraData.upperVerticalLimit, CameraData.lowerVerticalLimit);
+            cameraPivot.localRotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0f);
+        }
+        
+        private void ZoomCamera(Vector2 zoomInput) {
+            if (!CameraData.cameraFollowMouse)
+                return;
+
+            var currentZoom = _cameraRig.GetCurrentCameraZoom();
+
+            if (float.IsNaN(currentZoom))
+                return;
+
+            var target = currentZoom - zoomInput.y * CameraData.zoomIncrement;
+            target = Mathf.Clamp(target, CameraData.minZoomDistance, CameraData.maxZoomDistance);
+            CameraRigManager.Instance.SetCameraZoom(target);
+        }
+
+        /// <summary>
+        /// Sets our cameraRig tracking target.
+        /// </summary>
+        private void CameraSetup() {
+            SyncTransform.Instance.SetFollowTransform(gameObject.transform);
+
+            if (!cameraPivot)
+                cameraPivot = SyncTransform.Instance.transform;
+
+            _brain.WorldUpOverride = cameraPivot;
+
+            if (_cameraRig == null) {
+                Debug.LogError("Camera rig is null and doesn't appear to be in scene.");
+
+                return;
+            }
+
+            _cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
+        }
+
+        public void SetCameraFollowMouse(bool follow) => CameraData.cameraFollowMouse = follow;
+        public void SetCameraSpeed(float speed) => CameraData.cameraSpeed = speed;
+        public float GetCameraSpeed() => CameraData.cameraSpeed;
+        public void SetCameraSmooth(bool isSmooth) => CameraData.smoothCameraRotation = isSmooth;
+        
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
