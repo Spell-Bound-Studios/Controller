@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Spellbound.Controller {
     /// <summary>
-    /// Place this on a gameobject that you want to 1:1 match the transform with some offset.
+    /// Place this on a game object that you want to 1:1 match the transform with some offset.
     /// </summary>
     public class SyncTransform : MonoBehaviour {
         public static SyncTransform Instance;
 
         [SerializeField] private Transform followThisTransform;
-        [SerializeField] private Vector3 offset = new(0f, 2f, 0f);
+        [SerializeField] private Vector3 offset;
         private Transform _tr;
 
         private void Awake() {
@@ -44,5 +44,7 @@ namespace Spellbound.Controller {
             followThisTransform = tr;
             enabled = true;
         }
+        
+        public void SetCameraOffset(Vector3 offsetValue) => offset = offsetValue;
     }
 }
