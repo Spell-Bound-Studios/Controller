@@ -11290,6 +11290,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 250909882}
   m_CullTransparentMesh: 1
+--- !u!114 &271483753 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1946062343892457487, guid: ca382dd7399f70e46aded009217673dd, type: 3}
+  m_PrefabInstance: {fileID: 1775708472}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32188aeac1164e399e8eafd77aed690a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &299978195
 GameObject:
   m_ObjectHideFlags: 0
@@ -11692,7 +11703,7 @@ TerrainCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 421072905}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 831f888cea743904d88f1da6c80bd17d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -11703,7 +11714,7 @@ TerrainCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: 247c151888b67764480ae28258b0c513, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 19f37dd00d91a064bbbb11a53ce81c80, type: 2}
   m_EnableTreeColliders: 1
 --- !u!218 &421072907
 Terrain:
@@ -11714,7 +11725,7 @@ Terrain:
   m_GameObject: {fileID: 421072905}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 247c151888b67764480ae28258b0c513, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 19f37dd00d91a064bbbb11a53ce81c80, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
@@ -22631,7 +22642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e161097326040c9b3af6d667e07fce7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputActionsSO: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
+  exampleInputManager: {fileID: 271483753}
   throwSpeed: 15
   timeUntilDestroy: 10
   spawnForwardOffset: 0.5

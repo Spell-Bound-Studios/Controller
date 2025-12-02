@@ -1,4 +1,5 @@
 ﻿using System;
+using Spellbound.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,6 +25,8 @@ namespace Spellbound.Controller.Samples
         #region Unity Lifecycle
 
         private void Awake() {
+            SingletonManager.RegisterSingleton(this);
+            
             _inputActions = new ExampleInputActions();
             _inputActions.PlayerInput.SetCallbacks(this);
             _inputActions.ConsoleInput.SetCallbacks(this);
@@ -41,6 +44,7 @@ namespace Spellbound.Controller.Samples
         private void OnDisable() => _inputActions?.Disable();
         
         private void OnDestroy() {
+            SingletonManager.UnregisterSingleton<ExampleInputManager>();
             _inputActions?.Dispose();
         }
         

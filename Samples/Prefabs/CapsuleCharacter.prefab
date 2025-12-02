@@ -185,7 +185,6 @@ GameObject:
   - component: {fileID: 7305499241619662692}
   - component: {fileID: 6752135915643218695}
   - component: {fileID: 8915035600698087468}
-  - component: {fileID: 818432367506289426}
   - component: {fileID: 4235120299701147794}
   m_Layer: 3
   m_Name: CapsuleCharacter
@@ -276,18 +275,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8eb2e0d2ae84de2b731964bad76422c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <input>k__BackingField: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
+  <ExampleInput>k__BackingField: {fileID: 0}
   <referenceTransform>k__BackingField: {fileID: 0}
+  cameraPivot: {fileID: 0}
+  <CameraData>k__BackingField:
+    <upperVerticalLimit>k__BackingField: 89
+    <lowerVerticalLimit>k__BackingField: 89
+    <cameraSmoothingFactor>k__BackingField: 25
+    <zoomIncrement>k__BackingField: 0.2
+    <cursorLockOnStart>k__BackingField: 1
+    <cameraFollowMouse>k__BackingField: 1
+    <smoothCameraRotation>k__BackingField: 0
+    <minZoomDistance>k__BackingField: 1
+    <maxZoomDistance>k__BackingField: 8
   <Rb>k__BackingField: {fileID: 0}
   <ResizableCapsuleCollider>k__BackingField:
     collider: {fileID: 7305499241619662692}
     <DefaultColliderData>k__BackingField:
       <Height>k__BackingField: 2
       <Radius>k__BackingField: 0.5
-      overrideHeight: 0
-      overrideRadius: 0
-      <FallbackHeight>k__BackingField: 1.8
-      <FallbackRadius>k__BackingField: 0.3
+      <OverrideHeight>k__BackingField: 0
+      <OverrideRadius>k__BackingField: 0
       <SuppressWarnings>k__BackingField: 0
       <SuppressConsole>k__BackingField: 1
     <SlopeData>k__BackingField:
@@ -335,31 +343,6 @@ MonoBehaviour:
   actionStates:
   - {fileID: 11400000, guid: f74e86fc5b8d42c4099c063fc8fe07d4, type: 2}
   animator: {fileID: 0}
---- !u!114 &818432367506289426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8702816091274949866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af2854c7a5bd4fc892e2d5be2cd6f985, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  input: {fileID: 11400000, guid: 183a4ffbcd84ea34e85f2c26ab7b2aa6, type: 2}
-  cameraPivot: {fileID: 0}
-  upperVerticalLimit: 89
-  lowerVerticalLimit: 89
-  cameraSmoothingFactor: 25
-  zoomIncrement: 0.2
-  cursorLockOnStart: 1
-  cameraFollowMouse: 1
-  cameraSpeed: 0.5
-  smoothCameraRotation: 1
-  minZoomDistance: 1
-  maxZoomDistance: 8
-  playerRotationMode: 1
 --- !u!114 &4235120299701147794
 MonoBehaviour:
   m_ObjectHideFlags: 0

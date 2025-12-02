@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Spellbound.Controller.Samples {
     public class ObjectThrower : MonoBehaviour {
