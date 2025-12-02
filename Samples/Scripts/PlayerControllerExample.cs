@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Spellbound.Core;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -86,10 +87,17 @@ namespace Spellbound.Controller.Samples {
         public Vector3 planarUp { get; private set; }
 
         private void Awake() {
-            planarUp = transform.up;
+            _tr = transform;
+            planarUp = _tr.up;
 
-            if (ExampleInput == null)
-                Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
+            if (ExampleInput == null) {
+                if (!SingletonManager.TryGetSingletonInstance<ExampleInputManager>(out var im)) {
+                    Debug.LogError("ExampleInput is missing in the scene most likely.", this);
+                    return;
+                }
+
+                ExampleInput = im;
+            }
 
             Rb = GetComponent<Rigidbody>();
             Rb.freezeRotation = true;
@@ -101,10 +109,11 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void Start() {
-            // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
-            CameraInit();
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
+            
+            // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
+            CameraInit();
         }
 
         public void Update() {
