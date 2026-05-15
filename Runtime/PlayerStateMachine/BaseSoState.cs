@@ -1,6 +1,5 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-using Spellbound.Core;
 using Spellbound.Core.Tooling;
 using Unity.Collections;
 using UnityEngine;
