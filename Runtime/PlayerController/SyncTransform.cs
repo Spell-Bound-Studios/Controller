@@ -44,7 +44,7 @@ namespace Spellbound.Controller {
             followThisTransform = tr;
             enabled = true;
         }
-        
+
         public void SetCameraOffset(Vector3 offsetValue) => offset = offsetValue;
     }
 }

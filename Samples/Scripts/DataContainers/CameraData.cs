@@ -1,20 +1,23 @@
-﻿using System;
+﻿// Copyright 2025 Spellbound Studio Inc.
+
+using System;
 using System.ComponentModel;
 using UnityEngine;
 
-namespace Spellbound.Controller.Samples
-{
+namespace Spellbound.Controller.Samples {
     [Serializable]
-    public class CameraData
-    {
+    public class CameraData {
         // How high you can move your camera.
-        [field: SerializeField, Range(0f, 90f)] public float upperVerticalLimit { get; private set; } = 89f;
+        [field: SerializeField, Range(0f, 90f)]
+        public float upperVerticalLimit { get; private set; } = 89f;
 
         // How low you can move your camera.
-        [field: SerializeField, Range(0f, 90f)] public float lowerVerticalLimit { get; private set; } = 89f;
+        [field: SerializeField, Range(0f, 90f)]
+        public float lowerVerticalLimit { get; private set; } = 89f;
 
         // Multiplies the time.deltaTime by this factor.
-        [field: SerializeField, Range(1f, 50f)] public float cameraSmoothingFactor { get; private set; } = 25f;
+        [field: SerializeField, Range(1f, 50f)]
+        public float cameraSmoothingFactor { get; private set; } = 25f;
 
         // Controls how fast you zoom in and out.
         [field: SerializeField] public float zoomIncrement { get; private set; } = .2f;

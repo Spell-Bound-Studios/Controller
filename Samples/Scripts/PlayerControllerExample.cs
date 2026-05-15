@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using Spellbound.Core;
+using Spellbound.Core.Tooling;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -29,7 +29,9 @@ namespace Spellbound.Controller.Samples {
         public ExampleInputManager ExampleInput { get; private set; }
 
         [Header("Camera References:")]
-        [field: SerializeField] public Transform referenceTransform { get; private set; }
+        [field: SerializeField]
+        public Transform referenceTransform { get; private set; }
+
         [field: SerializeField] private Transform cameraPivot;
         [field: SerializeField] public CameraData CameraData { get; private set; }
         private CameraRigManager _cameraRig;
@@ -74,14 +76,11 @@ namespace Spellbound.Controller.Samples {
         public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
 
-        [Header("Locomotion States")] 
-        public List<BaseSoState> locoStates;
+        [Header("Locomotion States")] public List<BaseSoState> locoStates;
 
-        [Header("Action States")] 
-        public List<BaseSoState> actionStates;
+        [Header("Action States")] public List<BaseSoState> actionStates;
 
-        [Header("Animator"), SerializeField] 
-        private Animator animator;
+        [Header("Animator"), SerializeField] private Animator animator;
 
         // What direction is up from the player?
         public Vector3 planarUp { get; private set; }
@@ -93,6 +92,7 @@ namespace Spellbound.Controller.Samples {
             if (ExampleInput == null) {
                 if (!SingletonManager.TryGetSingletonInstance<ExampleInputManager>(out var im)) {
                     Debug.LogError("ExampleInput is missing in the scene most likely.", this);
+
                     return;
                 }
 
@@ -111,7 +111,7 @@ namespace Spellbound.Controller.Samples {
         private void Start() {
             referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
-            
+
             // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
             CameraInit();
         }
@@ -134,11 +134,10 @@ namespace Spellbound.Controller.Samples {
         }
 #endif
 
-        private void CameraInit()
-        {
+        private void CameraInit() {
             Cursor.lockState = CameraData.cursorLockOnStart
-                ? CursorLockMode.Locked
-                : CursorLockMode.None;
+                    ? CursorLockMode.Locked
+                    : CursorLockMode.None;
 
             if (ExampleInput == null)
                 Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
@@ -174,7 +173,7 @@ namespace Spellbound.Controller.Samples {
 
             CameraSetup();
         }
-        
+
         /// <summary>
         /// Rotates the camera based on the device horizontal and vertical input about the pivot.
         /// </summary>
@@ -200,7 +199,7 @@ namespace Spellbound.Controller.Samples {
             _currentXAngle = Mathf.Clamp(_currentXAngle, -CameraData.upperVerticalLimit, CameraData.lowerVerticalLimit);
             cameraPivot.localRotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0f);
         }
-        
+
         private void ZoomCamera(Vector2 zoomInput) {
             if (!CameraData.cameraFollowMouse)
                 return;
@@ -239,7 +238,7 @@ namespace Spellbound.Controller.Samples {
         public void SetCameraSpeed(float speed) => CameraData.cameraSpeed = speed;
         public float GetCameraSpeed() => CameraData.cameraSpeed;
         public void SetCameraSmooth(bool isSmooth) => CameraData.smoothCameraRotation = isSmooth;
-        
+
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
             locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
