@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Spellbound.Core;
+using Spellbound.Core.Tooling;
 using Unity.Cinemachine;
 using UnityEngine;
 
