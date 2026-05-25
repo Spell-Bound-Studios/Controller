@@ -24,7 +24,7 @@ namespace Spellbound.Controller.Samples {
         [field: SerializeField] public bool cursorLockOnStart { get; private set; } = true;
         [field: SerializeField] public bool cameraFollowMouse { get; set; } = true;
 
-        [Header("Player Settings"), SerializeField, Description("How fast you can move your camera.")]
+        [Header("Player Settings"), Description("How fast you can move your camera.")]
         public float cameraSpeed { get; set; } = 0.5f;
 
         [field: SerializeField, Description("Optional lerp applied to input.")]
