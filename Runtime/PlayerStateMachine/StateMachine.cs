@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Spellbound.Core.Logging;
 
 namespace Spellbound.Controller {
     /// <summary>
@@ -28,6 +28,12 @@ namespace Spellbound.Controller {
         public BaseStateDriver CurrentActiveDriver { get; private set; }
         public TContext ctx { get; private set; }
 
+        /// <summary>
+        /// The enum slot of the currently-active state. Set only when a driver becomes active (in
+        /// <see cref="ChangeState"/>); the variant SO filling the slot is orthogonal (swap it freely).
+        /// </summary>
+        public TStateEnum CurrentStateType { get; private set; }
+
         private readonly Dictionary<TStateEnum, BaseStateDriver> _stateDrivers;
         private readonly Dictionary<Type, BaseSoState> _statesByType = new();
 
@@ -52,7 +58,7 @@ namespace Spellbound.Controller {
         /// </summary>
         public void SetInitialVariant(TStateEnum stateType, BaseSoState initialVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
-                Debug.LogError($"No state driver found for state type: {stateType}");
+                Log.Error($"No state driver found for state type: {stateType}");
 
                 return;
             }
@@ -66,7 +72,7 @@ namespace Spellbound.Controller {
 
         public void RegisterState(BaseSoState state) {
             if (state == null) {
-                Debug.LogError($"The state: {state.AssetName} that you're trying to register is null.");
+                Log.Error($"The state: {state.AssetName} that you're trying to register is null.");
 
                 return;
             }
@@ -74,7 +80,7 @@ namespace Spellbound.Controller {
             var stateType = state.GetType();
 
             if (!_statesByType.TryAdd(stateType, state)) {
-                Debug.LogError($"The state dictionary already contains {stateType}.");
+                Log.Error($"The state dictionary already contains {stateType}.");
 
                 return;
             }
@@ -87,7 +93,7 @@ namespace Spellbound.Controller {
         /// </summary>
         public void ChangeState(TStateEnum newStateType) {
             if (!_stateDrivers.TryGetValue(newStateType, out var newDriver)) {
-                Debug.LogError($"No state driver registered for state type: {newStateType}");
+                Log.Error($"No state driver registered for state type: {newStateType}");
 
                 return;
             }
@@ -97,6 +103,7 @@ namespace Spellbound.Controller {
 
             CurrentActiveDriver?.OnBecomeInactive();
             CurrentActiveDriver = newDriver;
+            CurrentStateType = newStateType;
             CurrentActiveDriver.OnBecomeActive();
         }
 
@@ -110,7 +117,7 @@ namespace Spellbound.Controller {
         /// </summary>
         public void ChangeVariant(TStateEnum stateType, BaseSoState newVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
-                Debug.LogError($"No state driver registered for state type: {stateType}");
+                Log.Error($"No state driver registered for state type: {stateType}");
 
                 return;
             }
@@ -147,7 +154,7 @@ namespace Spellbound.Controller {
         /// </summary>
         public void RegisterStateDriver(TStateEnum stateType, BaseStateDriver stateDriver) {
             if (_stateDrivers.ContainsKey(stateType))
-                Debug.LogWarning($"State driver for {stateType} is already registered. Overwriting.");
+                Log.Warn($"State driver for {stateType} is already registered. Overwriting.");
 
             _stateDrivers[stateType] = stateDriver;
         }
