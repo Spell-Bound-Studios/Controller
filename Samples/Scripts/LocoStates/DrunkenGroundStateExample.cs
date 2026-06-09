@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using UnityEngine;
 
@@ -21,7 +21,8 @@ namespace Spellbound.Controller.Samples {
                     : direction;
         }
 
+        // Swap the slot back to its default (the base ground state).
         protected override void HandleInteractPressed() =>
-                Ctx.locoStateMachine.ChangeVariant(LocoStateTypes.Grounded, Ctx.locoStates[0]);
+                Ctx.locoStateMachine.RestoreDefault(LocoStateTypes.Grounded);
     }
 }

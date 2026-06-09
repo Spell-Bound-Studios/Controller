@@ -1,7 +1,6 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
 using System;
-using System.Collections.Generic;
 using Spellbound.Core.Tooling;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -76,9 +75,10 @@ namespace Spellbound.Controller.Samples {
         public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
 
-        [Header("Locomotion States")] public List<BaseSoState> locoStates;
+        [Header("State Configs")]
+        [SerializeField] private LocoStateConfigExample locoConfig;
 
-        [Header("Action States")] public List<BaseSoState> actionStates;
+        [SerializeField] private ActionStateConfigExample actionConfig;
 
         [Header("Animator"), SerializeField] private Animator animator;
 
@@ -241,16 +241,10 @@ namespace Spellbound.Controller.Samples {
 
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
-            locoStateMachine.SetInitialVariant(LocoStateTypes.Grounded, locoStates[0]);
-            locoStateMachine.SetInitialVariant(LocoStateTypes.Falling, locoStates[2]);
-            locoStateMachine.SetInitialVariant(LocoStateTypes.Jumping, locoStates[3]);
-            locoStateMachine.SetInitialVariant(LocoStateTypes.Landing, locoStates[4]);
-            // Initialize a state by calling the ChangeState method to get the machine going.
-            locoStateMachine.ChangeState(LocoStateTypes.Falling);
+            locoStateMachine.Configure(locoConfig);
 
             actionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
-            actionStateMachine.SetInitialVariant(ActionStateTypes.Ready, actionStates[0]);
-            actionStateMachine.ChangeState(ActionStateTypes.Ready);
+            actionStateMachine.Configure(actionConfig);
         }
 
         /// <summary>

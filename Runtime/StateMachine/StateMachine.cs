@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
 using System.Collections.Generic;
@@ -6,36 +6,29 @@ using Spellbound.Core.Logging;
 
 namespace Spellbound.Controller {
     /// <summary>
-    /// This state machine is intended to be driven by a MonoBehaviour and offer simple public methods to change states
-    /// and state variants. Additional information on the difference between "drivers", "states" and "variants" can be
-    /// found in the read me.
+    /// An enum-keyed state machine whose slots are each filled by a swappable state SO.
     /// </summary>
-    /// <typeparam name="TContext">
-    /// TContext is expected to be a class of some kind that the user defines. We find that often times the controller
-    /// is the context required to run the state machine... however, we wanted to give the user complete flexibility
-    /// and allow them to containerize their own context should they choose.
-    /// </typeparam>
-    /// <typeparam name="TStateEnum">
-    /// TStateEnum is a user-defined enum. The state machine will instantiate one BaseStateDriver class per item in the
-    /// enum. We chose an enum because we find that it simplifies readability and allows the user to conceptualize
-    /// what it is that they are trying to make.
-    /// </typeparam>
-    /// Usage:
-    /// var myStateMachine = new StateMachine<MyContextClass, MyEnum>(myContext);
-    /// myStateMachine.SetInitialVariant(MyEnum.Item, myBaseStateSo);
-    /// myStateMachine.ChangeState(MyEnum.Item);
+    /// <typeparam name="TContext">The object the states act on — usually the owning controller.</typeparam>
+    /// <typeparam name="TStateEnum">The enum of state slots; one driver is created per value.</typeparam>
     public sealed class StateMachine<TContext, TStateEnum> where TContext : class where TStateEnum : Enum {
+        /// <summary>
+        /// The driver of the currently-active slot.
+        /// </summary>
         public BaseStateDriver CurrentActiveDriver { get; private set; }
+
+        /// <summary>
+        /// The context passed to every state.
+        /// </summary>
         public TContext ctx { get; private set; }
 
         /// <summary>
-        /// The enum slot of the currently-active state. Set only when a driver becomes active (in
-        /// <see cref="ChangeState"/>); the variant SO filling the slot is orthogonal (swap it freely).
+        /// The currently-active slot.
         /// </summary>
         public TStateEnum CurrentStateType { get; private set; }
 
         private readonly Dictionary<TStateEnum, BaseStateDriver> _stateDrivers;
         private readonly Dictionary<Type, BaseSoState> _statesByType = new();
+        private readonly Dictionary<TStateEnum, BaseSoState> _defaultVariants = new();
 
         public StateMachine(TContext ctx) {
             this.ctx = ctx;
@@ -44,17 +37,30 @@ namespace Spellbound.Controller {
             InitializeStateDrivers();
         }
 
+        #region Configuration
+
         /// <summary>
-        /// Automatically creates a state driver for each value in the enum.
+        /// Wires the machine from a config asset and enters its initial state.
         /// </summary>
-        private void InitializeStateDrivers() {
-            foreach (TStateEnum stateType in Enum.GetValues(typeof(TStateEnum)))
-                _stateDrivers[stateType] = new BaseStateDriver();
+        public void Configure(IStateMachineConfig<TStateEnum> config) {
+            if (config == null) {
+                Log.Error("Configure called with a null config; the state machine has no states.");
+
+                return;
+            }
+
+            ConfigureCore(config.Bindings, config.InitialState);
         }
 
         /// <summary>
-        /// Sets the initial state variant for a specific state type.
-        /// Call this during setup to assign ScriptableObject states to each state type.
+        /// Wires the machine from an inline binding list and enters the initial state.
+        /// </summary>
+        public void Configure<TBinding>(List<TBinding> bindings, TStateEnum initialState)
+                where TBinding : class, IStateBinding<TStateEnum> =>
+                ConfigureCore(bindings, initialState);
+
+        /// <summary>
+        /// Sets a slot's default variant and makes it the slot's current variant.
         /// </summary>
         public void SetInitialVariant(TStateEnum stateType, BaseSoState initialVariant) {
             if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
@@ -66,30 +72,55 @@ namespace Spellbound.Controller {
             if (initialVariant == null)
                 return;
 
-            initialVariant.InitializeWithContext(ctx);
+            _defaultVariants[stateType] = initialVariant;
+
+            if (initialVariant.Ctx == null)
+                initialVariant.InitializeWithContext(ctx);
+
             driver.ChangeVariant(initialVariant);
         }
 
+        /// <summary>
+        /// Registers a variant by its concrete type so it can be resolved later. Idempotent.
+        /// </summary>
         public void RegisterState(BaseSoState state) {
             if (state == null) {
-                Log.Error($"The state: {state.AssetName} that you're trying to register is null.");
+                Log.Error("Attempted to register a null state.");
 
                 return;
             }
 
             var stateType = state.GetType();
 
-            if (!_statesByType.TryAdd(stateType, state)) {
-                Log.Error($"The state dictionary already contains {stateType}.");
+            if (_statesByType.TryGetValue(stateType, out var existing)) {
+                if (!ReferenceEquals(existing, state))
+                    Log.Warn($"Two different assets of type {stateType.Name} were registered; keeping the first.");
 
                 return;
             }
 
-            state.InitializeWithContext(ctx);
+            _statesByType[stateType] = state;
+
+            if (state.Ctx == null)
+                state.InitializeWithContext(ctx);
         }
 
         /// <summary>
-        /// Changes to a different state type (different driver).
+        /// Replaces the driver for a slot. Advanced use only.
+        /// </summary>
+        public void RegisterStateDriver(TStateEnum stateType, BaseStateDriver stateDriver) {
+            if (_stateDrivers.ContainsKey(stateType))
+                Log.Warn($"State driver for {stateType} is already registered. Overwriting.");
+
+            _stateDrivers[stateType] = stateDriver;
+        }
+
+        #endregion
+
+        #region Transitions & Variants
+
+        /// <summary>
+        /// Activates a different slot.
         /// </summary>
         public void ChangeState(TStateEnum newStateType) {
             if (!_stateDrivers.TryGetValue(newStateType, out var newDriver)) {
@@ -108,55 +139,128 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
-        /// Helper method to get a registered state.
+        /// Swaps the variant filling a slot, taking effect immediately if the slot is active.
         /// </summary>
-        public BaseSoState GetRegisteredState<T>() where T : BaseSoState => _statesByType.GetValueOrDefault(typeof(T));
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void ChangeVariant(TStateEnum stateType, BaseSoState newVariant) {
-            if (!_stateDrivers.TryGetValue(stateType, out var driver)) {
-                Log.Error($"No state driver registered for state type: {stateType}");
+        public void ApplyVariant(TStateEnum slot, BaseSoState variant) {
+            if (!_stateDrivers.TryGetValue(slot, out var driver)) {
+                Log.Error($"No state driver registered for state type: {slot}");
 
                 return;
             }
 
-            if (newVariant.Ctx == null)
-                newVariant.InitializeWithContext(ctx);
+            if (variant == null) {
+                Log.Error($"ApplyVariant called with a null variant for slot {slot}; ignoring.");
 
-            driver.ChangeVariant(newVariant);
+                return;
+            }
+
+            RegisterState(variant);
+            driver.ChangeVariant(variant);
         }
 
         /// <summary>
-        /// Gets the current variant for a specific state type.
+        /// Swaps a slot to its registered variant of type <typeparamref name="TVariant"/>.
+        /// </summary>
+        public void ApplyVariant<TVariant>(TStateEnum slot) where TVariant : BaseSoState {
+            var variant = GetState<TVariant>();
+
+            if (variant == null) {
+                Log.Error($"No registered variant of type {typeof(TVariant).Name}; list it in the config or " +
+                          "apply it by reference first.");
+
+                return;
+            }
+
+            ApplyVariant(slot, variant);
+        }
+
+        /// <summary>
+        /// Restores a slot to the default variant recorded at configure time.
+        /// </summary>
+        public void RestoreDefault(TStateEnum slot) {
+            if (_defaultVariants.TryGetValue(slot, out var def) && def != null) {
+                ApplyVariant(slot, def);
+
+                return;
+            }
+
+            Log.Error($"No default variant recorded for slot {slot}; was the machine configured?");
+        }
+
+        #endregion
+
+        #region Queries
+
+        /// <summary>
+        /// Returns the registered variant of type <typeparamref name="TVariant"/>, or null.
+        /// </summary>
+        public TVariant GetState<TVariant>() where TVariant : BaseSoState =>
+                _statesByType.GetValueOrDefault(typeof(TVariant)) as TVariant;
+
+        /// <summary>
+        /// Returns the variant currently filling a slot.
         /// </summary>
         public BaseSoState GetCurrentVariant(TStateEnum stateType) =>
                 _stateDrivers.TryGetValue(stateType, out var driver)
                         ? driver.CurrentVariant
                         : null;
 
+        /// <summary>
+        /// Returns the active slot's current variant.
+        /// </summary>
         public BaseSoState GetCurrentRunningState() => CurrentActiveDriver?.CurrentVariant;
 
+        #endregion
+
+        #region Tick
+
         /// <summary>
-        /// Call this from your MonoBehaviour's Update method.
+        /// Drives the active state's update; call from MonoBehaviour.Update.
         /// </summary>
         public void UpdateStateMachine() => CurrentActiveDriver?.DriveUpdate();
 
         /// <summary>
-        /// Call this from your MonoBehaviour's FixedUpdate method.
+        /// Drives the active state's fixed update; call from MonoBehaviour.FixedUpdate.
         /// </summary>
         public void FixedUpdateStateMachine() => CurrentActiveDriver?.DriveFixedUpdate();
 
-        /// <summary>
-        /// Registers a state driver for a specific state type if the user wants to create a custom state driver.
-        /// This will likely go unused except for advanced users.
-        /// </summary>
-        public void RegisterStateDriver(TStateEnum stateType, BaseStateDriver stateDriver) {
-            if (_stateDrivers.ContainsKey(stateType))
-                Log.Warn($"State driver for {stateType} is already registered. Overwriting.");
+        #endregion
 
-            _stateDrivers[stateType] = stateDriver;
+        #region Internal
+
+        private void InitializeStateDrivers() {
+            foreach (TStateEnum stateType in Enum.GetValues(typeof(TStateEnum)))
+                _stateDrivers[stateType] = new BaseStateDriver();
         }
+
+        private void ConfigureCore(IReadOnlyList<IStateBinding<TStateEnum>> bindings, TStateEnum initialState) {
+            if (bindings == null) {
+                Log.Error("Configure called with null bindings; the state machine has no states.");
+
+                return;
+            }
+
+            var slotSeen = new HashSet<TStateEnum>();
+
+            for (var i = 0; i < bindings.Count; i++) {
+                var binding = bindings[i];
+                var variant = binding?.Variant;
+
+                if (variant == null) {
+                    Log.Warn($"State binding at index {i} has a null variant; skipping.");
+
+                    continue;
+                }
+
+                RegisterState(variant);
+
+                if (slotSeen.Add(binding.Slot))
+                    SetInitialVariant(binding.Slot, variant);
+            }
+
+            ChangeState(initialState);
+        }
+
+        #endregion
     }
 }
