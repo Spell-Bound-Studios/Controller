@@ -11,7 +11,8 @@ namespace Spellbound.Controller {
     /// </summary>
     /// <typeparam name="TContext">The object the states act on — usually the owning controller.</typeparam>
     /// <typeparam name="TStateEnum">The enum of state slots; one driver is created per value.</typeparam>
-    public sealed class StateMachine<TContext, TStateEnum> where TContext : class where TStateEnum : Enum {
+    public sealed class StateMachine<TContext, TStateEnum> : IStateMachine
+            where TContext : class where TStateEnum : Enum {
         /// <summary>
         /// The driver of the currently-active slot.
         /// </summary>
@@ -192,6 +193,26 @@ namespace Spellbound.Controller {
         #endregion
 
         #region Queries
+
+        /// <summary>
+        /// The active slot's current variant, or null.
+        /// </summary>
+        public BaseSoState CurrentState => GetCurrentRunningState();
+
+        /// <summary>
+        /// The active variant's stable hash, or 0 if none.
+        /// </summary>
+        public uint CurrentStateHash => GetCurrentRunningState()?.Hash ?? 0u;
+
+        /// <summary>
+        /// True if the active variant is a <typeparamref name="TVariant"/> (or a subtype of it).
+        /// </summary>
+        public bool IsInState<TVariant>() where TVariant : BaseSoState => GetCurrentRunningState() is TVariant;
+
+        /// <summary>
+        /// True if the active variant is exactly the asset with this hash.
+        /// </summary>
+        public bool IsInState(uint stateHash) => GetCurrentRunningState() is { } state && state.Hash == stateHash;
 
         /// <summary>
         /// Returns this machine's instance of type <typeparamref name="TVariant"/>, or null.
