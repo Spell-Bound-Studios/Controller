@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Spellbound.Core.Logging;
+using UnityEngine;
 
 namespace Spellbound.Controller {
     /// <summary>
@@ -72,37 +73,33 @@ namespace Spellbound.Controller {
             if (initialVariant == null)
                 return;
 
-            _defaultVariants[stateType] = initialVariant;
-
-            if (initialVariant.Ctx == null)
-                initialVariant.InitializeWithContext(ctx);
-
-            driver.ChangeVariant(initialVariant);
+            var instance = RegisterState(initialVariant);
+            _defaultVariants[stateType] = instance;
+            driver.ChangeVariant(instance);
         }
 
         /// <summary>
-        /// Registers a variant by its concrete type so it can be resolved later. Idempotent.
+        /// Returns this machine's own instance of a state, cloning the shared asset on first request — so the
+        /// asset is never mutated and every controller runs its own copy. One instance per concrete type.
         /// </summary>
-        public void RegisterState(BaseSoState state) {
-            if (state == null) {
+        public BaseSoState RegisterState(BaseSoState source) {
+            if (source == null) {
                 Log.Error("Attempted to register a null state.");
 
-                return;
+                return null;
             }
 
-            var stateType = state.GetType();
+            var stateType = source.GetType();
 
-            if (_statesByType.TryGetValue(stateType, out var existing)) {
-                if (!ReferenceEquals(existing, state))
-                    Log.Warn($"Two different assets of type {stateType.Name} were registered; keeping the first.");
+            if (_statesByType.TryGetValue(stateType, out var existing))
+                return existing;
 
-                return;
-            }
+            var instance = UnityEngine.Object.Instantiate(source);
+            instance.name = source.name;
+            _statesByType[stateType] = instance;
+            instance.InitializeWithContext(ctx);
 
-            _statesByType[stateType] = state;
-
-            if (state.Ctx == null)
-                state.InitializeWithContext(ctx);
+            return instance;
         }
 
         /// <summary>
@@ -154,8 +151,7 @@ namespace Spellbound.Controller {
                 return;
             }
 
-            RegisterState(variant);
-            driver.ChangeVariant(variant);
+            driver.ChangeVariant(RegisterState(variant));
         }
 
         /// <summary>
@@ -178,8 +174,14 @@ namespace Spellbound.Controller {
         /// Restores a slot to the default variant recorded at configure time.
         /// </summary>
         public void RestoreDefault(TStateEnum slot) {
+            if (!_stateDrivers.TryGetValue(slot, out var driver)) {
+                Log.Error($"No state driver registered for state type: {slot}");
+
+                return;
+            }
+
             if (_defaultVariants.TryGetValue(slot, out var def) && def != null) {
-                ApplyVariant(slot, def);
+                driver.ChangeVariant(def);
 
                 return;
             }
@@ -192,7 +194,7 @@ namespace Spellbound.Controller {
         #region Queries
 
         /// <summary>
-        /// Returns the registered variant of type <typeparamref name="TVariant"/>, or null.
+        /// Returns this machine's instance of type <typeparamref name="TVariant"/>, or null.
         /// </summary>
         public TVariant GetState<TVariant>() where TVariant : BaseSoState =>
                 _statesByType.GetValueOrDefault(typeof(TVariant)) as TVariant;
@@ -226,6 +228,26 @@ namespace Spellbound.Controller {
 
         #endregion
 
+        #region Teardown
+
+        /// <summary>
+        /// Exits the active state and destroys this machine's cloned state instances. Call from the owner's
+        /// OnDestroy so the per-instance states don't leak.
+        /// </summary>
+        public void Dispose() {
+            CurrentActiveDriver?.OnBecomeInactive();
+            CurrentActiveDriver = null;
+
+            foreach (var instance in _statesByType.Values)
+                if (instance != null)
+                    UnityEngine.Object.Destroy(instance);
+
+            _statesByType.Clear();
+            _defaultVariants.Clear();
+        }
+
+        #endregion
+
         #region Internal
 
         private void InitializeStateDrivers() {
@@ -244,18 +266,18 @@ namespace Spellbound.Controller {
 
             for (var i = 0; i < bindings.Count; i++) {
                 var binding = bindings[i];
-                var variant = binding?.Variant;
+                var source = binding?.Variant;
 
-                if (variant == null) {
+                if (source == null) {
                     Log.Warn($"State binding at index {i} has a null variant; skipping.");
 
                     continue;
                 }
 
-                RegisterState(variant);
+                RegisterState(source);
 
                 if (slotSeen.Add(binding.Slot))
-                    SetInitialVariant(binding.Slot, variant);
+                    SetInitialVariant(binding.Slot, source);
             }
 
             ChangeState(initialState);
