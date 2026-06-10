@@ -151,7 +151,7 @@ namespace Spellbound.Controller.Samples {
                 Camera.main.TryGetComponent(out _brain);
 
             if (!_brain)
-                _brain = FindFirstObjectByType<CinemachineBrain>();
+                _brain = FindAnyObjectByType<CinemachineBrain>();
 
             if (!_brain)
                 Debug.LogError("No brain found. CinemachineBrain missing from scene.", this);
