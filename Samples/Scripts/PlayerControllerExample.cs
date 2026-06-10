@@ -127,6 +127,11 @@ namespace Spellbound.Controller.Samples {
             actionStateMachine.FixedUpdateStateMachine();
         }
 
+        private void OnDestroy() {
+            locoStateMachine?.Dispose();
+            actionStateMachine?.Dispose();
+        }
+
 #if UNITY_EDITOR
         private void OnValidate() {
             ResizableCapsuleCollider.Initialize(gameObject);
