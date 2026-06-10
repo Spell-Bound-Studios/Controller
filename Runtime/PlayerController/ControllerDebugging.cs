@@ -140,7 +140,7 @@ namespace Spellbound.Controller {
         }
 
         private static void EnsureEventSystem() {
-            if (FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None) != null)
+            if (FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() != null)
                 return;
 
             var eventSystemGo = new GameObject("EventSystem");
