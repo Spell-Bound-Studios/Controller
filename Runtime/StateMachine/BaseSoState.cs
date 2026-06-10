@@ -30,15 +30,8 @@ namespace Spellbound.Controller {
         private void OnValidate() {
             var assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
 
-            if (string.IsNullOrEmpty(assetPath)) {
-                if (!string.IsNullOrEmpty(id) || hash != 0u) {
-                    id = string.Empty;
-                    hash = 0u;
-                    UnityEditor.EditorUtility.SetDirty(this);
-                }
-
+            if (string.IsNullOrEmpty(assetPath))
                 return;
-            }
 
             var newName = name;
 
