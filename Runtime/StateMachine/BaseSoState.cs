@@ -24,8 +24,8 @@ namespace Spellbound.Controller {
 
 #if UNITY_EDITOR
         /// <summary>
-        /// Keeps <see cref="Id"/> (asset GUID) and <see cref="Hash"/> (its stable FNV-1a) in sync with the asset
-        /// whenever it changes. Hashing happens here at edit time only — never at runtime.
+        /// Re-syncs the asset's name, <see cref="Id"/> (GUID), and <see cref="Hash"/> to the file on disk at edit
+        /// time, marking dirty so a rename's new name / hash actually persists. Never runs at runtime.
         /// </summary>
         private void OnValidate() {
             var assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
@@ -33,10 +33,11 @@ namespace Spellbound.Controller {
             if (string.IsNullOrEmpty(assetPath))
                 return;
 
-            var newName = name;
+            var fileName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
 
-            if (assetName != newName) {
-                assetName = newName;
+            if (name != fileName || assetName != fileName) {
+                name = fileName;
+                assetName = fileName;
                 UnityEditor.EditorUtility.SetDirty(this);
             }
 
