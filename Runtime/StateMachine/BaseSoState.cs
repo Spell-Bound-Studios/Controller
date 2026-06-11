@@ -1,56 +1,15 @@
 // Copyright 2025 Spellbound Studio Inc.
 
-using Spellbound.Core.Hashing;
 using Spellbound.Core.Registries;
-using Spellbound.Core.Tooling;
-using Unity.Collections;
-using UnityEngine;
 
 namespace Spellbound.Controller {
     /// <summary>
     /// Base type for ScriptableObject states. Each concrete state is an asset that the state machine holds and
-    /// swaps. Carries a stable identity — <see cref="Id"/> (asset GUID) and <see cref="Hash"/> (its FNV-1a, the
-    /// registry / save / network id) — so a state can be referenced by a single value. See
-    /// <see cref="StateRegistry"/>.
+    /// swaps. Inherits its stable identity (asset GUID + FNV-1a hash) from <see cref="HashedScriptableObject"/>,
+    /// so a state can be referenced by a single value. See <see cref="StateRegistry"/>.
     /// </summary>
-    public abstract class BaseSoState : ScriptableObject, IRegistryEntry {
-        [SerializeField, ReadOnly, Immutable] private string id;
-        [SerializeField, ReadOnly, Immutable] private uint hash;
-        [SerializeField, ReadOnly, Immutable] private string assetName;
-        public string Id => id;
-        public uint Hash => hash;
-        public string AssetName => assetName;
+    public abstract class BaseSoState : HashedScriptableObject {
         public object Ctx;
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// Re-syncs the asset's name, <see cref="Id"/> (GUID), and <see cref="Hash"/> to the file on disk at edit
-        /// time, marking dirty so a rename's new name / hash actually persists. Never runs at runtime.
-        /// </summary>
-        private void OnValidate() {
-            var assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
-
-            if (string.IsNullOrEmpty(assetPath))
-                return;
-
-            var fileName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
-
-            if (name != fileName || assetName != fileName) {
-                name = fileName;
-                assetName = fileName;
-                UnityEditor.EditorUtility.SetDirty(this);
-            }
-
-            var assetGuid = UnityEditor.AssetDatabase.GUIDFromAssetPath(assetPath).ToString();
-            var newHash = StableHash.Fnv1A32(assetGuid);
-
-            if (id != assetGuid || hash != newHash) {
-                id = assetGuid;
-                hash = newHash;
-                UnityEditor.EditorUtility.SetDirty(this);
-            }
-        }
-#endif
 
         /// <summary>
         /// Called once when the state machine initializes to cache the context.
