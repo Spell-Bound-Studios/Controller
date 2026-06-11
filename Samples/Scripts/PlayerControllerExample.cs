@@ -134,6 +134,9 @@ namespace Spellbound.Controller.Samples {
 
 #if UNITY_EDITOR
         private void OnValidate() {
+            if (ResizableCapsuleCollider == null || !TryGetComponent(out CapsuleCollider _))
+                return;
+
             ResizableCapsuleCollider.Initialize(gameObject);
             ResizableCapsuleCollider.CalculateCapsuleColliderDimensions();
         }
@@ -264,7 +267,7 @@ namespace Spellbound.Controller.Samples {
                 var currentStateVariant = locoStateMachine.GetCurrentRunningState();
 
                 return currentStateVariant != null
-                        ? currentStateVariant.AssetName
+                        ? currentStateVariant.name
                         : "None";
             });
 
@@ -284,7 +287,7 @@ namespace Spellbound.Controller.Samples {
                 var currentStateVariant = actionStateMachine.GetCurrentRunningState();
 
                 return currentStateVariant != null
-                        ? currentStateVariant.AssetName
+                        ? currentStateVariant.name
                         : "None";
             });
 
