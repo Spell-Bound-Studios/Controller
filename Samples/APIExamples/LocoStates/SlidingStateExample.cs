@@ -11,7 +11,9 @@ namespace Spellbound.Controller.Samples {
     /// </summary>
     [CreateAssetMenu(fileName = "SlidingStateExample", menuName = "Spellbound/StateMachine/SlidingStateExample")]
     public class SlidingStateExample : BaseLocomotionStateExample {
-        [field: SerializeField, Range(0f, 15f)]
+        [field: SerializeField, Range(0f, 15f),
+         Tooltip("Hysteresis: how many degrees below Max Slope Angle the ground must flatten before sliding ends " +
+                 "and you stand up. Higher = keeps sliding longer (resists flip-flopping near the cutoff); lower = stands up sooner.")]
         public float SlideExitAngleBuffer { get; set; } = 2f;
 
         protected override void EnterStateLogic() { }

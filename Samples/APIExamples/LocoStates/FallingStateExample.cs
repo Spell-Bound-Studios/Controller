@@ -1,18 +1,21 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
-    /// This method is supposed to demonstrate how easy it is to make a new falling state that can alter the behavior
-    /// of how this state interprets movement compared to the ground state examples.
+    /// Default airborne state: preserves the horizontal momentum you launched with and lets input only nudge your
+    /// heading (additive air steering, never braking). Swap in <see cref="BallisticFallingStateExample"/> for the
+    /// no-control variant — a one-asset swap that shows how each state encapsulates its own feel.
     /// </summary>
     [CreateAssetMenu(fileName = "FallingStateExample", menuName = "Spellbound/StateMachine/FallingStateExample")]
     public class FallingStateExample : BaseLocomotionStateExample {
-        protected override void EnterStateLogic() =>
-                // Here we show that it's as simple as changing a protected variable in this state to impact player movement
-                // that will only apply in this state. We could override the handle input as well.
-                HSpeedModifier = 0.3f;
+        [field: SerializeField, Range(0f, 30f),
+         Tooltip("Air steering strength. Nudges your preserved launch momentum toward input without braking it. " +
+                 "Higher = more in-air control; lower = barely steerable; 0 = none (pure ballistic).")]
+        public float AirControlAccel { get; set; } = 5f;
+
+        protected override void EnterStateLogic() { }
 
         protected override void UpdateStateLogic() { }
 
@@ -23,12 +26,20 @@ namespace Spellbound.Controller.Samples {
                 return;
             }
 
-            HandleInput();
+            HandleAirControl();
             HandleCharacterRotation();
         }
 
-        protected override void ExitStateLogic() =>
-                // Then just change it back.
-                HSpeedModifier = 1.0f;
+        protected override void ExitStateLogic() { }
+
+        /// <summary>
+        /// Adds a gentle steering acceleration toward input on top of the existing horizontal velocity, so the
+        /// capsule keeps its momentum and only adjusts heading. Walls cancel the into-surface part.
+        /// </summary>
+        protected virtual void HandleAirControl() {
+            var steer = GetInputDirectionRelativeToCamera() * AirControlAccel;
+
+            Ctx.Rb.AddForce(CancelWallPush(steer), ForceMode.Acceleration);
+        }
     }
 }

@@ -7,10 +7,14 @@ namespace Spellbound.Controller.Samples {
     [Serializable]
     public class RotationData {
         [Header("Rotation Settings")]
-        [field: SerializeField, Range(0f, 1000f)]
-        public float turnTowardsInputSpeed { get; set; } = 500f;
+        [field: SerializeField, Range(0f, 2000f),
+         Tooltip("How fast the character turns to face its movement direction (deg/s). Higher = snappier, more " +
+                 "responsive turns; lower = slower, floatier turning.")]
+        public float turnTowardsInputSpeed { get; set; } = 1000f;
 
-        [field: SerializeField, Range(0f, 180f)]
+        [field: SerializeField, Range(0f, 180f),
+         Tooltip("Heading error (degrees) at which the turn reaches full speed; below it the turn eases off. " +
+                 "Higher = gentler, more gradual small corrections; lower = even tiny corrections snap to face the input.")]
         public float RotationFallOffAngle { get; set; } = 90f;
     }
 }

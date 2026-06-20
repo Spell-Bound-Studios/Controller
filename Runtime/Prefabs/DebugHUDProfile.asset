@@ -27,3 +27,5 @@ MonoBehaviour:
     enabled: 1
   - key: Landing
     enabled: 1
+  - key: Sliding
+    enabled: 1

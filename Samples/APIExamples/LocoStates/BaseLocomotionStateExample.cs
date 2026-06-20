@@ -58,12 +58,14 @@ namespace Spellbound.Controller.Samples {
                 );
 
         /// <summary>
-        /// Probes for ground beneath the capsule with a slope-scaled reach and caches the hit on this state.
-        /// Returns whether the capsule is grounded; each state acts on the return value in its own loop.
+        /// Probes for ground beneath the capsule with a slope- and speed-scaled reach (faster movement reaches
+        /// further, so ramps and bumps don't flicker to falling) and caches the hit on this state. Returns
+        /// whether grounded; each state acts on the return value in its own loop.
         /// </summary>
         protected virtual bool PerformGroundCheck() {
             var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
-            var reach = floatData.RideHeight * SlopeReachFactor() + floatData.GroundedTolerance;
+            var reach = floatData.RideHeight * SlopeReachFactor() + floatData.GroundedTolerance +
+                        ControllerHelper.GetHorizontalSpeed(Ctx.Rb, Ctx.planarUp) * floatData.GroundProbeSpeedScale;
 
             Ground = Ctx.ResizableCapsuleCollider.ProbeGround(
                 -Ctx.planarUp, reach + floatData.ProbeRadius, Ctx.LayerData.GroundLayer);

@@ -7,27 +7,37 @@ namespace Spellbound.Controller {
     [Serializable]
     public class DefaultColliderData {
         [Header("Collider Configuration")]
-        [field: SerializeField]
+        [field: SerializeField,
+         Tooltip("Capsule height. Auto-measured from the mesh unless Override Height is on; drives ride height and the ceiling probe.")]
         public float Height { get; private set; }
 
         public float CenterY { get; private set; }
-        [field: SerializeField] public float Radius { get; private set; }
+
+        [field: SerializeField,
+         Tooltip("Capsule radius. Auto-measured from the mesh unless Override Radius is on. Wider = fatter body that fits through fewer gaps.")]
+        public float Radius { get; private set; }
 
         // If the user doesn't want to automatically calculate based on mesh bounds then set to true.
         [Header("Override Settings")]
-        [field: SerializeField]
+        [field: SerializeField,
+         Tooltip("Use the manual Height above instead of auto-measuring it from the mesh.")]
         public bool OverrideHeight { get; private set; }
 
-        [field: SerializeField] public bool OverrideRadius { get; private set; }
+        [field: SerializeField,
+         Tooltip("Use the manual Radius above instead of auto-measuring it from the mesh.")]
+        public bool OverrideRadius { get; private set; }
 
         private const float FallbackHeight = 1.8f;
         private const float FallbackRadius = 0.3f;
 
         [Header("Log Suppression")]
-        [field: SerializeField]
+        [field: SerializeField,
+         Tooltip("Silence inspector warnings about a missing mesh / fallback sizing.")]
         public bool SuppressWarnings { get; private set; }
 
-        [field: SerializeField] public bool SuppressConsole { get; private set; } = true;
+        [field: SerializeField,
+         Tooltip("Silence console logs about collider auto-sizing. On by default to keep the console clean.")]
+        public bool SuppressConsole { get; private set; } = true;
 
         public void Initialize(GameObject go) {
             Bounds bounds = default;
