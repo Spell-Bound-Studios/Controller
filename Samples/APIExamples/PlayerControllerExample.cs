@@ -68,10 +68,6 @@ namespace Spellbound.Controller.Samples {
         [field: SerializeField]
         public StatData StatData { get; private set; }
 
-        [Header("State Settings:")]
-        [field: SerializeField]
-        public StateData StateData { get; private set; }
-
         public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
         public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
 
@@ -325,7 +321,7 @@ namespace Spellbound.Controller.Samples {
                 var reach = floatData.RideHeight * ControllerHelper.GetSlopeReachFactor(angle, StatData.maxSlopeAngle) +
                             floatData.GroundedTolerance;
 
-                Gizmos.color = StateData.Grounded
+                Gizmos.color = probe.HasHit && probe.Distance <= reach
                         ? Color.green
                         : Color.red;
                 Gizmos.DrawWireSphere(origin, radius);
@@ -340,21 +336,5 @@ namespace Spellbound.Controller.Samples {
                 Gizmos.DrawLine(probe.Point, probe.Point + probe.Normal * 0.5f);
             });
         }
-    }
-
-    /// <summary>
-    /// These are the enums belonging to our state machine example. You can put these anywhere - I chose to put them
-    /// here as easy reference but feel free to put them anywhere in your game as long as they are accessible by the
-    /// state machine and states you create.
-    /// </summary>
-    public enum LocoStateTypes {
-        Grounded,
-        Jumping,
-        Falling,
-        Landing
-    }
-
-    public enum ActionStateTypes {
-        Ready
     }
 }

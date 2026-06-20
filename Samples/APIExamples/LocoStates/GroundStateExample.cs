@@ -12,14 +12,22 @@ namespace Spellbound.Controller.Samples {
             Ctx.ExampleInput.OnJumpPressed += HandleJumpPressed;
         }
 
-        protected override void UpdateStateLogic() {
-            if (!Ctx.StateData.Grounded)
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
-        }
+        protected override void UpdateStateLogic() { }
 
         protected override void FixedUpdateStateLogic() {
-            if (PerformGroundCheck())
-                KeepCapsuleFloating();
+            if (!PerformGroundCheck()) {
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+
+                return;
+            }
+
+            if (IsSlopeTooSteep()) {
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Sliding);
+
+                return;
+            }
+
+            KeepCapsuleFloating();
             HandleInput();
             HandleCharacterRotation();
         }

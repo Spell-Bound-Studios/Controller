@@ -14,13 +14,15 @@ namespace Spellbound.Controller.Samples {
                 // that will only apply in this state. We could override the handle input as well.
                 HSpeedModifier = 0.3f;
 
-        protected override void UpdateStateLogic() {
-            if (Ctx.StateData.Grounded)
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
-        }
+        protected override void UpdateStateLogic() { }
 
         protected override void FixedUpdateStateLogic() {
-            PerformGroundCheck();
+            if (PerformGroundCheck()) {
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
+
+                return;
+            }
+
             HandleInput();
             HandleCharacterRotation();
         }

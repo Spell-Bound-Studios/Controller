@@ -27,6 +27,13 @@ namespace Spellbound.Controller {
         [field: SerializeField, Range(0f, 1f)]
         public float GroundedTolerance { get; set; } = 0.3f;
 
+        [Header("Wall & Ceiling")]
+        [field: SerializeField, Range(0f, 1f)]
+        public float WallProbeDistance { get; set; } = 0.35f;
+
+        [field: SerializeField, Range(0f, 1f)]
+        public float CeilingClearance { get; set; } = 0.15f;
+
         public float RideHeight =>
                 OverrideCalculatedDistance
                         ? DesiredFloatDistance

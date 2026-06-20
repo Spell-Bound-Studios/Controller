@@ -25,21 +25,23 @@ namespace Spellbound.Controller.Samples {
             Jump();
         }
 
-        protected override void UpdateStateLogic() {
-            // If the minimum time expires
-            if (_jumpMinRoutine == null) {
-                // Check grounded and exit ground state.
-                if (Ctx.StateData.Grounded)
-                    Ctx.locoStateMachine.ChangeState(LocoStateTypes.Landing);
-            }
-
-            // If maximum time expires
-            if (_jumpMaxRoutine == null)
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
-        }
+        protected override void UpdateStateLogic() { }
 
         protected override void FixedUpdateStateLogic() {
-            PerformGroundCheck();
+            var grounded = PerformGroundCheck();
+
+            if (_jumpMinRoutine == null && grounded) {
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Landing);
+
+                return;
+            }
+
+            if (_jumpMaxRoutine == null) {
+                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+
+                return;
+            }
+
             HandleInput();
             HandleCharacterRotation();
         }

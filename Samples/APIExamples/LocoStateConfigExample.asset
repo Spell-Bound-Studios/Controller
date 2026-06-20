@@ -21,4 +21,6 @@ MonoBehaviour:
     variant: {fileID: 11400000, guid: f3d2de77669c7344aa3ef7fbc9b9a5f2, type: 2}
   - slot: 3
     variant: {fileID: 11400000, guid: 607165397872b4546b1c883577803163, type: 2}
+  - slot: 4
+    variant: {fileID: 11400000, guid: b233ba4eb55c424d8fb1495ea557f8d3, type: 2}
   initialState: 2

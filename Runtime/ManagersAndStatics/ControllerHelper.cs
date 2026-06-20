@@ -181,6 +181,13 @@ namespace Spellbound.Controller {
             rb.AddForce(upForce, forceMode);
         }
 
+        /// <summary>
+        /// Removes the part of a vector that drives into a surface, leaving the component that slides along it.
+        /// The surface normal points out of the surface (toward the mover).
+        /// </summary>
+        public static Vector3 CancelIntoSurface(Vector3 vector, Vector3 surfaceNormal) =>
+                vector - Mathf.Min(Vector3.Dot(vector, surfaceNormal), 0f) * surfaceNormal;
+
         // #####################
         // GROUND PROBE & FLOAT
         // #####################
@@ -247,6 +254,12 @@ namespace Spellbound.Controller {
 
             return Mathf.Clamp(1f / Mathf.Cos(clamped * Mathf.Deg2Rad), 1f, 4f);
         }
+
+        /// <summary>
+        /// Returns the magnitude of gravitational acceleration along the fall line of a slope (g·sinθ).
+        /// </summary>
+        public static float GetSlopeAccelerationMagnitude(float gravityMagnitude, float slopeAngle) =>
+                gravityMagnitude * Mathf.Sin(slopeAngle * Mathf.Deg2Rad);
 
         // ###########################
         // COLLISION & OVERLAP HELPERS

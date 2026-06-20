@@ -15,13 +15,13 @@ namespace Spellbound.Controller.Samples {
             var moveDir = inputDir;
             var slopeSpeed = 1f;
 
-            if (Ctx.StateData.Grounded) {
+            if (Ground.HasHit) {
                 moveDir = ControllerHelper.GetSlopeAdjustedDirection(inputDir, Ground.Normal, Ctx.planarUp);
                 slopeSpeed = ResolveSlopeSpeed(inputDir);
             }
 
             var targetVelocity = slopeSpeed * HSpeedModifier * Ctx.StatData.movementSpeed * moveDir;
-            var velocityChange = targetVelocity - ControllerHelper.GetHorizontalVelocity(Ctx.Rb);
+            var velocityChange = CancelWallPush(targetVelocity - ControllerHelper.GetHorizontalVelocity(Ctx.Rb));
 
             Ctx.Rb.AddForce(velocityChange, Ctx.RigidbodyData.horizontalForceMode);
         }
@@ -58,8 +58,8 @@ namespace Spellbound.Controller.Samples {
                 );
 
         /// <summary>
-        /// Probes for ground beneath the capsule with a slope-scaled reach, caches the hit, and publishes
-        /// <see cref="StateData.Grounded"/>.
+        /// Probes for ground beneath the capsule with a slope-scaled reach and caches the hit on this state.
+        /// Returns whether the capsule is grounded; each state acts on the return value in its own loop.
         /// </summary>
         protected virtual bool PerformGroundCheck() {
             var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
@@ -68,18 +68,15 @@ namespace Spellbound.Controller.Samples {
             Ground = Ctx.ResizableCapsuleCollider.ProbeGround(
                 -Ctx.planarUp, reach + floatData.ProbeRadius, Ctx.LayerData.GroundLayer);
 
-            Ctx.StateData.Grounded = Ground.HasHit && Ground.Distance <= reach;
-
-            return Ctx.StateData.Grounded;
+            return Ground.HasHit && Ground.Distance <= reach;
         }
 
         /// <summary>
-        /// Applies the float-spring force that holds the capsule at its slope-scaled ride height.
+        /// Applies the float-spring force that holds the capsule at its slope-scaled ride height, suppressing
+        /// the upward push and upward velocity when a ceiling is close above so the capsule never pops into it.
+        /// Call only after <see cref="PerformGroundCheck"/> has reported grounded this tick.
         /// </summary>
         protected virtual void KeepCapsuleFloating() {
-            if (!Ctx.StateData.Grounded)
-                return;
-
             var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
 
             var springForce = ControllerHelper.SolveFloatSpring(
@@ -90,16 +87,61 @@ namespace Spellbound.Controller.Samples {
                 floatData.SpringStrength,
                 floatData.SpringDamper);
 
+            var ceiling = ProbeCeiling();
+
+            if (ceiling.HasHit) {
+                springForce = ControllerHelper.CancelIntoSurface(springForce, ceiling.Normal);
+                Ctx.Rb.linearVelocity = ControllerHelper.CancelIntoSurface(Ctx.Rb.linearVelocity, ceiling.Normal);
+            }
+
             Ctx.Rb.AddForce(springForce, ForceMode.Acceleration);
+        }
+
+        /// <summary>
+        /// Cancels the part of a horizontal push that drives into a wall — a probed surface steeper than the
+        /// walkable <see cref="StatData.maxSlopeAngle"/> — so the capsule slides along it instead of pressing in.
+        /// Steep faces are never ascendable, so this is also what keeps the capsule from climbing walls.
+        /// </summary>
+        protected Vector3 CancelWallPush(Vector3 horizontalForce) {
+            if (horizontalForce.sqrMagnitude < 1e-6f)
+                return horizontalForce;
+
+            var wall = Ctx.ResizableCapsuleCollider.ProbeGround(
+                horizontalForce.normalized,
+                Ctx.ResizableCapsuleCollider.CapsuleFloatData.WallProbeDistance,
+                Ctx.LayerData.GroundLayer);
+
+            if (!wall.HasHit || ControllerHelper.GetSlopeAngle(wall.Normal, Ctx.planarUp) <= Ctx.StatData.maxSlopeAngle)
+                return horizontalForce;
+
+            return ControllerHelper.CancelIntoSurface(horizontalForce, wall.Normal);
+        }
+
+        /// <summary>
+        /// Probes upward for a ceiling within <see cref="CapsuleFloatData.CeilingClearance"/> of the capsule top.
+        /// </summary>
+        protected GroundProbeResult ProbeCeiling() {
+            var capsule = Ctx.ResizableCapsuleCollider;
+            var distance = capsule.collider.bounds.extents.y + capsule.CapsuleFloatData.CeilingClearance;
+
+            return capsule.ProbeGround(Ctx.planarUp, distance, Ctx.LayerData.GroundLayer);
         }
 
         /// <summary>
         /// The 1/cos factor that lengthens the straight-down ground reach so descents stay grounded.
         /// </summary>
-        protected float SlopeReachFactor() =>
-                ControllerHelper.GetSlopeReachFactor(
-                    ControllerHelper.GetSlopeAngle(Ground.Normal, Ctx.planarUp),
-                    Ctx.StatData.maxSlopeAngle);
+        protected virtual float SlopeReachFactor() =>
+                ControllerHelper.GetSlopeReachFactor(CurrentSlopeAngle(), Ctx.StatData.maxSlopeAngle);
+
+        /// <summary>
+        /// The angle in degrees of the last probed ground surface relative to the controller's up direction.
+        /// </summary>
+        protected float CurrentSlopeAngle() => ControllerHelper.GetSlopeAngle(Ground.Normal, Ctx.planarUp);
+
+        /// <summary>
+        /// True when the last probed surface is steeper than the walkable <see cref="StatData.maxSlopeAngle"/>.
+        /// </summary>
+        protected bool IsSlopeTooSteep() => CurrentSlopeAngle() > Ctx.StatData.maxSlopeAngle;
 
         protected virtual void HandleCharacterRotation() =>
                 ControllerHelper.HandleCharacterRotation(
