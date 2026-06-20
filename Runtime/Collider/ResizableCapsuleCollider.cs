@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
 using UnityEngine;
@@ -12,38 +12,46 @@ namespace Spellbound.Controller {
     public class ResizableCapsuleCollider {
         [field: HideInInspector] public CapsuleCollider collider;
 
-        // This is the "old" capsule that is not being modified. It's essentially the player visual.
+        /// <summary>The unmodified capsule dimensions derived from the player visual.</summary>
         [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
 
-        // This is where step height percentage, raycasts, and force data will live.
-        [field: SerializeField] public SlopeData SlopeData { get; private set; }
+        /// <summary>Step-height percentage, ground-ray distance, and step-reach force.</summary>
+        [field: SerializeField] public SlopeData SlopeData { get; private set; } = new();
 
-        // This is where floating info will live.
-        [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; }
+        /// <summary>Ride height, float-spring, and ground-probe settings.</summary>
+        [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; } = new();
 
         public void Initialize(GameObject go) {
             if (collider != null)
                 return;
 
             collider = go.GetComponent<CapsuleCollider>();
-
-            // This will calculate all the base default data.
             DefaultColliderData.Initialize(go);
         }
 
         /// <summary>
-        /// Recalculates capsule dimensions based on current settings - keep separate from Initialize to avoid rewriting
-        /// objects at runtime.
-        /// Call this when you need to update the collider size.
+        /// Recalculates capsule dimensions and the calculated float distance from the current settings.
         /// </summary>
         public void CalculateCapsuleColliderDimensions() {
-            // The first thing it should do is calculate the center.
             collider.center =
                     new Vector3(0f, DefaultColliderData.Height * (1f + SlopeData.StepHeightPercentage) * 0.5f, 0f);
 
             SetCapsuleColliderRadius(DefaultColliderData.Radius);
             SetCapsuleColliderHeight((DefaultColliderData.Height - collider.center.y) * 2f);
+
+            CapsuleFloatData.SetCalculatedFloatDistance(collider.center.y * collider.transform.lossyScale.y);
         }
+
+        /// <summary>
+        /// Spherecasts beneath the capsule along the given direction and distance using the configured probe radius.
+        /// </summary>
+        public GroundProbeResult ProbeGround(Vector3 direction, float distance, LayerMask layers) =>
+                ControllerHelper.ProbeGround(
+                    collider.bounds.center,
+                    direction,
+                    distance,
+                    CapsuleFloatData.ProbeRadius,
+                    layers);
 
         public void SetCapsuleColliderRadius(float r) => collider.radius = r;
         public void SetCapsuleColliderHeight(float h) => collider.height = h;

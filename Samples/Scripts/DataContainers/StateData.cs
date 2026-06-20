@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
 using UnityEngine;
@@ -7,6 +7,5 @@ namespace Spellbound.Controller.Samples {
     [Serializable]
     public class StateData {
         [field: SerializeField] public bool Grounded { get; set; }
-        [field: SerializeField] public AnimationCurve SlopeSpeedCurve { get; private set; }
     }
 }

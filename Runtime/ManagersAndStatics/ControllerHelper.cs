@@ -181,6 +181,73 @@ namespace Spellbound.Controller {
             rb.AddForce(upForce, forceMode);
         }
 
+        // #####################
+        // GROUND PROBE & FLOAT
+        // #####################
+
+        /// <summary>
+        /// Spherecasts along a direction for ground, reporting the hit distance, surface normal, and contact point.
+        /// </summary>
+        public static GroundProbeResult ProbeGround(
+            Vector3 origin, Vector3 direction, float probeDistance, float probeRadius, LayerMask layers) {
+            if (!Physics.SphereCast(origin, probeRadius, direction, out var hit, probeDistance, layers,
+                    QueryTriggerInteraction.Ignore))
+                return GroundProbeResult.Miss;
+
+            return new GroundProbeResult(true, hit.distance + probeRadius, hit.normal, hit.point);
+        }
+
+        /// <summary>
+        /// Returns the PD spring force that holds a floating body at its ride height along the probe direction.
+        /// </summary>
+        public static Vector3 SolveFloatSpring(
+            Vector3 probeDirection, float hitDistance, float rideHeight, Vector3 currentVelocity, float strength,
+            float damper) {
+            var relativeVelocity = Vector3.Dot(probeDirection, currentVelocity);
+            var offset = hitDistance - rideHeight;
+            var springForce = offset * strength - relativeVelocity * damper;
+
+            return probeDirection * springForce;
+        }
+
+        // ######
+        // SLOPE
+        // ######
+
+        /// <summary>
+        /// Returns the angle in degrees between a surface normal and the up direction.
+        /// </summary>
+        public static float GetSlopeAngle(Vector3 normal, Vector3 up) => Vector3.Angle(normal, up);
+
+        /// <summary>
+        /// Returns the downhill (fall-line) direction along a slope, or zero on flat ground.
+        /// </summary>
+        public static Vector3 GetSlopeDirection(Vector3 normal, Vector3 up) =>
+                Vector3.ProjectOnPlane(-up, normal).normalized;
+
+        /// <summary>
+        /// Returns the horizontal move direction that yields constant speed along a slope surface.
+        /// </summary>
+        public static Vector3 GetSlopeAdjustedDirection(Vector3 horizontalDir, Vector3 normal, Vector3 up) {
+            var magnitude = horizontalDir.magnitude;
+
+            if (magnitude < 1e-4f)
+                return Vector3.zero;
+
+            var alongSlope = Vector3.ProjectOnPlane(horizontalDir, normal).normalized;
+
+            return Vector3.ProjectOnPlane(alongSlope, up) * magnitude;
+        }
+
+        /// <summary>
+        /// Returns the 1/cos(angle) factor (clamped) that grows a straight-down ground reach to track a slope.
+        /// </summary>
+        public static float GetSlopeReachFactor(float slopeAngle, float maxAngle) {
+            var clamped = Mathf.Clamp(slopeAngle, 0f, maxAngle);
+
+            return Mathf.Clamp(1f / Mathf.Cos(clamped * Mathf.Deg2Rad), 1f, 4f);
+        }
+
         // ###########################
         // COLLISION & OVERLAP HELPERS
         // ###########################

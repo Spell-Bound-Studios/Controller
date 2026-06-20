@@ -19,13 +19,6 @@ namespace Spellbound.Controller.Samples {
                 Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
         }
 
-        /// <summary>
-        /// Physics update override.
-        /// </summary>
-        /// <remarks>
-        /// We chose not to run the KeepCapsuleFloating(); here too because when the player is falling, we have no need
-        /// to run calculations for a force correction.
-        /// </remarks>
         protected override void FixedUpdateStateLogic() {
             PerformGroundCheck();
             HandleInput();

@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
 using UnityEngine;
@@ -6,11 +6,34 @@ using UnityEngine;
 namespace Spellbound.Controller {
     [Serializable]
     public class CapsuleFloatData {
-        [Header("Collider Configuration")]
-        [field: SerializeField]
-        public float DesiredFloatDistance { get; private set; }
+        [Header("Ride Height")]
+        [field: SerializeField, Range(0f, 5f)]
+        public float DesiredFloatDistance { get; set; } = 1f;
 
         [field: SerializeField] public float CalculatedFloatDistance { get; private set; }
-        [field: SerializeField] public bool OverrideCalculatedDistance { get; private set; }
+        [field: SerializeField] public bool OverrideCalculatedDistance { get; set; }
+
+        [Header("Float Spring")]
+        [field: SerializeField, Range(0f, 500f)]
+        public float SpringStrength { get; set; } = 200f;
+
+        [field: SerializeField, Range(0f, 100f)]
+        public float SpringDamper { get; set; } = 25f;
+
+        [Header("Ground Probe")]
+        [field: SerializeField, Range(0.01f, 1f)]
+        public float ProbeRadius { get; set; } = 0.25f;
+
+        [field: SerializeField, Range(0f, 1f)]
+        public float GroundedTolerance { get; set; } = 0.3f;
+
+        public float RideHeight =>
+                OverrideCalculatedDistance
+                        ? DesiredFloatDistance
+                        : CalculatedFloatDistance;
+
+        public bool IsWithinGroundedRange(float distance) => distance <= RideHeight + GroundedTolerance;
+
+        public void SetCalculatedFloatDistance(float distance) => CalculatedFloatDistance = distance;
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
 using UnityEngine;
@@ -7,9 +7,10 @@ namespace Spellbound.Controller.Samples {
     [Serializable]
     public class RotationData {
         [Header("Rotation Settings")]
-        [field: SerializeField]
-        public float turnTowardsInputSpeed { get; private set; } = 500f;
+        [field: SerializeField, Range(0f, 1000f)]
+        public float turnTowardsInputSpeed { get; set; } = 500f;
 
-        [field: SerializeField] public float RotationFallOffAngle { get; private set; } = 90f;
+        [field: SerializeField, Range(0f, 180f)]
+        public float RotationFallOffAngle { get; set; } = 90f;
     }
 }

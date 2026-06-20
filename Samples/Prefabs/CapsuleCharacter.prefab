@@ -62,6 +62,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -83,9 +85,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6313341127592897817
 GameObject:
@@ -148,6 +152,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -169,9 +175,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &8702816091274949866
 GameObject:
@@ -243,10 +251,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8702816091274949866}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -281,14 +289,15 @@ MonoBehaviour:
   <CameraData>k__BackingField:
     <upperVerticalLimit>k__BackingField: 89
     <lowerVerticalLimit>k__BackingField: 89
+    <cameraSpeed>k__BackingField: 0.5
+    <smoothCameraRotation>k__BackingField: 0
     <cameraSmoothingFactor>k__BackingField: 25
     <zoomIncrement>k__BackingField: 0.2
-    <cursorLockOnStart>k__BackingField: 1
-    <cameraFollowMouse>k__BackingField: 1
-    <smoothCameraRotation>k__BackingField: 0
     <minZoomDistance>k__BackingField: 1
     <maxZoomDistance>k__BackingField: 8
-  <Rb>k__BackingField: {fileID: 0}
+    <cursorLockOnStart>k__BackingField: 1
+    <cameraFollowMouse>k__BackingField: 1
+  <Rb>k__BackingField: {fileID: 6752135915643218695}
   <ResizableCapsuleCollider>k__BackingField:
     collider: {fileID: 7305499241619662692}
     <DefaultColliderData>k__BackingField:
@@ -304,8 +313,12 @@ MonoBehaviour:
       <StepReachForce>k__BackingField: 25
     <CapsuleFloatData>k__BackingField:
       <DesiredFloatDistance>k__BackingField: 0
-      <CalculatedFloatDistance>k__BackingField: 0
+      <CalculatedFloatDistance>k__BackingField: 1.254
       <OverrideCalculatedDistance>k__BackingField: 0
+      <SpringStrength>k__BackingField: 200
+      <SpringDamper>k__BackingField: 25
+      <ProbeRadius>k__BackingField: 0.25
+      <GroundedTolerance>k__BackingField: 0.3
   <LayerData>k__BackingField:
     <GroundLayer>k__BackingField:
       serializedVersion: 2
@@ -321,27 +334,48 @@ MonoBehaviour:
     <jumpForce>k__BackingField: 7
     <JumpMultiplier>k__BackingField: 1
     <gravity>k__BackingField: -20
-    <slopeSpeedModifier>k__BackingField: 1
+    <maxSlopeAngle>k__BackingField: 50
+    <slopeSpeedCurve>k__BackingField:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: -1
+        value: 0.25
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1.3
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
     <TerminalSlidingSpeed>k__BackingField: 50
     <slideAccelMultiplier>k__BackingField: 2
     <lateralSteerAccel>k__BackingField: 8
     <planarDrag>k__BackingField: 1.2
   <StateData>k__BackingField:
     <Grounded>k__BackingField: 0
-    <SlopeSpeedCurve>k__BackingField:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  locoStates:
-  - {fileID: 11400000, guid: 8bc6e6c30705ef446853c20571975a4c, type: 2}
-  - {fileID: 11400000, guid: 6feeed4ebacccbe46a99a1ff5299e921, type: 2}
-  - {fileID: 11400000, guid: f3d2de77669c7344aa3ef7fbc9b9a5f2, type: 2}
-  - {fileID: 11400000, guid: d77276bd9c4719645a191117ec0dd31c, type: 2}
-  - {fileID: 11400000, guid: 607165397872b4546b1c883577803163, type: 2}
-  actionStates:
-  - {fileID: 11400000, guid: f74e86fc5b8d42c4099c063fc8fe07d4, type: 2}
+  locoConfig: {fileID: 11400000, guid: de16b7b0001ecba468c1acb62564312d, type: 2}
+  actionConfig: {fileID: 11400000, guid: 7752d09e8bd4c51479a37f3db114dbe3, type: 2}
   animator: {fileID: 0}
 --- !u!114 &4235120299701147794
 MonoBehaviour:

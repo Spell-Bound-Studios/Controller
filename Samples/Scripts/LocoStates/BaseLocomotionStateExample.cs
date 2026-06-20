@@ -1,4 +1,4 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using UnityEngine;
 
@@ -6,19 +6,48 @@ namespace Spellbound.Controller.Samples {
     public abstract class BaseLocomotionStateExample : BaseSoState {
         protected new PlayerControllerExample Ctx;
         protected float HSpeedModifier = 1f;
-        protected RaycastHit Hit;
+        protected GroundProbeResult Ground = GroundProbeResult.Miss;
 
-        // All inheritors will have access to this Ctx.
         protected override void OnCtxInitialized() => Ctx = base.Ctx as PlayerControllerExample;
 
         protected virtual void HandleInput() {
-            var inputDesired = GetInputDirectionRelativeToCamera();
+            var inputDir = GetInputDirectionRelativeToCamera();
+            var moveDir = inputDir;
+            var slopeSpeed = 1f;
 
-            var horizontalVelocity =
-                    Ctx.StatData.slopeSpeedModifier * HSpeedModifier * Ctx.StatData.movementSpeed * inputDesired -
-                    ControllerHelper.GetHorizontalVelocity(Ctx.Rb);
+            if (Ctx.StateData.Grounded) {
+                moveDir = ControllerHelper.GetSlopeAdjustedDirection(inputDir, Ground.Normal, Ctx.planarUp);
+                slopeSpeed = ResolveSlopeSpeed(inputDir);
+            }
 
-            Ctx.Rb.AddForce(horizontalVelocity, Ctx.RigidbodyData.horizontalForceMode);
+            var targetVelocity = slopeSpeed * HSpeedModifier * Ctx.StatData.movementSpeed * moveDir;
+            var velocityChange = targetVelocity - ControllerHelper.GetHorizontalVelocity(Ctx.Rb);
+
+            Ctx.Rb.AddForce(velocityChange, Ctx.RigidbodyData.horizontalForceMode);
+        }
+
+        /// <summary>
+        /// Samples the slope-speed curve at the signed, normalized slope along the move direction
+        /// (-1 uphill, +1 downhill).
+        /// </summary>
+        protected virtual float ResolveSlopeSpeed(Vector3 inputDir) {
+            var curve = Ctx.StatData.slopeSpeedCurve;
+
+            if (curve == null || curve.length == 0)
+                return 1f;
+
+            var up = Ctx.planarUp;
+            var angle = ControllerHelper.GetSlopeAngle(Ground.Normal, up);
+            var maxAngle = Ctx.StatData.maxSlopeAngle;
+
+            if (angle < 0.5f || maxAngle < 0.01f || inputDir.sqrMagnitude < 1e-4f)
+                return curve.Evaluate(0f);
+
+            var alongSlope = Vector3.ProjectOnPlane(inputDir, Ground.Normal).normalized;
+            var alignment = Vector3.Dot(alongSlope, ControllerHelper.GetSlopeDirection(Ground.Normal, up));
+            var signedSlope = Mathf.Clamp(angle / maxAngle * alignment, -1f, 1f);
+
+            return curve.Evaluate(signedSlope);
         }
 
         protected virtual Vector3 GetInputDirectionRelativeToCamera() =>
@@ -29,49 +58,48 @@ namespace Spellbound.Controller.Samples {
                 );
 
         /// <summary>
-        /// This method checks for ground and controls the Ctx.StateData.Grounded bool by flipping it if it hits the
-        /// ground with its raycast. It also provides a lift force to enable stepping up or down.
-        /// <remarks>
-        /// This is just an example. But we wanted to show how you could put this in a lower level of abstraction, or
-        /// we think that this is potentially something that all loco states could use.
-        /// </remarks>
+        /// Probes for ground beneath the capsule with a slope-scaled reach, caches the hit, and publishes
+        /// <see cref="StateData.Grounded"/>.
         /// </summary>
         protected virtual bool PerformGroundCheck() {
-            var rayOrigin = Ctx.ResizableCapsuleCollider.collider.bounds.center;
-            var rayDistance = Ctx.ResizableCapsuleCollider.SlopeData.RayDistance;
-            var upDirection = Ctx.planarUp;
+            var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
+            var reach = floatData.RideHeight * SlopeReachFactor() + floatData.GroundedTolerance;
 
-            if (!Physics.Raycast(
-                    rayOrigin,
-                    -upDirection,
-                    out Hit,
-                    rayDistance,
-                    Ctx.LayerData.GroundLayer,
-                    QueryTriggerInteraction.Ignore)) {
-                Ctx.StateData.Grounded = false;
+            Ground = Ctx.ResizableCapsuleCollider.ProbeGround(
+                -Ctx.planarUp, reach + floatData.ProbeRadius, Ctx.LayerData.GroundLayer);
 
-                return Ctx.StateData.Grounded;
-            }
-
-            Ctx.StateData.Grounded = true;
+            Ctx.StateData.Grounded = Ground.HasHit && Ground.Distance <= reach;
 
             return Ctx.StateData.Grounded;
         }
 
+        /// <summary>
+        /// Applies the float-spring force that holds the capsule at its slope-scaled ride height.
+        /// </summary>
         protected virtual void KeepCapsuleFloating() {
-            var distanceToGround =
-                    Ctx.ResizableCapsuleCollider.collider.center.y * Ctx.gameObject.transform.localScale.y -
-                    Hit.distance;
-
-            if (Mathf.Approximately(distanceToGround, 0f))
+            if (!Ctx.StateData.Grounded)
                 return;
 
-            var amountToLift =
-                    distanceToGround * Ctx.ResizableCapsuleCollider.SlopeData.StepReachForce - Ctx.Rb.linearVelocity.y;
+            var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
 
-            if (!Mathf.Approximately(amountToLift, 0f))
-                Ctx.Rb.AddForce(Vector3.up * amountToLift, ForceMode.VelocityChange);
+            var springForce = ControllerHelper.SolveFloatSpring(
+                -Ctx.planarUp,
+                Ground.Distance,
+                floatData.RideHeight * SlopeReachFactor(),
+                Ctx.Rb.linearVelocity,
+                floatData.SpringStrength,
+                floatData.SpringDamper);
+
+            Ctx.Rb.AddForce(springForce, ForceMode.Acceleration);
         }
+
+        /// <summary>
+        /// The 1/cos factor that lengthens the straight-down ground reach so descents stay grounded.
+        /// </summary>
+        protected float SlopeReachFactor() =>
+                ControllerHelper.GetSlopeReachFactor(
+                    ControllerHelper.GetSlopeAngle(Ground.Normal, Ctx.planarUp),
+                    Ctx.StatData.maxSlopeAngle);
 
         protected virtual void HandleCharacterRotation() =>
                 ControllerHelper.HandleCharacterRotation(

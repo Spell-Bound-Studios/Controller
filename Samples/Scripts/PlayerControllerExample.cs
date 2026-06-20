@@ -302,15 +302,42 @@ namespace Spellbound.Controller.Samples {
             }
 
             debugHud.Gizmo(() => {
-                var origin = ResizableCapsuleCollider.collider.bounds.center;
-                var dir = -planarUp;
+                var capsule = ResizableCapsuleCollider;
 
-                var rayLen = ResizableCapsuleCollider.SlopeData.RayDistance;
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(origin, origin + dir * rayLen);
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(origin, 0.06f);
-                Gizmos.DrawSphere(origin + dir * rayLen, 0.06f);
+                if (capsule.collider == null)
+                    return;
+
+                var floatData = capsule.CapsuleFloatData;
+                var up = planarUp.sqrMagnitude > 0.5f
+                        ? planarUp
+                        : transform.up;
+                var origin = capsule.collider.bounds.center;
+                var radius = floatData.ProbeRadius;
+
+                var maxReach = floatData.RideHeight *
+                               ControllerHelper.GetSlopeReachFactor(StatData.maxSlopeAngle, StatData.maxSlopeAngle) +
+                               floatData.GroundedTolerance + radius;
+                var probe = capsule.ProbeGround(-up, maxReach, LayerData.GroundLayer);
+
+                var angle = probe.HasHit
+                        ? ControllerHelper.GetSlopeAngle(probe.Normal, up)
+                        : 0f;
+                var reach = floatData.RideHeight * ControllerHelper.GetSlopeReachFactor(angle, StatData.maxSlopeAngle) +
+                            floatData.GroundedTolerance;
+
+                Gizmos.color = StateData.Grounded
+                        ? Color.green
+                        : Color.red;
+                Gizmos.DrawWireSphere(origin, radius);
+                Gizmos.DrawLine(origin, origin - up * reach);
+                Gizmos.DrawWireSphere(origin - up * (reach - radius), radius);
+
+                if (!probe.HasHit)
+                    return;
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(origin - up * (probe.Distance - radius), radius);
+                Gizmos.DrawLine(probe.Point, probe.Point + probe.Normal * 0.5f);
             });
         }
     }
