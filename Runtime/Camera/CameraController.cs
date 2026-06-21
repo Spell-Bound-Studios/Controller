@@ -37,7 +37,9 @@ namespace Spellbound.Controller {
             _pitch = _smoothedPitch = euler.x;
         }
 
-        /// <summary>The live camera's forward — the basis for camera-relative movement.</summary>
+        /// <summary>
+        /// The live camera's forward — the basis for camera-relative movement.
+        /// </summary>
         public Vector3 ReferenceForward {
             get {
                 var cam = _rig?.CurrentCameraTransform;
@@ -50,7 +52,9 @@ namespace Spellbound.Controller {
             }
         }
 
-        /// <summary>World-space offset added to the follow target when positioning the pivot.</summary>
+        /// <summary>
+        /// World-space offset added to the follow target when positioning the pivot.
+        /// </summary>
         public Vector3 Offset {
             get => _offset;
             set => _offset = value;
@@ -94,7 +98,9 @@ namespace Spellbound.Controller {
             _pivot.localRotation = Quaternion.Euler(_smoothedPitch, _smoothedYaw, 0f);
         }
 
-        /// <summary>Eases the camera yaw to line up behind the follow target's facing, at <paramref name="degreesPerSecond"/>.</summary>
+        /// <summary>
+        /// Eases the camera yaw to line up behind the follow target's facing, at <paramref name="degreesPerSecond"/>.
+        /// </summary>
         public void EaseBehind(float degreesPerSecond) {
             if (_followTarget == null)
                 return;
@@ -102,7 +108,9 @@ namespace Spellbound.Controller {
             _yaw = Mathf.MoveTowardsAngle(_yaw, _followTarget.eulerAngles.y, degreesPerSecond * Time.deltaTime);
         }
 
-        /// <summary>Adjusts the live camera's zoom by <paramref name="delta"/>, clamped to the current profile's range.</summary>
+        /// <summary>
+        /// Adjusts the live camera's zoom by <paramref name="delta"/>, clamped to the current profile's range.
+        /// </summary>
         public void Zoom(float delta) {
             if (_rig == null || float.IsNaN(_rig.Zoom))
                 return;
@@ -114,7 +122,9 @@ namespace Spellbound.Controller {
             _rig.Zoom = Mathf.Clamp(_rig.Zoom + delta, range.x, range.y);
         }
 
-        /// <summary>Switches the live camera to <paramref name="profile"/>; the rig blends to it.</summary>
+        /// <summary>
+        /// Switches the live camera to <paramref name="profile"/>; the rig blends to it.
+        /// </summary>
         public void SwitchCamera(CameraProfile profile) => _rig?.Switch(profile);
     }
 }

@@ -22,13 +22,13 @@ namespace Spellbound.Controller.Samples {
 
         protected override void FixedUpdateStateLogic() {
             if (!PerformGroundCheck()) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Falling);
 
                 return;
             }
 
             if (HasRecoveredToWalkable()) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Grounded);
 
                 return;
             }
@@ -45,7 +45,7 @@ namespace Spellbound.Controller.Samples {
         /// planar speed with drag and a hard terminal cap.
         /// </summary>
         protected virtual void HandleSlide() {
-            var up = Ctx.planarUp;
+            var up = Ctx.PlanarUp;
             var normal = Ground.Normal;
             var slopeDir = ControllerHelper.GetSlopeDirection(normal, up);
 

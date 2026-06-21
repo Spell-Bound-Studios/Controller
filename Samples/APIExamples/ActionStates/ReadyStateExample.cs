@@ -13,7 +13,7 @@ namespace Spellbound.Controller.Samples {
 
         protected override void UpdateStateLogic() {
             if (Ctx.ExampleInput.IsAiming)
-                Ctx.actionStateMachine.ChangeState(ActionStateTypes.Aiming);
+                Ctx.ActionStateMachine.ChangeState(ActionStateTypes.Aiming);
         }
 
         protected override void FixedUpdateStateLogic() { }

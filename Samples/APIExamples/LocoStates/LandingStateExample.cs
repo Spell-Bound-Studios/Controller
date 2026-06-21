@@ -20,7 +20,7 @@ namespace Spellbound.Controller.Samples {
 
         protected override void UpdateStateLogic() {
             if (_landRoutine == null)
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Grounded);
         }
 
         protected override void FixedUpdateStateLogic() {

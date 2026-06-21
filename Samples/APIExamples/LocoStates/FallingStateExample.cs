@@ -21,7 +21,7 @@ namespace Spellbound.Controller.Samples {
 
         protected override void FixedUpdateStateLogic() {
             if (PerformGroundCheck()) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Grounded);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Grounded);
 
                 return;
             }

@@ -29,3 +29,5 @@ MonoBehaviour:
     enabled: 1
   - key: Sliding
     enabled: 1
+  - key: Aiming
+    enabled: 1

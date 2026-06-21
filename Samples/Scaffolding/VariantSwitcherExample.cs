@@ -48,7 +48,7 @@ namespace Spellbound.Controller.Samples {
                 _populated = false;
             }
 
-            if (controller != null && controller.locoStateMachine != null) {
+            if (controller != null && controller.LocoStateMachine != null) {
                 if (!_populated)
                     PopulateVariants();
 
@@ -102,7 +102,7 @@ namespace Spellbound.Controller.Samples {
             _buttons.Clear();
 
             foreach (LocoStateTypes slot in Enum.GetValues(typeof(LocoStateTypes))) {
-                var current = controller.locoStateMachine.GetCurrentVariant(slot);
+                var current = controller.LocoStateMachine.GetCurrentVariant(slot);
 
                 if (current == null)
                     continue;
@@ -131,13 +131,13 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void ApplyVariant(LocoStateTypes slot, BaseSoState variant) {
-            controller.locoStateMachine.ApplyVariant(slot, variant);
+            controller.LocoStateMachine.ApplyVariant(slot, variant);
             RefreshHighlights();
         }
 
         private void RefreshHighlights() {
             foreach (var (button, slot, type) in _buttons) {
-                var current = controller.locoStateMachine.GetCurrentVariant(slot);
+                var current = controller.LocoStateMachine.GetCurrentVariant(slot);
 
                 button.style.backgroundColor = current != null && current.GetType() == type
                         ? new Color(0.18f, 0.5f, 0.9f)
@@ -149,7 +149,7 @@ namespace Spellbound.Controller.Samples {
             if (_status == null)
                 return;
 
-            if (controller == null || controller.locoStateMachine == null)
+            if (controller == null || controller.LocoStateMachine == null)
                 _status.text = "Waiting for a spawned character…";
             else if (_buttons.Count == 0)
                 _status.text = "No states found under Resources/States.";

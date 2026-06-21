@@ -10,10 +10,10 @@ namespace Spellbound.Controller.Samples {
             // Reference transform right and forward projected on this transforms up normal plane to get a proper direction.
             var direction =
                     Vector3.ProjectOnPlane(
-                        Ctx.referenceTransform.right, Ctx.planarUp).normalized *
+                        Ctx.ReferenceTransform.right, Ctx.PlanarUp).normalized *
                     Ctx.ExampleInput.Direction.y +
                     Vector3.ProjectOnPlane(
-                        Ctx.referenceTransform.forward, Ctx.planarUp).normalized *
+                        Ctx.ReferenceTransform.forward, Ctx.PlanarUp).normalized *
                     Ctx.ExampleInput.Direction.x;
 
             return direction.magnitude > 1f
@@ -23,6 +23,6 @@ namespace Spellbound.Controller.Samples {
 
         // Swap the slot back to its default (the base ground state).
         protected override void HandleInteractPressed() =>
-                Ctx.locoStateMachine.RestoreDefault(LocoStateTypes.Grounded);
+                Ctx.LocoStateMachine.RestoreDefault(LocoStateTypes.Grounded);
     }
 }

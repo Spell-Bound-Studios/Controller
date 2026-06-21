@@ -29,7 +29,7 @@ namespace Spellbound.Controller.Samples {
 
         protected override void UpdateStateLogic() {
             if (!Ctx.ExampleInput.IsAiming)
-                Ctx.actionStateMachine.ChangeState(ActionStateTypes.Ready);
+                Ctx.ActionStateMachine.ChangeState(ActionStateTypes.Ready);
         }
 
         protected override void FixedUpdateStateLogic() { }

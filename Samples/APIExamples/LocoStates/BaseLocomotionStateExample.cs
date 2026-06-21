@@ -16,7 +16,7 @@ namespace Spellbound.Controller.Samples {
             var slopeSpeed = 1f;
 
             if (Ground.HasHit) {
-                moveDir = ControllerHelper.GetSlopeAdjustedDirection(inputDir, Ground.Normal, Ctx.planarUp);
+                moveDir = ControllerHelper.GetSlopeAdjustedDirection(inputDir, Ground.Normal, Ctx.PlanarUp);
                 slopeSpeed = ResolveSlopeSpeed(inputDir);
             }
 
@@ -36,7 +36,7 @@ namespace Spellbound.Controller.Samples {
             if (curve == null || curve.length == 0)
                 return 1f;
 
-            var up = Ctx.planarUp;
+            var up = Ctx.PlanarUp;
             var angle = ControllerHelper.GetSlopeAngle(Ground.Normal, up);
             var maxAngle = Ctx.StatData.maxSlopeAngle;
 
@@ -53,8 +53,8 @@ namespace Spellbound.Controller.Samples {
         protected virtual Vector3 GetInputDirectionRelativeToCamera() =>
                 ControllerHelper.GetInputDirectionRelativeToCamera(
                     Ctx.ExampleInput.Direction,
-                    Ctx.referenceTransform,
-                    Ctx.planarUp
+                    Ctx.ReferenceTransform,
+                    Ctx.PlanarUp
                 );
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace Spellbound.Controller.Samples {
         protected virtual bool PerformGroundCheck() {
             var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
             var reach = floatData.RideHeight * SlopeReachFactor() + floatData.GroundedTolerance +
-                        ControllerHelper.GetHorizontalSpeed(Ctx.Rb, Ctx.planarUp) * floatData.GroundProbeSpeedScale;
+                        ControllerHelper.GetHorizontalSpeed(Ctx.Rb, Ctx.PlanarUp) * floatData.GroundProbeSpeedScale;
 
             Ground = Ctx.ResizableCapsuleCollider.ProbeGround(
-                -Ctx.planarUp, reach + floatData.ProbeRadius, Ctx.LayerData.GroundLayer);
+                -Ctx.PlanarUp, reach + floatData.ProbeRadius, Ctx.LayerData.GroundLayer);
 
             return Ground.HasHit && Ground.Distance <= reach;
         }
@@ -82,7 +82,7 @@ namespace Spellbound.Controller.Samples {
             var floatData = Ctx.ResizableCapsuleCollider.CapsuleFloatData;
 
             var springForce = ControllerHelper.SolveFloatSpring(
-                -Ctx.planarUp,
+                -Ctx.PlanarUp,
                 Ground.Distance,
                 floatData.RideHeight * SlopeReachFactor(),
                 Ctx.Rb.linearVelocity,
@@ -113,7 +113,7 @@ namespace Spellbound.Controller.Samples {
                 Ctx.ResizableCapsuleCollider.CapsuleFloatData.WallProbeDistance,
                 Ctx.LayerData.GroundLayer);
 
-            if (!wall.HasHit || ControllerHelper.GetSlopeAngle(wall.Normal, Ctx.planarUp) <= Ctx.StatData.maxSlopeAngle)
+            if (!wall.HasHit || ControllerHelper.GetSlopeAngle(wall.Normal, Ctx.PlanarUp) <= Ctx.StatData.maxSlopeAngle)
                 return horizontalForce;
 
             return ControllerHelper.CancelIntoSurface(horizontalForce, wall.Normal);
@@ -126,7 +126,7 @@ namespace Spellbound.Controller.Samples {
             var capsule = Ctx.ResizableCapsuleCollider;
             var distance = capsule.collider.bounds.extents.y + capsule.CapsuleFloatData.CeilingClearance;
 
-            return capsule.ProbeGround(Ctx.planarUp, distance, Ctx.LayerData.GroundLayer);
+            return capsule.ProbeGround(Ctx.PlanarUp, distance, Ctx.LayerData.GroundLayer);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Spellbound.Controller.Samples {
         /// <summary>
         /// The angle in degrees of the last probed ground surface relative to the controller's up direction.
         /// </summary>
-        protected float CurrentSlopeAngle() => ControllerHelper.GetSlopeAngle(Ground.Normal, Ctx.planarUp);
+        protected float CurrentSlopeAngle() => ControllerHelper.GetSlopeAngle(Ground.Normal, Ctx.PlanarUp);
 
         /// <summary>
         /// True when the last probed surface is steeper than the walkable <see cref="StatData.maxSlopeAngle"/>.
@@ -148,7 +148,7 @@ namespace Spellbound.Controller.Samples {
         protected virtual void HandleCharacterRotation() =>
                 ControllerHelper.HandleCharacterRotation(
                     Ctx.Rb,
-                    Ctx.planarUp,
+                    Ctx.PlanarUp,
                     Ctx.RotationData.turnTowardsInputSpeed,
                     Ctx.RotationData.RotationFallOffAngle,
                     Time.fixedDeltaTime);

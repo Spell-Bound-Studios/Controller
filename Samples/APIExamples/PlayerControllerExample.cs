@@ -63,8 +63,8 @@ namespace Spellbound.Controller.Samples {
         [field: SerializeField]
         public StatData StatData { get; private set; }
 
-        public StateMachine<PlayerControllerExample, LocoStateTypes> locoStateMachine { get; private set; }
-        public StateMachine<PlayerControllerExample, ActionStateTypes> actionStateMachine { get; private set; }
+        public StateMachine<PlayerControllerExample, LocoStateTypes> LocoStateMachine { get; private set; }
+        public StateMachine<PlayerControllerExample, ActionStateTypes> ActionStateMachine { get; private set; }
 
         [Header("State Configs")]
         [SerializeField] private LocoStateConfigExample locoConfig;
@@ -74,21 +74,22 @@ namespace Spellbound.Controller.Samples {
         [Header("Animator"), SerializeField] private Animator animator;
 
         // What direction is up from the player?
-        public Vector3 planarUp { get; private set; }
+        public Vector3 PlanarUp { get; private set; }
 
-        /// <summary>The live camera's transform — the basis states use for camera-relative movement.</summary>
-        public Transform referenceTransform => _cameraRig != null
+        /// <summary>
+        /// The live camera's transform — the basis states use for camera-relative movement.
+        /// </summary>
+        public Transform ReferenceTransform => _cameraRig != null
                 ? _cameraRig.CurrentCameraTransform
                 : null;
 
         private void Awake() {
             _tr = transform;
-            planarUp = _tr.up;
+            PlanarUp = _tr.up;
 
             if (ExampleInput == null) {
                 if (!SingletonManager.TryGetSingletonInstance<ExampleInputManager>(out var im)) {
                     Log.Error("ExampleInput is missing in the scene most likely.");
-
                     return;
                 }
 
@@ -110,16 +111,15 @@ namespace Spellbound.Controller.Samples {
         }
 
         public void Update() {
-            locoStateMachine.UpdateStateMachine();
-            actionStateMachine.UpdateStateMachine();
+            LocoStateMachine.UpdateStateMachine();
+            ActionStateMachine.UpdateStateMachine();
         }
 
         public void FixedUpdate() {
-            locoStateMachine.FixedUpdateStateMachine();
-            actionStateMachine.FixedUpdateStateMachine();
+            LocoStateMachine.FixedUpdateStateMachine();
+            ActionStateMachine.FixedUpdateStateMachine();
         }
-
-        // Camera follows and looks after movement has resolved this frame.
+        
         private void LateUpdate() {
             if (_camera == null)
                 return;
@@ -131,8 +131,8 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void OnDestroy() {
-            locoStateMachine?.Dispose();
-            actionStateMachine?.Dispose();
+            LocoStateMachine?.Dispose();
+            ActionStateMachine?.Dispose();
 
             if (ExampleInput != null)
                 ExampleInput.OnMouseWheelInput -= OnZoom;
@@ -157,7 +157,6 @@ namespace Spellbound.Controller.Samples {
 
             if (_cameraRig == null) {
                 Log.Error("CameraRigManager is missing from the scene.");
-
                 return;
             }
 
@@ -187,11 +186,11 @@ namespace Spellbound.Controller.Samples {
         public void SetCameraFollowMouse(bool follow) => CameraData.FollowMouse = follow;
 
         private void ConfigureStateMachines() {
-            locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
-            locoStateMachine.Configure(locoConfig);
+            LocoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);
+            LocoStateMachine.Configure(locoConfig);
 
-            actionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
-            actionStateMachine.Configure(actionConfig);
+            ActionStateMachine = new StateMachine<PlayerControllerExample, ActionStateTypes>(this);
+            ActionStateMachine.Configure(actionConfig);
         }
 
         /// <summary>
@@ -203,7 +202,7 @@ namespace Spellbound.Controller.Samples {
         public void RegisterDebugInfo(ControllerDebugging debugHud) {
             // Show which ScriptableObject state is currently running
             debugHud.Field("Current Loco State", () => {
-                var currentStateVariant = locoStateMachine.GetCurrentRunningState();
+                var currentStateVariant = LocoStateMachine.GetCurrentRunningState();
 
                 return currentStateVariant != null
                         ? currentStateVariant.name
@@ -213,7 +212,7 @@ namespace Spellbound.Controller.Samples {
             // Show each driver (enum value) and what variant it's pointing to
             foreach (LocoStateTypes stateType in Enum.GetValues(typeof(LocoStateTypes))) {
                 debugHud.Field($"{stateType}", () => {
-                    var currentVariant = locoStateMachine.GetCurrentVariant(stateType);
+                    var currentVariant = LocoStateMachine.GetCurrentVariant(stateType);
 
                     return currentVariant != null
                             ? currentVariant.name
@@ -223,7 +222,7 @@ namespace Spellbound.Controller.Samples {
 
             // Repeat for action state machine.
             debugHud.Field("Current Action State", () => {
-                var currentStateVariant = actionStateMachine.GetCurrentRunningState();
+                var currentStateVariant = ActionStateMachine.GetCurrentRunningState();
 
                 return currentStateVariant != null
                         ? currentStateVariant.name
@@ -232,7 +231,7 @@ namespace Spellbound.Controller.Samples {
 
             foreach (ActionStateTypes stateType in Enum.GetValues(typeof(ActionStateTypes))) {
                 debugHud.Field($"{stateType}", () => {
-                    var currentVariant = actionStateMachine.GetCurrentVariant(stateType);
+                    var currentVariant = ActionStateMachine.GetCurrentVariant(stateType);
 
                     return currentVariant != null
                             ? currentVariant.name
@@ -247,8 +246,8 @@ namespace Spellbound.Controller.Samples {
                     return;
 
                 var floatData = capsule.CapsuleFloatData;
-                var up = planarUp.sqrMagnitude > 0.5f
-                        ? planarUp
+                var up = PlanarUp.sqrMagnitude > 0.5f
+                        ? PlanarUp
                         : transform.up;
                 var origin = capsule.collider.bounds.center;
                 var radius = floatData.ProbeRadius;

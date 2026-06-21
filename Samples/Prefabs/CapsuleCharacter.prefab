@@ -284,19 +284,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <ExampleInput>k__BackingField: {fileID: 0}
-  <referenceTransform>k__BackingField: {fileID: 0}
-  cameraPivot: {fileID: 0}
   <CameraData>k__BackingField:
-    <upperVerticalLimit>k__BackingField: 89
-    <lowerVerticalLimit>k__BackingField: 89
-    <cameraSpeed>k__BackingField: 0.5
-    <smoothCameraRotation>k__BackingField: 0
-    <cameraSmoothingFactor>k__BackingField: 25
-    <zoomIncrement>k__BackingField: 0.2
-    <minZoomDistance>k__BackingField: 1
-    <maxZoomDistance>k__BackingField: 8
-    <cursorLockOnStart>k__BackingField: 1
-    <cameraFollowMouse>k__BackingField: 1
+    <SensitivityX>k__BackingField: 0.5
+    <SensitivityY>k__BackingField: 0.5
+    <InvertY>k__BackingField: 0
+    <SmoothLook>k__BackingField: 0
+    <SmoothingFactor>k__BackingField: 25
+    <MinPitch>k__BackingField: -89
+    <MaxPitch>k__BackingField: 89
+    <ZoomStep>k__BackingField: 0.2
+    <LockCursorOnStart>k__BackingField: 1
+    <FollowMouse>k__BackingField: 1
+  cameraOffset: {x: 0, y: 1.5, z: 0}
   <Rb>k__BackingField: {fileID: 6752135915643218695}
   <ResizableCapsuleCollider>k__BackingField:
     collider: {fileID: 7305499241619662692}
@@ -319,6 +318,9 @@ MonoBehaviour:
       <SpringDamper>k__BackingField: 25
       <ProbeRadius>k__BackingField: 0.25
       <GroundedTolerance>k__BackingField: 0.3
+      <GroundProbeSpeedScale>k__BackingField: 0.1
+      <WallProbeDistance>k__BackingField: 0.35
+      <CeilingClearance>k__BackingField: 0.15
   <LayerData>k__BackingField:
     <GroundLayer>k__BackingField:
       serializedVersion: 2
@@ -372,8 +374,6 @@ MonoBehaviour:
     <slideAccelMultiplier>k__BackingField: 2
     <lateralSteerAccel>k__BackingField: 8
     <planarDrag>k__BackingField: 1.2
-  <StateData>k__BackingField:
-    <Grounded>k__BackingField: 0
   locoConfig: {fileID: 11400000, guid: de16b7b0001ecba468c1acb62564312d, type: 2}
   actionConfig: {fileID: 11400000, guid: 7752d09e8bd4c51479a37f3db114dbe3, type: 2}
   animator: {fileID: 0}

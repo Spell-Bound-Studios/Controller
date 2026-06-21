@@ -16,13 +16,13 @@ namespace Spellbound.Controller.Samples {
 
         protected override void FixedUpdateStateLogic() {
             if (!PerformGroundCheck()) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Falling);
 
                 return;
             }
 
             if (IsSlopeTooSteep()) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Sliding);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Sliding);
 
                 return;
             }
@@ -39,8 +39,8 @@ namespace Spellbound.Controller.Samples {
 
         // Swap this slot to the drunken variant (e.g. as if a potion were consumed).
         protected virtual void HandleInteractPressed() =>
-                Ctx.locoStateMachine.ApplyVariant(LocoStateTypes.Grounded, drunkenVariant);
+                Ctx.LocoStateMachine.ApplyVariant(LocoStateTypes.Grounded, drunkenVariant);
 
-        private void HandleJumpPressed() => Ctx.locoStateMachine.ChangeState(LocoStateTypes.Jumping);
+        private void HandleJumpPressed() => Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Jumping);
     }
 }

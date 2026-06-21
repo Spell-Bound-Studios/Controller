@@ -31,13 +31,13 @@ namespace Spellbound.Controller.Samples {
             var grounded = PerformGroundCheck();
 
             if (_jumpMinRoutine == null && grounded) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Landing);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Landing);
 
                 return;
             }
 
             if (_jumpMaxRoutine == null) {
-                Ctx.locoStateMachine.ChangeState(LocoStateTypes.Falling);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Falling);
 
                 return;
             }
@@ -56,7 +56,7 @@ namespace Spellbound.Controller.Samples {
         /// </summary>
         protected virtual void Jump() =>
                 Ctx.Rb.AddForce(
-                    Ctx.StatData.jumpForce * Ctx.StatData.JumpMultiplier * DefaultJumpMultiplier * Ctx.planarUp,
+                    Ctx.StatData.jumpForce * Ctx.StatData.JumpMultiplier * DefaultJumpMultiplier * Ctx.PlanarUp,
                     Ctx.RigidbodyData.verticalForceMode);
 
         /// <summary>
