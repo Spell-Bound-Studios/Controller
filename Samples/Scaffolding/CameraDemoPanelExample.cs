@@ -4,18 +4,16 @@ using System;
 using System.Collections.Generic;
 using Spellbound.Core.Logging;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Cursor = UnityEngine.Cursor;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
     /// Runtime UIToolkit panel showcasing the camera API: switch the live camera by <see cref="CameraProfile"/>
     /// (discovered from <see cref="CameraProfileRegistry"/>) and drive the live <see cref="ICameraSettings"/>
-    /// (sensitivity, invert, smoothing, pitch) with sliders/toggles. Demo scaffolding.
-    ///
-    /// Setup: put this on a GameObject; it adds a <see cref="UIDocument"/>. Assign a Panel Settings and LEAVE the
-    /// Source Asset empty — the panel is built in code. Press the toggle key to free the cursor so you can click.
+    /// (sensitivity, invert, smoothing, pitch) with sliders/toggles. Manages only its own sub-panel (never clears
+    /// the root), so it coexists with the other demo panels on one shared UIDocument; add a
+    /// <see cref="DemoCursorToggleExample"/> to free the cursor for clicks. Assign a Panel Settings, leave the
+    /// Source Asset empty. Demo scaffolding.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class CameraDemoPanelExample : MonoBehaviour {
@@ -23,17 +21,12 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Controller whose CameraData (ICameraSettings) the sliders drive. Auto-found if left empty.")]
         private PlayerControllerExample controller;
 
-        [SerializeField,
-         Tooltip("Key that frees the cursor and pauses look so you can click the panel; press again to resume.")]
-        private Key toggleCursorKey = Key.Tab;
-
         private readonly List<(Button button, CameraProfile profile)> _camButtons = new();
         private UIDocument _document;
         private VisualElement _panel;
         private VisualElement _content;
         private Label _status;
         private bool _populated;
-        private bool _cursorFree;
 
         private void Awake() {
             _document = GetComponent<UIDocument>();
@@ -49,9 +42,6 @@ namespace Spellbound.Controller.Samples {
 
             if (_panel == null)
                 return;
-
-            if (Keyboard.current != null && Keyboard.current[toggleCursorKey].wasPressedThisFrame)
-                ToggleCursor();
 
             if (controller == null) {
                 controller = FindAnyObjectByType<PlayerControllerExample>();
@@ -84,9 +74,6 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void BuildChrome() {
-            var root = _document.rootVisualElement;
-            root.Clear();
-
             _panel = new VisualElement {
                 style = {
                     position = Position.Absolute, top = 10f, left = 10f, width = 260f,
@@ -94,7 +81,7 @@ namespace Spellbound.Controller.Samples {
                     backgroundColor = new Color(0f, 0f, 0f, 0.8f)
                 }
             };
-            root.Add(_panel);
+            _document.rootVisualElement.Add(_panel);
 
             _panel.Add(MakeLabel("Camera API", 14f, Color.white, true));
             _status = MakeLabel(string.Empty, 10f, new Color(0.85f, 0.85f, 0.55f), false);
@@ -154,27 +141,13 @@ namespace Spellbound.Controller.Samples {
                         : new Color(0.22f, 0.22f, 0.26f);
         }
 
-        private void ToggleCursor() {
-            _cursorFree = !_cursorFree;
-            Cursor.lockState = _cursorFree
-                    ? CursorLockMode.None
-                    : CursorLockMode.Locked;
-            Cursor.visible = _cursorFree;
-
-            if (controller != null)
-                controller.SetCameraFollowMouse(!_cursorFree);
-        }
-
         private void UpdateStatus() {
             if (_status == null)
                 return;
 
-            if (controller == null || CameraRigManager.Instance == null)
-                _status.text = "Waiting for a spawned character…";
-            else
-                _status.text = _cursorFree
-                        ? $"Cursor free — adjust + click.  [{toggleCursorKey}] resumes."
-                        : $"[{toggleCursorKey}] frees cursor to click.";
+            _status.text = controller == null || CameraRigManager.Instance == null
+                    ? "Waiting for a spawned character…"
+                    : string.Empty;
         }
 
         private static Label MakeLabel(string text, float size, Color color, bool header) =>

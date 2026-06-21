@@ -4,20 +4,15 @@ using System;
 using System.Collections.Generic;
 using Spellbound.Core.Logging;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Cursor = UnityEngine.Cursor;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
     /// Runtime UIToolkit panel that lists each locomotion slot and the state variants registered for it (found in
     /// <see cref="StateRegistry"/>) and applies a chosen one to the live machine via ApplyVariant, so you can swap
-    /// states and feel them without leaving play mode.
-    ///
-    /// Setup: put this on a GameObject; it adds a <see cref="UIDocument"/>. Assign a Panel Settings asset and
-    /// LEAVE the Source Asset empty — the panel is built entirely in code. The character is spawned at runtime, so
-    /// the panel waits for it and auto-binds. Because spawning locks the cursor for mouse-look, press the toggle
-    /// key to free the cursor (and pause look) so you can click. Demo scaffolding, not part of the controller.
+    /// states and feel them without leaving play mode. Manages only its own sub-panel (never clears the root), so it
+    /// coexists with the other demo panels on one shared UIDocument; add a <see cref="DemoCursorToggleExample"/> to
+    /// free the cursor for clicks. Assign a Panel Settings, leave the Source Asset empty. Demo scaffolding.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class VariantSwitcherExample : MonoBehaviour {
@@ -26,17 +21,12 @@ namespace Spellbound.Controller.Samples {
                  "instance) when left empty.")]
         private PlayerControllerExample controller;
 
-        [SerializeField,
-         Tooltip("Key that frees the cursor and pauses mouse-look so you can click the panel; press again to resume.")]
-        private Key toggleCursorKey = Key.Tab;
-
         private readonly List<(Button button, LocoStateTypes slot, Type type)> _buttons = new();
         private UIDocument _document;
         private VisualElement _slotContainer;
         private Label _status;
         private VisualElement _panel;
         private bool _populated;
-        private bool _cursorFree;
 
         private void Awake() {
             _document = GetComponent<UIDocument>();
@@ -52,9 +42,6 @@ namespace Spellbound.Controller.Samples {
 
             if (_panel == null)
                 return;
-
-            if (Keyboard.current != null && Keyboard.current[toggleCursorKey].wasPressedThisFrame)
-                ToggleCursor();
 
             if (controller == null) {
                 controller = FindAnyObjectByType<PlayerControllerExample>();
@@ -76,8 +63,8 @@ namespace Spellbound.Controller.Samples {
             UpdateStatus();
         }
 
-        // UIDocument can clear or recreate its rootVisualElement after startup (which silently drops a code-built
-        // panel — the "flash then gone" symptom); rebuild whenever ours is no longer attached to the live root.
+        // UIDocument can recreate its rootVisualElement after startup; rebuild our own sub-panel when it detaches.
+        // We never clear the root, so other demo panels sharing this UIDocument are left untouched.
         private void EnsurePanelAttached() {
             var liveRoot = _document.rootVisualElement;
 
@@ -89,9 +76,6 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void BuildChrome() {
-            var root = _document.rootVisualElement;
-            root.Clear();
-
             _panel = new VisualElement {
                 style = {
                     position = Position.Absolute, top = 10f, right = 10f, width = 240f,
@@ -99,7 +83,7 @@ namespace Spellbound.Controller.Samples {
                     backgroundColor = new Color(0f, 0f, 0f, 0.8f)
                 }
             };
-            root.Add(_panel);
+            _document.rootVisualElement.Add(_panel);
 
             _panel.Add(MakeLabel("State Variants", 14f, Color.white, true));
             _status = MakeLabel(string.Empty, 10f, new Color(0.85f, 0.85f, 0.55f), false);
@@ -161,17 +145,6 @@ namespace Spellbound.Controller.Samples {
             }
         }
 
-        private void ToggleCursor() {
-            _cursorFree = !_cursorFree;
-            Cursor.lockState = _cursorFree
-                    ? CursorLockMode.None
-                    : CursorLockMode.Locked;
-            Cursor.visible = _cursorFree;
-
-            if (controller != null)
-                controller.SetCameraFollowMouse(!_cursorFree);
-        }
-
         private void UpdateStatus() {
             if (_status == null)
                 return;
@@ -181,9 +154,7 @@ namespace Spellbound.Controller.Samples {
             else if (_buttons.Count == 0)
                 _status.text = "No states found under Resources/States.";
             else
-                _status.text = _cursorFree
-                        ? $"Cursor free — click to swap.  [{toggleCursorKey}] resumes."
-                        : $"[{toggleCursorKey}] frees cursor to click.";
+                _status.text = string.Empty;
         }
 
         private static Label MakeLabel(string text, float size, Color color, bool header) =>
