@@ -1,16 +1,17 @@
 // Copyright 2025 Spellbound Studio Inc.
 
+using System;
 using UnityEngine;
 
 namespace Spellbound.Controller {
     /// <summary>
     /// Plain (non-MonoBehaviour) camera control API. The consumer instantiates it and calls the capabilities it
     /// wants from wherever it likes — e.g. <see cref="TrackTarget"/> and <see cref="ApplyLook"/> from a LateUpdate,
-    /// <see cref="Zoom"/> / <see cref="SwitchCamera"/> from input events. Input is fed in (never read here) so any
-    /// binding drives it. Cinemachine owns the actual camera positioning and its update timing; this only drives
-    /// the pivot the cameras track, switches the live camera, and adjusts zoom.
+    /// <see cref="SwitchCamera"/> from input events. Input is fed in (never read here) so any binding drives it. It
+    /// creates and owns a pivot the cameras track, drives that pivot (follow + look), and switches the live camera;
+    /// Cinemachine owns the actual camera positioning and its update timing. <see cref="Dispose"/> destroys the pivot.
     /// </summary>
-    public sealed class CameraController {
+    public sealed class CameraController : IDisposable {
         private readonly ICameraRig _rig;
         private readonly Transform _pivot;
         private readonly Transform _followTarget;
@@ -22,20 +23,30 @@ namespace Spellbound.Controller {
         private float _smoothedYaw;
         private float _smoothedPitch;
 
-        public CameraController(ICameraRig rig, Transform pivot, Transform followTarget, ICameraSettings settings,
+        public CameraController(ICameraRig rig, Transform followTarget, ICameraSettings settings,
             Vector3 offset = default) {
             _rig = rig;
-            _pivot = pivot;
             _followTarget = followTarget;
             _settings = settings;
             _offset = offset;
 
-            var euler = pivot != null
-                    ? pivot.localRotation.eulerAngles
-                    : Vector3.zero;
-            _yaw = _smoothedYaw = euler.y;
-            _pitch = _smoothedPitch = euler.x;
+            _pivot = new GameObject("CameraPivot").transform;
+            _yaw = _smoothedYaw = followTarget != null
+                    ? followTarget.eulerAngles.y
+                    : 0f;
+            _pitch = _smoothedPitch = 0f;
+
+            TrackTarget();
+            _pivot.localRotation = Quaternion.Euler(_pitch, _yaw, 0f);
+
+            _rig?.SetFollowTarget(_pivot);
         }
+
+        /// <summary>
+        /// The runtime pivot this controller creates and drives; the rig tracks it. Exposed so the consumer can
+        /// point Cinemachine's world-up override at it.
+        /// </summary>
+        public Transform Pivot => _pivot;
 
         /// <summary>
         /// The live camera's forward — the basis for camera-relative movement.
@@ -109,22 +120,16 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
-        /// Adjusts the live camera's zoom by <paramref name="delta"/>, clamped to the current profile's range.
-        /// </summary>
-        public void Zoom(float delta) {
-            if (_rig == null || float.IsNaN(_rig.Zoom))
-                return;
-
-            var range = _rig.Current != null
-                    ? _rig.Current.ZoomRange
-                    : new Vector2(float.NegativeInfinity, float.PositiveInfinity);
-
-            _rig.Zoom = Mathf.Clamp(_rig.Zoom + delta, range.x, range.y);
-        }
-
-        /// <summary>
         /// Switches the live camera to <paramref name="profile"/>; the rig blends to it.
         /// </summary>
         public void SwitchCamera(CameraProfile profile) => _rig?.Switch(profile);
+
+        /// <summary>
+        /// Destroys the runtime pivot this controller created. Call from the owner's OnDestroy.
+        /// </summary>
+        public void Dispose() {
+            if (_pivot != null)
+                UnityEngine.Object.Destroy(_pivot.gameObject);
+        }
     }
 }

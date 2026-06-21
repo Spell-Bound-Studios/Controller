@@ -292,7 +292,6 @@ MonoBehaviour:
     <SmoothingFactor>k__BackingField: 25
     <MinPitch>k__BackingField: -89
     <MaxPitch>k__BackingField: 89
-    <ZoomStep>k__BackingField: 0.2
     <LockCursorOnStart>k__BackingField: 1
     <FollowMouse>k__BackingField: 1
   cameraOffset: {x: 0, y: 1.5, z: 0}

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Spellbound.Controller.Samples {
     /// <summary>
     /// The sample's serialized camera settings — implements <see cref="ICameraSettings"/> so any UI can drive the
-    /// look/feel live, plus the extra knobs the sample Ctx reads (zoom step, cursor, follow toggle).
+    /// look/feel live, plus the cursor and follow toggles the sample Ctx reads.
     /// </summary>
     [Serializable]
     public class CameraData : ICameraSettings {
@@ -41,11 +41,7 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Highest pitch in degrees (how far up you can look). Higher = look further up.")]
         public float MaxPitch { get; set; } = 89f;
 
-        [Header("Zoom & Cursor")]
-        [field: SerializeField, Range(0f, 2f),
-         Tooltip("Distance the camera zooms per scroll notch. Higher = faster zoom steps; lower = finer control.")]
-        public float ZoomStep { get; set; } = 0.2f;
-
+        [Header("Cursor")]
         [field: SerializeField,
          Tooltip("Lock and hide the cursor on start for mouse-look. On = FPS-style; off = free cursor.")]
         public bool LockCursorOnStart { get; set; } = true;

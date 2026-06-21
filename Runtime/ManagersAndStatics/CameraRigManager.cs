@@ -15,36 +15,18 @@ namespace Spellbound.Controller {
     public class CameraRigManager : CinemachineCameraManagerBase, ICameraRig {
         public static CameraRigManager Instance;
 
-        [SerializeField] private Transform pivot;
         [SerializeField] private CameraProfile defaultProfile;
         [SerializeField] private List<CameraBinding> cameras = new();
 
         private readonly Dictionary<CameraProfile, CinemachineCamera> _byProfile = new();
-        private readonly Dictionary<CameraProfile, CinemachineThirdPersonFollow> _zoomers = new();
 
         private CinemachineCamera _currentCamera;
-        private CinemachineThirdPersonFollow _currentZoomer;
 
-        /// <summary>
-        /// The transform the live camera tracks — the consumer drives this (follow + look).
-        /// </summary>
-        public Transform Pivot => pivot;
-        
         public CameraProfile Current { get; private set; }
 
         public Transform CurrentCameraTransform => _currentCamera != null
                 ? _currentCamera.transform
                 : null;
-
-        public float Zoom {
-            get => _currentZoomer != null
-                    ? _currentZoomer.CameraDistance
-                    : float.NaN;
-            set {
-                if (_currentZoomer != null)
-                    _currentZoomer.CameraDistance = value;
-            }
-        }
 
         private void Awake() {
             if (Instance != null && Instance != this) {
@@ -66,18 +48,9 @@ namespace Spellbound.Controller {
                     continue;
                 }
 
-                if (!_byProfile.TryAdd(binding.Profile, binding.Camera)) {
-                    Log.Error(
-                        $"[CameraRigManager] Duplicate camera binding for profile '{binding.Profile.name}'.");
-
-                    continue;
-                }
-
-                _zoomers[binding.Profile] = binding.Camera.GetComponent<CinemachineThirdPersonFollow>();
+                if (!_byProfile.TryAdd(binding.Profile, binding.Camera))
+                    Log.Error($"[CameraRigManager] Duplicate camera binding for profile '{binding.Profile.name}'.");
             }
-
-            if (pivot != null)
-                DefaultTarget.Target.TrackingTarget = pivot;
 
             var initial = defaultProfile != null && _byProfile.ContainsKey(defaultProfile)
                     ? defaultProfile
@@ -91,6 +64,11 @@ namespace Spellbound.Controller {
                 Log.Error("[CameraRigManager] No camera bindings configured.");
         }
 
+        /// <summary>
+        /// Points the rig's default target at the consumer's runtime pivot; every child camera tracks it.
+        /// </summary>
+        public void SetFollowTarget(Transform target) => DefaultTarget.Target.TrackingTarget = target;
+
         public void Switch(CameraProfile profile) {
             if (profile == null || !_byProfile.TryGetValue(profile, out var camera)) {
                 Log.Warn(
@@ -101,7 +79,6 @@ namespace Spellbound.Controller {
 
             Current = profile;
             _currentCamera = camera;
-            _zoomers.TryGetValue(profile, out _currentZoomer);
         }
 
         /// <summary>

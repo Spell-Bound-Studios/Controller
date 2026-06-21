@@ -14,5 +14,3 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   guid:
   hash: 0
-  <BlendTime>k__BackingField: 0.3
-  <ZoomRange>k__BackingField: {x: 1, y: 4}

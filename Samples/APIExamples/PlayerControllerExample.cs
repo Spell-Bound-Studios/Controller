@@ -133,9 +133,7 @@ namespace Spellbound.Controller.Samples {
         private void OnDestroy() {
             LocoStateMachine?.Dispose();
             ActionStateMachine?.Dispose();
-
-            if (ExampleInput != null)
-                ExampleInput.OnMouseWheelInput -= OnZoom;
+            _camera?.Dispose();
         }
 
 #if UNITY_EDITOR
@@ -164,9 +162,7 @@ namespace Spellbound.Controller.Samples {
                     ? CursorLockMode.Locked
                     : CursorLockMode.None;
 
-            _camera = new CameraController(_cameraRig, _cameraRig.Pivot, _tr, CameraData, cameraOffset);
-
-            ExampleInput.OnMouseWheelInput += OnZoom;
+            _camera = new CameraController(_cameraRig, _tr, CameraData, cameraOffset);
 
             if (!_brain && Camera.main)
                 Camera.main.TryGetComponent(out _brain);
@@ -174,13 +170,8 @@ namespace Spellbound.Controller.Samples {
             if (!_brain)
                 _brain = FindAnyObjectByType<CinemachineBrain>();
 
-            if (_brain && _cameraRig.Pivot != null)
-                _brain.WorldUpOverride = _cameraRig.Pivot;
-        }
-
-        private void OnZoom(Vector2 scroll) {
-            if (CameraData.FollowMouse)
-                _camera?.Zoom(-scroll.y * CameraData.ZoomStep);
+            if (_brain && _camera.Pivot != null)
+                _brain.WorldUpOverride = _camera.Pivot;
         }
 
         public void SetCameraFollowMouse(bool follow) => CameraData.FollowMouse = follow;
