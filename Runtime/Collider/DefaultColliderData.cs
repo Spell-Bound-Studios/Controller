@@ -1,6 +1,7 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
 using System;
+using Spellbound.Core.Logging;
 using UnityEngine;
 
 namespace Spellbound.Controller {
@@ -81,7 +82,7 @@ namespace Spellbound.Controller {
 
             if (!foundMesh) {
                 if (!SuppressConsole) {
-                    Debug.LogWarning($"No mesh found on {go.name} or its children. " +
+                    Log.Warn($"No mesh found on {go.name} or its children. " +
                                      $"Using fallback values for non-overridden values.");
                 }
 
@@ -91,7 +92,7 @@ namespace Spellbound.Controller {
             }
 
             if (!SuppressConsole)
-                Debug.Log($"Using mesh bounds from {meshSource} on {go.name}");
+                Log.Info($"Using mesh bounds from {meshSource} on {go.name}");
 
             if (!OverrideHeight) {
                 Height = bounds.size.y;
@@ -125,7 +126,7 @@ namespace Spellbound.Controller {
 
         private void ValidateAndClampHeight() {
             if (Height <= 0f) {
-                Debug.LogWarning($"Calculated height {Height} is invalid. Using fallback height {FallbackHeight}.");
+                Log.Warn($"Calculated height {Height} is invalid. Using fallback height {FallbackHeight}.");
                 Height = FallbackHeight;
             }
 
@@ -135,7 +136,7 @@ namespace Spellbound.Controller {
 
         private void ValidateAndClampRadius() {
             if (Radius <= 0f) {
-                Debug.LogWarning($"Calculated radius {Radius} is invalid. Using fallback radius {FallbackRadius}.");
+                Log.Warn($"Calculated radius {Radius} is invalid. Using fallback radius {FallbackRadius}.");
                 Radius = FallbackRadius;
             }
 
@@ -144,17 +145,17 @@ namespace Spellbound.Controller {
 
         private void ValidateConfiguration() {
             if (CenterY > Height) {
-                Debug.LogWarning($"CenterY ({CenterY}) cannot be higher than Height ({Height}). Clamping to height.");
+                Log.Warn($"CenterY ({CenterY}) cannot be higher than Height ({Height}). Clamping to height.");
                 CenterY = Height;
             }
 
             if (CenterY < 0f) {
-                Debug.LogWarning($"CenterY ({CenterY}) cannot be negative. Setting to 0.");
+                Log.Warn($"CenterY ({CenterY}) cannot be negative. Setting to 0.");
                 CenterY = 0f;
             }
 
             if (!SuppressConsole) {
-                Debug.Log(
+                Log.Info(
                     $"DefaultColliderData initialized: Height={Height:F2}, CenterY={CenterY:F2}, Radius={Radius:F2}");
             }
         }

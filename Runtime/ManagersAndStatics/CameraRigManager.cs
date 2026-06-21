@@ -1,21 +1,50 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
+using System;
 using System.Collections.Generic;
+using Spellbound.Core.Logging;
 using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Spellbound.Controller {
-    public class CameraRigManager : CinemachineCameraManagerBase {
+    /// <summary>
+    /// The central store for camera operations: maps each <see cref="CameraProfile"/> to a Cinemachine camera and
+    /// blends to the live one. This is the only camera MonoBehaviour — Cinemachine's
+    /// <see cref="CinemachineCameraManagerBase"/> must live on the rig GameObject. Drive it via <see cref="ICameraRig"/>.
+    /// </summary>
+    public class CameraRigManager : CinemachineCameraManagerBase, ICameraRig {
         public static CameraRigManager Instance;
 
-        private readonly Dictionary<ControllerHelper.CameraType, CinemachineCamera> _cinemachineCameras = new();
+        [SerializeField] private Transform pivot;
+        [SerializeField] private CameraProfile defaultProfile;
+        [SerializeField] private List<CameraBinding> cameras = new();
 
-        private readonly Dictionary<ControllerHelper.CameraType, CinemachineThirdPersonFollow> _thirdPersonCameras =
-                new();
+        private readonly Dictionary<CameraProfile, CinemachineCamera> _byProfile = new();
+        private readonly Dictionary<CameraProfile, CinemachineThirdPersonFollow> _zoomers = new();
 
-        private ControllerHelper.CameraType _currentType = ControllerHelper.CameraType.Default;
-        private CinemachineCamera _currentCinemachineCamera;
-        private CinemachineThirdPersonFollow _currentThirdPersonCamera;
+        private CinemachineCamera _currentCamera;
+        private CinemachineThirdPersonFollow _currentZoomer;
+
+        /// <summary>
+        /// The transform the live camera tracks — the consumer drives this (follow + look).
+        /// </summary>
+        public Transform Pivot => pivot;
+        
+        public CameraProfile Current { get; private set; }
+
+        public Transform CurrentCameraTransform => _currentCamera != null
+                ? _currentCamera.transform
+                : null;
+
+        public float Zoom {
+            get => _currentZoomer != null
+                    ? _currentZoomer.CameraDistance
+                    : float.NaN;
+            set {
+                if (_currentZoomer != null)
+                    _currentZoomer.CameraDistance = value;
+            }
+        }
 
         private void Awake() {
             if (Instance != null && Instance != this) {
@@ -30,77 +59,65 @@ namespace Spellbound.Controller {
         protected override void Start() {
             base.Start();
 
-            foreach (var cam in ChildCameras) {
-                var camBehaviour = cam.GetComponent<CameraTypeBehaviour>();
-
-                if (!camBehaviour) {
-                    Debug.LogError("Found a camera without a camera type behaviour.", this);
+            foreach (var binding in cameras) {
+                if (binding?.Profile == null || binding.Camera == null) {
+                    Log.Error("[CameraRigManager] A camera binding is missing its profile or camera.");
 
                     continue;
                 }
 
-                if (!_cinemachineCameras.TryAdd(camBehaviour.CameraType, (CinemachineCamera)cam)) {
-                    Debug.LogError("Camera type already exists in the virtual cameras dict", this);
+                if (!_byProfile.TryAdd(binding.Profile, binding.Camera)) {
+                    Log.Error(
+                        $"[CameraRigManager] Duplicate camera binding for profile '{binding.Profile.name}'.");
 
                     continue;
                 }
 
-                var followCam = cam.GetComponent<CinemachineThirdPersonFollow>();
-
-                if (!_thirdPersonCameras.TryAdd(camBehaviour.CameraType, followCam)) {
-                    Debug.LogError("Camera type already exists in the third person camera dict", this);
-
-                    continue;
-                }
+                _zoomers[binding.Profile] = binding.Camera.GetComponent<CinemachineThirdPersonFollow>();
             }
 
-            if (_cinemachineCameras.TryGetValue(ControllerHelper.CameraType.Default, out var defaultCam)) {
-                _currentType = ControllerHelper.CameraType.Default;
-                _currentCinemachineCamera = defaultCam;
-                _thirdPersonCameras.TryGetValue(_currentType, out _currentThirdPersonCamera);
-            }
-            else if (ChildCameras.Count > 0) {
-                _currentCinemachineCamera = (CinemachineCamera)ChildCameras[0];
+            if (pivot != null)
+                DefaultTarget.Target.TrackingTarget = pivot;
 
-                var fallbackBehaviour = _currentCinemachineCamera.GetComponent<CameraTypeBehaviour>();
+            var initial = defaultProfile != null && _byProfile.ContainsKey(defaultProfile)
+                    ? defaultProfile
+                    : cameras.Count > 0
+                            ? cameras[0]?.Profile
+                            : null;
 
-                _currentType = fallbackBehaviour
-                        ? fallbackBehaviour.CameraType
-                        : _currentType;
-                _thirdPersonCameras.TryGetValue(_currentType, out _currentThirdPersonCamera);
-
-                Debug.LogWarning(
-                    $"[CameraRigManager] No Default camera found. Falling back to {_currentCinemachineCamera.name}.");
-            }
+            if (initial != null)
+                Switch(initial);
             else
-                Debug.LogError("[CameraRigManager] No cameras found at all!", this);
+                Log.Error("[CameraRigManager] No camera bindings configured.");
         }
 
-        public CinemachineCamera GetCurrentCamera() => _currentCinemachineCamera;
-
-        public float GetCurrentCameraZoom() =>
-                _currentThirdPersonCamera != null
-                        ? _currentThirdPersonCamera.CameraDistance
-                        : float.NaN;
-
-        public void SwitchCamera(ControllerHelper.CameraType cameraType) {
-            if (!_cinemachineCameras.TryGetValue(cameraType, out var cinemachineCamera)) {
-                Debug.LogWarning($"[CameraRigManager] No camera registered for type '{cameraType}'.");
+        public void Switch(CameraProfile profile) {
+            if (profile == null || !_byProfile.TryGetValue(profile, out var camera)) {
+                Log.Warn(
+                    $"[CameraRigManager] No camera bound for profile '{(profile != null ? profile.name : "null")}'.");
 
                 return;
             }
 
-            _currentType = cameraType;
-            _currentCinemachineCamera = cinemachineCamera;
-            _thirdPersonCameras.TryGetValue(_currentType, out _currentThirdPersonCamera);
+            Current = profile;
+            _currentCamera = camera;
+            _zoomers.TryGetValue(profile, out _currentZoomer);
         }
 
-        public void SetCameraZoom(float zoomValue) {
-            if (_currentThirdPersonCamera != null)
-                _currentThirdPersonCamera.CameraDistance = zoomValue;
-        }
+        /// <summary>
+        /// The live Cinemachine camera (e.g. for world-space UI / billboards that need it directly).
+        /// </summary>
+        public CinemachineCamera GetCurrentCamera() => _currentCamera;
 
         protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) =>
-                _currentCinemachineCamera;
+                _currentCamera;
+
+        [Serializable]
+        private class CameraBinding {
+            [SerializeField] private CameraProfile profile;
+            [SerializeField] private CinemachineCamera camera;
+            public CameraProfile Profile => profile;
+            public CinemachineCamera Camera => camera;
+        }
     }
 }

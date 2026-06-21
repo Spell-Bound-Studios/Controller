@@ -5,6 +5,7 @@ namespace Spellbound.Controller.Samples {
     /// The action state slots for the sample controller's action state machine.
     /// </summary>
     public enum ActionStateTypes {
-        Ready
+        Ready,
+        Aiming
     }
 }

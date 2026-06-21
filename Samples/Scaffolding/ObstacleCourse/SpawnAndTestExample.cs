@@ -1,5 +1,6 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
+using Spellbound.Core.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +12,7 @@ namespace Spellbound.Controller.Samples {
 
         private void Awake() {
             if (playerPrefab == null)
-                Debug.LogError("Player prefab is null", this);
+                Log.Error("Player prefab is null");
 
             if (spawnPlayerBtn == null)
                 spawnPlayerBtn = GetComponent<Button>();

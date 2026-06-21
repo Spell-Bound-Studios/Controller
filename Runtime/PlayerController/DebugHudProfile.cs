@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Spellbound.Core.Logging;
 using UnityEngine;
 
 namespace Spellbound.Controller {
@@ -181,7 +182,7 @@ namespace Spellbound.Controller {
         [ContextMenu("Clean Up Profile")]
         public void EditorCleanUp() {
             ValidateProfile();
-            Debug.Log($"Profile cleaned up. {GetFieldCount()} fields remaining, {GetEnabledFieldCount()} enabled.");
+            Log.Info($"Profile cleaned up. {GetFieldCount()} fields remaining, {GetEnabledFieldCount()} enabled.");
         }
 
         private void OnValidate() =>

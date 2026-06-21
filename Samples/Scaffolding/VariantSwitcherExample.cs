@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Spellbound.Core.Logging;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -42,8 +43,7 @@ namespace Spellbound.Controller.Samples {
 
             if (_document.panelSettings == null) {
                 _document.panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
-                Debug.Log("VariantSwitcherExample created a runtime PanelSettings; assign one for reliable styling.",
-                    this);
+                Log.Warn("VariantSwitcherExample created a runtime PanelSettings; assign one for reliable styling.");
             }
         }
 

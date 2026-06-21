@@ -72,6 +72,8 @@ namespace Spellbound.Controller.Samples {
         public Vector3 LookDirection => _inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
         public float MouseWheelValue => _inputActions.PlayerInput.MouseWheel.ReadValue<float>();
 
+        public bool IsAiming => Mouse.current != null && Mouse.current.rightButton.isPressed;
+
         public void OnMovement(InputAction.CallbackContext context) { }
 
         public void OnJump(InputAction.CallbackContext context) {

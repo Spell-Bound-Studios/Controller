@@ -1,5 +1,6 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
+using Spellbound.Core.Logging;
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
@@ -14,7 +15,7 @@ namespace Spellbound.Controller.Samples {
             var col = GetComponent<Collider>();
 
             if (col.isTrigger) {
-                Debug.LogWarning(
+                Log.Warn(
                     "Launcher: Collider is a trigger. Collision normals are unavailable. Set Is Trigger = false.");
             }
         }

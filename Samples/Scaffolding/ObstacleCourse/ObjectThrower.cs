@@ -1,6 +1,7 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
 using System.Collections.Generic;
+using Spellbound.Core.Logging;
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
@@ -14,7 +15,7 @@ namespace Spellbound.Controller.Samples {
 
         private void Awake() {
             if (!exampleInputManager)
-                Debug.LogError("ObjectThrow is missing playerInputActionsSO. Please drag and drop it.", this);
+                Log.Error("ObjectThrow is missing playerInputActionsSO. Please drag and drop it.");
 
             CollectChildTemplates();
         }
@@ -40,8 +41,8 @@ namespace Spellbound.Controller.Samples {
             }
 
             if (_templates.Count == 0) {
-                Debug.LogWarning(
-                    "PlaneObjectThrower: No child templates found. Add children under this object to throw.", this);
+                Log.Warn(
+                    "PlaneObjectThrower: No child templates found. Add children under this object to throw.");
             }
         }
 
@@ -69,7 +70,7 @@ namespace Spellbound.Controller.Samples {
                 rb = go.AddComponent<Rigidbody>();
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
-                Debug.LogWarning("PlaneObjectThrower: Template had no Rigidbody; added one at runtime.", go);
+                Log.Warn("PlaneObjectThrower: Template had no Rigidbody; added one at runtime.");
             }
 
             rb.AddForce(dir * throwSpeed, ForceMode.VelocityChange);

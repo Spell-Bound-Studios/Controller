@@ -1,6 +1,7 @@
-﻿// Copyright 2025 Spellbound Studio Inc.
+// Copyright 2025 Spellbound Studio Inc.
 
 using System;
+using Spellbound.Core.Logging;
 using Spellbound.Core.Tooling;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -27,22 +28,16 @@ namespace Spellbound.Controller.Samples {
         [field: SerializeField]
         public ExampleInputManager ExampleInput { get; private set; }
 
-        [Header("Camera References:")]
+        [Header("Camera:")]
         [field: SerializeField]
-        public Transform referenceTransform { get; private set; }
+        public CameraData CameraData { get; private set; }
 
-        [field: SerializeField] private Transform cameraPivot;
-        [field: SerializeField] public CameraData CameraData { get; private set; }
+        [SerializeField] private Vector3 cameraOffset;
+        private CameraController _camera;
         private CameraRigManager _cameraRig;
         private CinemachineBrain _brain;
 
         private Transform _tr;
-
-        // Cached local rotation value X.
-        private float _currentXAngle;
-
-        // Cached local rotation value Y.
-        private float _currentYAngle;
 
         [Header("Rigidbody Reference:")]
         [field: SerializeField]
@@ -81,13 +76,18 @@ namespace Spellbound.Controller.Samples {
         // What direction is up from the player?
         public Vector3 planarUp { get; private set; }
 
+        /// <summary>The live camera's transform — the basis states use for camera-relative movement.</summary>
+        public Transform referenceTransform => _cameraRig != null
+                ? _cameraRig.CurrentCameraTransform
+                : null;
+
         private void Awake() {
             _tr = transform;
             planarUp = _tr.up;
 
             if (ExampleInput == null) {
                 if (!SingletonManager.TryGetSingletonInstance<ExampleInputManager>(out var im)) {
-                    Debug.LogError("ExampleInput is missing in the scene most likely.", this);
+                    Log.Error("ExampleInput is missing in the scene most likely.");
 
                     return;
                 }
@@ -105,15 +105,11 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void Start() {
-            referenceTransform = CameraRigManager.Instance.GetCurrentCamera().transform;
             ConfigureStateMachines();
-
-            // Get your current camera from our built-in CameraRig or get your own custom camera and assign it here.
-            CameraInit();
+            InitCamera();
         }
 
         public void Update() {
-            RotateCamera(ExampleInput.LookDirection.x, -ExampleInput.LookDirection.y);
             locoStateMachine.UpdateStateMachine();
             actionStateMachine.UpdateStateMachine();
         }
@@ -123,9 +119,23 @@ namespace Spellbound.Controller.Samples {
             actionStateMachine.FixedUpdateStateMachine();
         }
 
+        // Camera follows and looks after movement has resolved this frame.
+        private void LateUpdate() {
+            if (_camera == null)
+                return;
+
+            _camera.TrackTarget();
+
+            if (CameraData.FollowMouse)
+                _camera.ApplyLook(ExampleInput.LookDirection);
+        }
+
         private void OnDestroy() {
             locoStateMachine?.Dispose();
             actionStateMachine?.Dispose();
+
+            if (ExampleInput != null)
+                ExampleInput.OnMouseWheelInput -= OnZoom;
         }
 
 #if UNITY_EDITOR
@@ -138,13 +148,26 @@ namespace Spellbound.Controller.Samples {
         }
 #endif
 
-        private void CameraInit() {
-            Cursor.lockState = CameraData.cursorLockOnStart
+        /// <summary>
+        /// Wires the standalone <see cref="CameraController"/> to the rig and starts driving it. The player owns no
+        /// camera logic beyond feeding input — swap the rig or the controller to change camera behaviour entirely.
+        /// </summary>
+        private void InitCamera() {
+            _cameraRig = CameraRigManager.Instance;
+
+            if (_cameraRig == null) {
+                Log.Error("CameraRigManager is missing from the scene.");
+
+                return;
+            }
+
+            Cursor.lockState = CameraData.LockCursorOnStart
                     ? CursorLockMode.Locked
                     : CursorLockMode.None;
 
-            if (ExampleInput == null)
-                Debug.LogError("Please drag and drop an input reference in the CharacterController", this);
+            _camera = new CameraController(_cameraRig, _cameraRig.Pivot, _tr, CameraData, cameraOffset);
+
+            ExampleInput.OnMouseWheelInput += OnZoom;
 
             if (!_brain && Camera.main)
                 Camera.main.TryGetComponent(out _brain);
@@ -152,96 +175,16 @@ namespace Spellbound.Controller.Samples {
             if (!_brain)
                 _brain = FindAnyObjectByType<CinemachineBrain>();
 
-            if (!_brain)
-                Debug.LogError("No brain found. CinemachineBrain missing from scene.", this);
-
-            _currentXAngle = _tr.localRotation.eulerAngles.x;
-            _currentYAngle = _tr.localRotation.eulerAngles.y;
-
-            if (CameraRigManager.Instance == null) {
-                Debug.LogError("CameraController has a dependency on CameraRigManager. Please ensure the camera rig" +
-                               "prefab is in the scene or the CameraRigManager script is on your custom camera rig.",
-                    this);
-            }
-
-            if (SyncTransform.Instance == null) {
-                Debug.LogError("CameraController has a dependency on SyncTransform. Please ensure the CameraFollow" +
-                               "prefab is in the scene or the SyncTransform script is on your custom object.",
-                    this);
-            }
-
-            _cameraRig = CameraRigManager.Instance;
-
-            if (ExampleInput)
-                ExampleInput.OnMouseWheelInput += ZoomCamera;
-
-            CameraSetup();
+            if (_brain && _cameraRig.Pivot != null)
+                _brain.WorldUpOverride = _cameraRig.Pivot;
         }
 
-        /// <summary>
-        /// Rotates the camera based on the device horizontal and vertical input about the pivot.
-        /// </summary>
-        private void RotateCamera(float horizontalInput, float verticalInput) {
-            if (!CameraData.cameraFollowMouse)
-                return;
-
-            var targetX = _currentXAngle + verticalInput * CameraData.cameraSpeed;
-            var targetY = _currentYAngle + horizontalInput * CameraData.cameraSpeed;
-
-            targetX = Mathf.Clamp(targetX, -CameraData.upperVerticalLimit, CameraData.lowerVerticalLimit);
-
-            if (CameraData.smoothCameraRotation) {
-                var blend = 1f - Mathf.Exp(-CameraData.cameraSmoothingFactor * Time.unscaledDeltaTime);
-                _currentXAngle = Mathf.LerpAngle(_currentXAngle, targetX, blend);
-                _currentYAngle = Mathf.LerpAngle(_currentYAngle, targetY, blend);
-            }
-            else {
-                _currentXAngle = targetX;
-                _currentYAngle = targetY;
-            }
-
-            _currentXAngle = Mathf.Clamp(_currentXAngle, -CameraData.upperVerticalLimit, CameraData.lowerVerticalLimit);
-            cameraPivot.localRotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0f);
+        private void OnZoom(Vector2 scroll) {
+            if (CameraData.FollowMouse)
+                _camera?.Zoom(-scroll.y * CameraData.ZoomStep);
         }
 
-        private void ZoomCamera(Vector2 zoomInput) {
-            if (!CameraData.cameraFollowMouse)
-                return;
-
-            var currentZoom = _cameraRig.GetCurrentCameraZoom();
-
-            if (float.IsNaN(currentZoom))
-                return;
-
-            var target = currentZoom - zoomInput.y * CameraData.zoomIncrement;
-            target = Mathf.Clamp(target, CameraData.minZoomDistance, CameraData.maxZoomDistance);
-            CameraRigManager.Instance.SetCameraZoom(target);
-        }
-
-        /// <summary>
-        /// Sets our cameraRig tracking target.
-        /// </summary>
-        private void CameraSetup() {
-            SyncTransform.Instance.SetFollowTransform(gameObject.transform);
-
-            if (!cameraPivot)
-                cameraPivot = SyncTransform.Instance.transform;
-
-            _brain.WorldUpOverride = cameraPivot;
-
-            if (_cameraRig == null) {
-                Debug.LogError("Camera rig is null and doesn't appear to be in scene.");
-
-                return;
-            }
-
-            _cameraRig.DefaultTarget.Target.TrackingTarget = cameraPivot;
-        }
-
-        public void SetCameraFollowMouse(bool follow) => CameraData.cameraFollowMouse = follow;
-        public void SetCameraSpeed(float speed) => CameraData.cameraSpeed = speed;
-        public float GetCameraSpeed() => CameraData.cameraSpeed;
-        public void SetCameraSmooth(bool isSmooth) => CameraData.smoothCameraRotation = isSmooth;
+        public void SetCameraFollowMouse(bool follow) => CameraData.FollowMouse = follow;
 
         private void ConfigureStateMachines() {
             locoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);

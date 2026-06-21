@@ -11,34 +11,6 @@ namespace Spellbound.Controller {
     /// in the base state and either implement or wrap one of these methods.
     /// </summary>
     public static class ControllerHelper {
-        public enum CameraCouplingMode {
-            Coupled,
-            CoupledWhenMoving,
-            Decoupled
-        }
-
-        public enum CameraType {
-            Default,
-            Zoomed,
-            BirdsEye,
-            Vehicle
-        }
-
-        public enum CastDirection {
-            Forward,
-            Backward,
-            Left,
-            Right,
-            Up,
-            Down
-        }
-
-        public enum RaycastLength {
-            Normal,
-            Extended,
-            Retracted
-        }
-
         /// <summary>
         /// Returns the horizontal velocity of a given rigidbody.
         /// </summary>
