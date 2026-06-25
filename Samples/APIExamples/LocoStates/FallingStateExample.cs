@@ -15,13 +15,37 @@ namespace Spellbound.Controller.Samples {
                  "Higher = more in-air control; lower = barely steerable; 0 = none (pure ballistic).")]
         public float AirControlAccel { get; set; } = 5f;
 
-        protected override void EnterStateLogic() { }
+        [Header("Animation")]
+        [SerializeField, Tooltip("Animator state (a 2-motion blend tree: idle-fall → terminal) this state plays.")]
+        private string fallStateName = "Falling";
 
-        protected override void UpdateStateLogic() { }
+        [field: SerializeField, Range(1f, 40f),
+         Tooltip("Downward speed (m/s) at which the fall blend reaches the terminal pose; slower falls ease back " +
+                 "toward the idle-fall pose.")]
+        public float TerminalFallSpeed { get; set; } = 20f;
+
+        private int _fallHash;
+        private readonly float[] _fallThresholds = new float[2];
+
+        protected override void OnStateInitialize() => _fallHash = Animator.StringToHash(fallStateName);
+
+        protected override void EnterStateLogic() =>
+                Ctx.Animation?.CrossFade(_fallHash, PlayerControllerExample.BaseLayer);
+
+        protected override void UpdateStateLogic() {
+            if (Ctx.Animation == null)
+                return;
+
+            _fallThresholds[0] = 0f;
+            _fallThresholds[1] = TerminalFallSpeed;
+
+            var fallSpeed = -ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.PlanarUp);
+            Ctx.Animation.SetFloat(Ctx.LocomotionBlend, AnimationMath.NormalizeBlend(fallSpeed, _fallThresholds));
+        }
 
         protected override void FixedUpdateStateLogic() {
             if (PerformGroundCheck()) {
-                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Grounded);
+                Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Landing);
 
                 return;
             }

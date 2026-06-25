@@ -16,7 +16,15 @@ namespace Spellbound.Controller.Samples {
                  "and you stand up. Higher = keeps sliding longer (resists flip-flopping near the cutoff); lower = stands up sooner.")]
         public float SlideExitAngleBuffer { get; set; } = 2f;
 
-        protected override void EnterStateLogic() { }
+        [Header("Animation")]
+        [SerializeField, Tooltip("Animator state this state plays while sliding.")]
+        private string slideStateName = "Sliding";
+        private int _slideHash;
+
+        protected override void OnStateInitialize() => _slideHash = Animator.StringToHash(slideStateName);
+
+        protected override void EnterStateLogic() =>
+                Ctx.Animation?.CrossFade(_slideHash, PlayerControllerExample.BaseLayer);
 
         protected override void UpdateStateLogic() { }
 

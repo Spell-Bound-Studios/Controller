@@ -66,9 +66,9 @@ namespace Spellbound.Controller.Samples {
         // UIDocument can recreate its rootVisualElement after startup; rebuild our own sub-panel when it detaches.
         // We never clear the root, so other demo panels sharing this UIDocument are left untouched.
         private void EnsurePanelAttached() {
-            var liveRoot = _document.rootVisualElement;
+            var column = DemoPanelLayout.GetColumn(_document.rootVisualElement);
 
-            if (liveRoot == null || (_panel != null && _panel.parent == liveRoot))
+            if (column == null || (_panel != null && _panel.parent == column))
                 return;
 
             BuildChrome();
@@ -76,14 +76,8 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void BuildChrome() {
-            _panel = new VisualElement {
-                style = {
-                    position = Position.Absolute, top = 10f, right = 10f, width = 240f,
-                    paddingTop = 8f, paddingBottom = 8f, paddingLeft = 8f, paddingRight = 8f,
-                    backgroundColor = new Color(0f, 0f, 0f, 0.8f)
-                }
-            };
-            _document.rootVisualElement.Add(_panel);
+            _panel = DemoPanelLayout.MakePanel();
+            DemoPanelLayout.GetColumn(_document.rootVisualElement).Add(_panel);
 
             _panel.Add(MakeLabel("State Variants", 14f, Color.white, true));
             _status = MakeLabel(string.Empty, 10f, new Color(0.85f, 0.85f, 0.55f), false);

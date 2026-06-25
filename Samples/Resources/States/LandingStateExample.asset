@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0e17a9c50ae4d2eb6c3e8a8485f4076, type: 3}
   m_Name: LandingStateExample
   m_EditorClassIdentifier: 
-  id: 607165397872b4546b1c883577803163
-  assetName: LandingStateExample
+  guid: 607165397872b4546b1c883577803163
+  hash: 3912084230
+  landRole:
+    role: player_land
+  landRollRole:
+    role: player_landing_roll
+  <RollImpactSpeed>k__BackingField: 8

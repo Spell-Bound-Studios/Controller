@@ -23,7 +23,7 @@ namespace Spellbound.Controller.Samples {
     /// Please reference the documentation for additional details, or please feel free to use the discord and use this
     /// as a reference to see how others leverage these tools and solve game-specific challenges.
     /// </summary>
-    public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo {
+    public sealed class PlayerControllerExample : MonoBehaviour, IDebuggingInfo, IAnimationController {
         [Header("Input Reference:")]
         [field: SerializeField]
         public ExampleInputManager ExampleInput { get; private set; }
@@ -73,6 +73,39 @@ namespace Spellbound.Controller.Samples {
 
         [Header("Animator"), SerializeField] private Animator animator;
 
+        [SerializeField, Tooltip("Float param the locomotion blend trees read as their normalized 0..1 axis.")]
+        private string blendParam = "Blend";
+
+        [SerializeField, Tooltip("Float param wired to the locomotion state's speed multiplier (stride/foot-slide warp).")]
+        private string speedWarpParam = "SpeedMul";
+
+        [SerializeField, Min(0f), Tooltip("Default crossfade duration (seconds) used when a caller passes 0.")]
+        private float defaultFade = 0.2f;
+
+        /// <summary>Base locomotion layer index — what this sample assigns layer 0 to mean.</summary>
+        public const int BaseLayer = 0;
+
+        /// <summary>Masked upper-body action layer index — what this sample assigns layer 1 to mean.</summary>
+        public const int ActionLayer = 1;
+
+        private int _blendHash;
+        private int _speedWarpHash;
+        private float _actionWeight;
+        private float _actionTarget;
+        private float _actionRate;
+
+        /// <summary>
+        /// The animation seam states drive. This controller is its own backend — a plain (non-networked) Animator;
+        /// a game would supply a networked implementation of the same interface instead.
+        /// </summary>
+        public IAnimationController Animation => this;
+
+        /// <summary>Hash of the locomotion blend axis param, for states feeding <see cref="AnimationMath.NormalizeBlend"/>.</summary>
+        public int LocomotionBlend => _blendHash;
+
+        /// <summary>Hash of the speed-warp multiplier param, for states feeding <see cref="AnimationMath.SpeedWarp"/>.</summary>
+        public int SpeedWarp => _speedWarpHash;
+
         // What direction is up from the player?
         public Vector3 PlanarUp { get; private set; }
 
@@ -106,6 +139,7 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void Start() {
+            InitAnimation();
             ConfigureStateMachines();
             InitCamera();
         }
@@ -113,6 +147,7 @@ namespace Spellbound.Controller.Samples {
         public void Update() {
             LocoStateMachine.UpdateStateMachine();
             ActionStateMachine.UpdateStateMachine();
+            TickActionLayer(Time.deltaTime);
         }
 
         public void FixedUpdate() {
@@ -175,6 +210,65 @@ namespace Spellbound.Controller.Samples {
         }
 
         public void SetCameraFollowMouse(bool follow) => CameraData.FollowMouse = follow;
+
+        /// <summary>
+        /// Caches the parameter hashes states drive. The Animator itself owns the states, blend trees, layers, and
+        /// mask — this controller only feeds it crossfades, params, and layer weights through <see cref="Animation"/>.
+        /// </summary>
+        private void InitAnimation() {
+            _blendHash = Animator.StringToHash(blendParam);
+            _speedWarpHash = Animator.StringToHash(speedWarpParam);
+
+            if (animator == null)
+                Log.Error("Animator is missing; animation calls will be ignored until one is assigned.");
+        }
+
+        /// <inheritdoc />
+        public void CrossFade(int stateHash, int layer = 0, float fade = 0f) {
+            if (animator != null)
+                animator.CrossFadeInFixedTime(stateHash, fade > 0f ? fade : defaultFade, layer);
+        }
+
+        /// <inheritdoc />
+        public void SetFloat(int paramHash, float value) {
+            if (animator != null)
+                animator.SetFloat(paramHash, value);
+        }
+
+        /// <inheritdoc />
+        public void SetLayerWeight(int layer, float weight) {
+            if (animator != null)
+                animator.SetLayerWeight(layer, weight);
+        }
+
+        /// <summary>
+        /// Eases the masked <see cref="ActionLayer"/> toward <paramref name="target"/> (0..1) over
+        /// <paramref name="fade"/> seconds — the sample's masking convention, ramped in Update over the generic
+        /// <see cref="SetLayerWeight"/>. Action states call this to fade the upper body in and out.
+        /// </summary>
+        public void FadeActionLayer(float target, float fade = 0f) {
+            _actionTarget = Mathf.Clamp01(target);
+            var f = fade > 0f
+                    ? fade
+                    : defaultFade;
+            _actionRate = f > 0f
+                    ? 1f / f
+                    : float.PositiveInfinity;
+        }
+
+        /// <summary>
+        /// Points the controller at a different Animator at runtime (a visual swap), or null to drive nothing. The
+        /// parameter hashes are name-based and carry over; the new Animator must share the same controller layout.
+        /// </summary>
+        public void SetAnimator(Animator target) => animator = target;
+
+        private void TickActionLayer(float deltaTime) {
+            if (animator == null || Mathf.Approximately(_actionWeight, _actionTarget))
+                return;
+
+            _actionWeight = Mathf.MoveTowards(_actionWeight, _actionTarget, _actionRate * deltaTime);
+            animator.SetLayerWeight(ActionLayer, _actionWeight);
+        }
 
         private void ConfigureStateMachines() {
             LocoStateMachine = new StateMachine<PlayerControllerExample, LocoStateTypes>(this);

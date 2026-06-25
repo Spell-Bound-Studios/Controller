@@ -13,6 +13,13 @@ namespace Spellbound.Controller.Samples {
     public class JumpStateExample : BaseLocomotionStateExample {
         protected float DefaultJumpMultiplier = 1.0f;
 
+        [Header("Animation")]
+        [SerializeField, Tooltip("Animator state this state plays on jump.")]
+        private string jumpStateName = "Jumping";
+        private int _jumpHash;
+
+        protected override void OnStateInitialize() => _jumpHash = Animator.StringToHash(jumpStateName);
+
         private readonly WaitForSeconds _minJumpDuration = new(0.3f);
         private readonly WaitForSeconds _maxJumpDuration = new(2f);
         private Coroutine _jumpMinRoutine;
@@ -23,6 +30,7 @@ namespace Spellbound.Controller.Samples {
             _jumpMaxRoutine = Ctx.StartCoroutine(JumpMaxRoutine());
 
             Jump();
+            Ctx.Animation?.CrossFade(_jumpHash, PlayerControllerExample.BaseLayer);
         }
 
         protected override void UpdateStateLogic() { }

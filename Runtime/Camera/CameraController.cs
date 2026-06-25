@@ -120,9 +120,9 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
-        /// Switches the live camera to <paramref name="profile"/>; the rig blends to it.
+        /// Switches the live camera to the one named <paramref name="cameraName"/>; the rig blends to it.
         /// </summary>
-        public void SwitchCamera(CameraProfile profile) => _rig?.Switch(profile);
+        public void SwitchCamera(string cameraName) => _rig?.Switch(cameraName);
 
         /// <summary>
         /// Destroys the runtime pivot this controller created. Call from the owner's OnDestroy.

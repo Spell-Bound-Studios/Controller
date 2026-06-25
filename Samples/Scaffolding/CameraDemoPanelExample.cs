@@ -8,12 +8,11 @@ using UnityEngine.UIElements;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
-    /// Runtime UIToolkit panel showcasing the camera API: switch the live camera by <see cref="CameraProfile"/>
-    /// (discovered from <see cref="CameraProfileRegistry"/>) and drive the live <see cref="ICameraSettings"/>
-    /// (sensitivity, invert, smoothing, pitch) with sliders/toggles. Manages only its own sub-panel (never clears
-    /// the root), so it coexists with the other demo panels on one shared UIDocument; add a
-    /// <see cref="DemoCursorToggleExample"/> to free the cursor for clicks. Assign a Panel Settings, leave the
-    /// Source Asset empty. Demo scaffolding.
+    /// Runtime UIToolkit panel showcasing the camera API: switch the live camera by name (the rig's cameras) and
+    /// drive the live <see cref="ICameraSettings"/> (sensitivity, invert, smoothing, pitch) with sliders/toggles.
+    /// Manages only its own sub-panel (never clears the root), so it coexists with the other demo panels on one
+    /// shared UIDocument; add a <see cref="DemoCursorToggleExample"/> to free the cursor for clicks. Assign a Panel
+    /// Settings, leave the Source Asset empty. Demo scaffolding.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class CameraDemoPanelExample : MonoBehaviour {
@@ -21,7 +20,7 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Controller whose CameraData (ICameraSettings) the sliders drive. Auto-found if left empty.")]
         private PlayerControllerExample controller;
 
-        private readonly List<(Button button, CameraProfile profile)> _camButtons = new();
+        private readonly List<(Button button, string cameraName)> _camButtons = new();
         private UIDocument _document;
         private VisualElement _panel;
         private VisualElement _content;
@@ -64,9 +63,9 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void EnsurePanelAttached() {
-            var liveRoot = _document.rootVisualElement;
+            var column = DemoPanelLayout.GetColumn(_document.rootVisualElement);
 
-            if (liveRoot == null || (_panel != null && _panel.parent == liveRoot))
+            if (column == null || (_panel != null && _panel.parent == column))
                 return;
 
             BuildChrome();
@@ -74,14 +73,8 @@ namespace Spellbound.Controller.Samples {
         }
 
         private void BuildChrome() {
-            _panel = new VisualElement {
-                style = {
-                    position = Position.Absolute, top = 10f, left = 10f, width = 260f,
-                    paddingTop = 8f, paddingBottom = 8f, paddingLeft = 8f, paddingRight = 8f,
-                    backgroundColor = new Color(0f, 0f, 0f, 0.8f)
-                }
-            };
-            _document.rootVisualElement.Add(_panel);
+            _panel = DemoPanelLayout.MakePanel();
+            DemoPanelLayout.GetColumn(_document.rootVisualElement).Add(_panel);
 
             _panel.Add(MakeLabel("Camera API", 14f, Color.white, true));
             _status = MakeLabel(string.Empty, 10f, new Color(0.85f, 0.85f, 0.55f), false);
@@ -102,12 +95,12 @@ namespace Spellbound.Controller.Samples {
             };
             _content.Add(row);
 
-            foreach (var profile in CameraProfileRegistry.All) {
-                if (profile == null)
+            foreach (var cameraName in CameraRigManager.Instance.CameraNames) {
+                if (string.IsNullOrEmpty(cameraName))
                     continue;
 
-                var captured = profile;
-                var button = new Button(() => Switch(captured)) { text = captured.name };
+                var captured = cameraName;
+                var button = new Button(() => Switch(captured)) { text = captured };
                 StyleButton(button);
                 row.Add(button);
                 _camButtons.Add((button, captured));
@@ -127,16 +120,16 @@ namespace Spellbound.Controller.Samples {
             _populated = true;
         }
 
-        private void Switch(CameraProfile profile) {
-            CameraRigManager.Instance.Switch(profile);
+        private void Switch(string cameraName) {
+            CameraRigManager.Instance.Switch(cameraName);
             RefreshHighlights();
         }
 
         private void RefreshHighlights() {
             var current = CameraRigManager.Instance.Current;
 
-            foreach (var (button, profile) in _camButtons)
-                button.style.backgroundColor = profile == current
+            foreach (var (button, cameraName) in _camButtons)
+                button.style.backgroundColor = cameraName == current
                         ? new Color(0.18f, 0.5f, 0.9f)
                         : new Color(0.22f, 0.22f, 0.26f);
         }

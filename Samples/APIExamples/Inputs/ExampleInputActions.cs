@@ -127,6 +127,24 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""4121d959-287b-4821-b2cb-75d995525564"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""67afc833-2c39-4be3-b6e2-6a343ddddc20"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -215,6 +233,28 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MouseWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6662391d-a77d-4d78-9296-b805d265a6f3"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f584c289-1f9b-4b8a-bdc4-b1c207238e53"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -317,6 +357,8 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
         m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
         m_PlayerInput_LookDirection = m_PlayerInput.FindAction("LookDirection", throwIfNotFound: true);
         m_PlayerInput_MouseWheel = m_PlayerInput.FindAction("MouseWheel", throwIfNotFound: true);
+        m_PlayerInput_Interact = m_PlayerInput.FindAction("Interact", throwIfNotFound: true);
+        m_PlayerInput_Sprint = m_PlayerInput.FindAction("Sprint", throwIfNotFound: true);
         // ConsoleInput
         m_ConsoleInput = asset.FindActionMap("ConsoleInput", throwIfNotFound: true);
         m_ConsoleInput_Close = m_ConsoleInput.FindAction("Close", throwIfNotFound: true);
@@ -408,6 +450,8 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Jump;
     private readonly InputAction m_PlayerInput_LookDirection;
     private readonly InputAction m_PlayerInput_MouseWheel;
+    private readonly InputAction m_PlayerInput_Interact;
+    private readonly InputAction m_PlayerInput_Sprint;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerInput".
     /// </summary>
@@ -435,6 +479,14 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerInput/MouseWheel".
         /// </summary>
         public InputAction @MouseWheel => m_Wrapper.m_PlayerInput_MouseWheel;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/Interact".
+        /// </summary>
+        public InputAction @Interact => m_Wrapper.m_PlayerInput_Interact;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerInput/Sprint".
+        /// </summary>
+        public InputAction @Sprint => m_Wrapper.m_PlayerInput_Sprint;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -473,6 +525,12 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started += instance.OnMouseWheel;
             @MouseWheel.performed += instance.OnMouseWheel;
             @MouseWheel.canceled += instance.OnMouseWheel;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
+            @Sprint.started += instance.OnSprint;
+            @Sprint.performed += instance.OnSprint;
+            @Sprint.canceled += instance.OnSprint;
         }
 
         /// <summary>
@@ -496,6 +554,12 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
             @MouseWheel.started -= instance.OnMouseWheel;
             @MouseWheel.performed -= instance.OnMouseWheel;
             @MouseWheel.canceled -= instance.OnMouseWheel;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
+            @Sprint.started -= instance.OnSprint;
+            @Sprint.performed -= instance.OnSprint;
+            @Sprint.canceled -= instance.OnSprint;
         }
 
         /// <summary>
@@ -693,6 +757,20 @@ public partial class @ExampleInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseWheel(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSprint(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "ConsoleInput" which allows adding and removing callbacks.

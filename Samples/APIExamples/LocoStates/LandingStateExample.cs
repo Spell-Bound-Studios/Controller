@@ -1,6 +1,5 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-using System.Collections;
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
@@ -10,16 +9,50 @@ namespace Spellbound.Controller.Samples {
     /// </summary>
     [CreateAssetMenu(fileName = "LandingStateExample", menuName = "Spellbound/StateMachine/LandingStateExample")]
     public class LandingStateExample : BaseLocomotionStateExample {
-        // Landing Thresholds
-        private readonly WaitForSeconds _landingDuration = new(0.15f);
-        private Coroutine _landRoutine;
+        private float _landTimer;
 
-        protected override void EnterStateLogic() =>
-                // Coroutines must yield before state checks begin.
-                _landRoutine = Ctx.StartCoroutine(LandRoutine());
+        [Header("Animation")]
+        [SerializeField, Tooltip("Animator state for a soft landing.")]
+        private string landStateName = "Landing";
+
+        [SerializeField, Tooltip("Animator state for a hard landing that rolls.")]
+        private string rollStateName = "LandingRoll";
+
+        [SerializeField, Min(0f), Tooltip("Seconds held in the soft-landing state before returning to grounded.")]
+        private float landDuration = 0.15f;
+
+        [SerializeField, Min(0f), Tooltip("Seconds held in the rolling-landing state before returning to grounded.")]
+        private float rollDuration = 0.6f;
+
+        private int _landHash;
+        private int _rollHash;
+
+        [field: SerializeField, Range(0f, 30f),
+         Tooltip("Downward impact speed (m/s) at or above which the landing rolls instead of a soft landing.")]
+        public float RollImpactSpeed { get; set; } = 8f;
+
+        protected override void OnStateInitialize() {
+            _landHash = Animator.StringToHash(landStateName);
+            _rollHash = Animator.StringToHash(rollStateName);
+        }
+
+        protected override void EnterStateLogic() {
+            var impact = -ControllerHelper.GetVerticalSpeed(Ctx.Rb, Ctx.PlanarUp);
+            var roll = impact >= RollImpactSpeed;
+
+            Ctx.Animation?.CrossFade(roll
+                    ? _rollHash
+                    : _landHash, PlayerControllerExample.BaseLayer);
+
+            _landTimer = roll
+                    ? rollDuration
+                    : landDuration;
+        }
 
         protected override void UpdateStateLogic() {
-            if (_landRoutine == null)
+            _landTimer -= Time.deltaTime;
+
+            if (_landTimer <= 0f)
                 Ctx.LocoStateMachine.ChangeState(LocoStateTypes.Grounded);
         }
 
@@ -31,12 +64,5 @@ namespace Spellbound.Controller.Samples {
         }
 
         protected override void ExitStateLogic() { }
-
-        private IEnumerator LandRoutine() {
-            // Prevents immediately being able to jump again.
-            yield return _landingDuration;
-
-            _landRoutine = null;
-        }
     }
 }

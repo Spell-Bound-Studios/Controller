@@ -4,27 +4,37 @@ using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
-    /// Action state entered while aiming (bow/gun): on enter it switches the rig to the aiming
-    /// <see cref="CameraProfile"/> — Cinemachine blends your current view in to the zoomed one — and restores the
-    /// prior camera on exit. This is how a gameplay feature consumes the camera API: through a state, driven by the
-    /// same machine that owns the player, not a standalone component bolted onto the scene.
+    /// Action state entered while aiming (bow/gun): on enter it switches the rig to the aiming camera (by name) —
+    /// Cinemachine blends your current view in to the zoomed one — and restores the prior camera on exit. This is
+    /// how a gameplay feature consumes the camera API: through a state, driven by the same machine that owns the
+    /// player, not a standalone component bolted onto the scene.
     /// </summary>
     [CreateAssetMenu(fileName = "AimingActionStateExample",
         menuName = "Spellbound/StateMachine/AimingActionStateExample")]
     public class AimingActionStateExample : BaseActionStateExample {
-        [SerializeField, Tooltip("Camera switched to while aiming (e.g. the zoomed-in AimingCameraProfile).")]
-        private CameraProfile aimProfile;
+        [SerializeField, Tooltip("Name of the camera switched to while aiming (the rig camera's GameObject name).")]
+        private string aimCameraName = "AimingCamera";
 
-        private CameraProfile _restore;
+        [Header("Animation")]
+        [SerializeField, Tooltip("Animator state on the masked action layer played while aiming.")]
+        private string aimStateName = "Aiming";
+        private int _aimHash;
+
+        private string _restore;
+
+        protected override void OnStateInitialize() => _aimHash = Animator.StringToHash(aimStateName);
 
         protected override void EnterStateLogic() {
+            Ctx.Animation?.CrossFade(_aimHash, PlayerControllerExample.ActionLayer);
+            Ctx.FadeActionLayer(1f);
+
             var rig = CameraRigManager.Instance;
 
             if (rig == null)
                 return;
 
             _restore = rig.Current;
-            rig.Switch(aimProfile);
+            rig.Switch(aimCameraName);
         }
 
         protected override void UpdateStateLogic() {
@@ -35,7 +45,9 @@ namespace Spellbound.Controller.Samples {
         protected override void FixedUpdateStateLogic() { }
 
         protected override void ExitStateLogic() {
-            if (_restore != null)
+            Ctx.FadeActionLayer(0f);
+
+            if (!string.IsNullOrEmpty(_restore))
                 CameraRigManager.Instance.Switch(_restore);
         }
     }

@@ -17,6 +17,8 @@ namespace Spellbound.Controller.Samples {
         public event Action OnJumpPressed = delegate { };
         public event Action OnInteractPressed = delegate { };
         public event Action<Vector2> OnMouseWheelInput = delegate { };
+        
+        public bool IsSprinting { get; private set; }
 
         // Console Input Events
         public event Action OnPreviousCommandPressed = delegate { };
@@ -77,13 +79,26 @@ namespace Spellbound.Controller.Samples {
         public void OnMovement(InputAction.CallbackContext context) { }
 
         public void OnJump(InputAction.CallbackContext context) {
-            if (context.performed) OnJumpPressed.Invoke();
+            if (context.performed) 
+                OnJumpPressed.Invoke();
         }
 
         public void OnLookDirection(InputAction.CallbackContext context) { }
 
         public void OnMouseWheel(InputAction.CallbackContext context) =>
                 OnMouseWheelInput.Invoke(context.ReadValue<Vector2>());
+
+        public void OnInteract(InputAction.CallbackContext context) {
+            if (context.performed) 
+                OnInteractPressed.Invoke();
+        }
+
+        public void OnSprint(InputAction.CallbackContext context) {
+            if (context.performed)
+                IsSprinting = true;
+            else if (context.canceled)
+                IsSprinting = false;
+        }
 
         #endregion
 
