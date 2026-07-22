@@ -31,3 +31,5 @@ MonoBehaviour:
     enabled: 1
   - key: Aiming
     enabled: 1
+  - key: Cinematic
+    enabled: 1

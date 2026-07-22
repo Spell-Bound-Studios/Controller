@@ -8302,6 +8302,7 @@ GameObject:
   - component: {fileID: 8915035600698087468}
   - component: {fileID: 4235120299701147794}
   - component: {fileID: 1900024906980112349}
+  - component: {fileID: 5320208621824808183}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -8487,8 +8488,9 @@ MonoBehaviour:
   locoConfig: {fileID: 11400000, guid: de16b7b0001ecba468c1acb62564312d, type: 2}
   actionConfig: {fileID: 11400000, guid: 7752d09e8bd4c51479a37f3db114dbe3, type: 2}
   animator: {fileID: 5305872858464282298}
-  animationCollection: {fileID: 11400000, guid: d576c036073afd345adab13b96e363c0, type: 2}
-  actionMask: {fileID: 31900000, guid: 5b8ae957668f3e14dbcc36fa47496e33, type: 2}
+  blendParam: Blend
+  speedWarpParam: SpeedMul
+  defaultFade: 0.2
 --- !u!114 &4235120299701147794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8533,6 +8535,20 @@ MonoBehaviour:
     root: {fileID: 1355569392189218491}
     animator: {fileID: 0}
   defaultLabel: Knight
+--- !u!114 &5320208621824808183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8702816091274949866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1790518932b645f210c26a38c0ac68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spellbound.Controller.Samples.FirstPersonBodyHiderExample
+  firstPersonCameraName: FirstPersonCamera
+  visualSwitcher: {fileID: 1900024906980112349}
 --- !u!1 &8707547554009297974
 GameObject:
   m_ObjectHideFlags: 0

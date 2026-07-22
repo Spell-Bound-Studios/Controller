@@ -16,6 +16,7 @@ namespace Spellbound.Controller.Samples {
         // Player Input Events
         public event Action OnJumpPressed = delegate { };
         public event Action OnInteractPressed = delegate { };
+        public event Action OnCinematicTogglePressed = delegate { };
         public event Action<Vector2> OnMouseWheelInput = delegate { };
         
         public bool IsSprinting { get; private set; }
@@ -65,6 +66,12 @@ namespace Spellbound.Controller.Samples {
             _inputActions.PlayerInput.Disable();
             _inputActions.ConsoleInput.Enable();
         }
+
+        public void EnablePlayerInput() => _inputActions.PlayerInput.Enable();
+
+        public void DisablePlayerInput() => _inputActions.PlayerInput.Disable();
+
+        public void PressCinematicToggle() => OnCinematicTogglePressed.Invoke();
 
         #endregion
 

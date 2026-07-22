@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Spellbound.Core.Logging;
+using Spellbound.Core.Tooling;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,7 +21,11 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Controller whose CameraData (ICameraSettings) the sliders drive. Auto-found if left empty.")]
         private PlayerControllerExample controller;
 
+        [SerializeField] private string stateDrivenCamera = "CinematicCamera";
+
         private readonly List<(Button button, string cameraName)> _camButtons = new();
+        private Button _cinematicButton;
+        private ICameraRig _rig;
         private UIDocument _document;
         private VisualElement _panel;
         private VisualElement _content;
@@ -47,11 +52,25 @@ namespace Spellbound.Controller.Samples {
                 _populated = false;
             }
 
-            if (controller != null && CameraRigManager.Instance != null) {
-                if (!_populated)
-                    Populate();
+            SingletonManager.TryGetSingletonInstance<ICameraRig>(out var rig);
 
-                RefreshHighlights();
+            if (!ReferenceEquals(rig, _rig)) {
+                if (_rig != null)
+                    _rig.CurrentChanged -= OnCurrentChanged;
+
+                _rig = rig;
+
+                if (_rig != null)
+                    _rig.CurrentChanged += OnCurrentChanged;
+
+                _populated = false;
+            }
+
+            if (controller != null && _rig != null) {
+                if (!_populated) {
+                    Populate();
+                    RefreshHighlights();
+                }
             }
             else if (_populated) {
                 _content.Clear();
@@ -61,6 +80,13 @@ namespace Spellbound.Controller.Samples {
 
             UpdateStatus();
         }
+
+        private void OnDestroy() {
+            if (_rig != null)
+                _rig.CurrentChanged -= OnCurrentChanged;
+        }
+
+        private void OnCurrentChanged(string previous, string current) => RefreshHighlights();
 
         private void EnsurePanelAttached() {
             var column = DemoPanelLayout.GetColumn(_document.rootVisualElement);
@@ -95,8 +121,8 @@ namespace Spellbound.Controller.Samples {
             };
             _content.Add(row);
 
-            foreach (var cameraName in CameraRigManager.Instance.CameraNames) {
-                if (string.IsNullOrEmpty(cameraName))
+            foreach (var cameraName in _rig.CameraNames) {
+                if (string.IsNullOrEmpty(cameraName) || cameraName == stateDrivenCamera)
                     continue;
 
                 var captured = cameraName;
@@ -105,6 +131,17 @@ namespace Spellbound.Controller.Samples {
                 row.Add(button);
                 _camButtons.Add((button, captured));
             }
+
+            _content.Add(MakeLabel("State", 12f, new Color(0.6f, 0.8f, 1f), false));
+
+            var stateRow = new VisualElement {
+                style = { flexDirection = FlexDirection.Row, flexWrap = Wrap.Wrap, marginBottom = 6f }
+            };
+            _content.Add(stateRow);
+
+            _cinematicButton = new Button(ToggleCinematic) { text = "Cinematic View" };
+            StyleButton(_cinematicButton);
+            stateRow.Add(_cinematicButton);
 
             _content.Add(MakeLabel("Look", 12f, new Color(0.6f, 0.8f, 1f), false));
 
@@ -120,16 +157,23 @@ namespace Spellbound.Controller.Samples {
             _populated = true;
         }
 
-        private void Switch(string cameraName) {
-            CameraRigManager.Instance.Switch(cameraName);
-            RefreshHighlights();
+        private void Switch(string cameraName) => _rig.Switch(cameraName);
+
+        private void ToggleCinematic() {
+            if (SingletonManager.TryGetSingletonInstance<ExampleInputManager>(out var input))
+                input.PressCinematicToggle();
         }
 
         private void RefreshHighlights() {
-            var current = CameraRigManager.Instance.Current;
+            var current = _rig.Current;
 
             foreach (var (button, cameraName) in _camButtons)
                 button.style.backgroundColor = cameraName == current
+                        ? new Color(0.18f, 0.5f, 0.9f)
+                        : new Color(0.22f, 0.22f, 0.26f);
+
+            if (_cinematicButton != null && controller != null && controller.ActionStateMachine != null)
+                _cinematicButton.style.backgroundColor = controller.ActionStateMachine.IsInState<CinematicActionStateExample>()
                         ? new Color(0.18f, 0.5f, 0.9f)
                         : new Color(0.22f, 0.22f, 0.26f);
         }
@@ -138,7 +182,7 @@ namespace Spellbound.Controller.Samples {
             if (_status == null)
                 return;
 
-            _status.text = controller == null || CameraRigManager.Instance == null
+            _status.text = controller == null || _rig == null
                     ? "Waiting for a spawned character…"
                     : string.Empty;
         }

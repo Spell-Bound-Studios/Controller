@@ -49,21 +49,6 @@ namespace Spellbound.Controller {
         public Transform Pivot => _pivot;
 
         /// <summary>
-        /// The live camera's forward — the basis for camera-relative movement.
-        /// </summary>
-        public Vector3 ReferenceForward {
-            get {
-                var cam = _rig?.CurrentCameraTransform;
-
-                return cam != null
-                        ? cam.forward
-                        : _pivot != null
-                                ? _pivot.forward
-                                : Vector3.forward;
-            }
-        }
-
-        /// <summary>
         /// World-space offset added to the follow target when positioning the pivot.
         /// </summary>
         public Vector3 Offset {
@@ -110,19 +95,9 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
-        /// Eases the camera yaw to line up behind the follow target's facing, at <paramref name="degreesPerSecond"/>.
-        /// </summary>
-        public void EaseBehind(float degreesPerSecond) {
-            if (_followTarget == null)
-                return;
-
-            _yaw = Mathf.MoveTowardsAngle(_yaw, _followTarget.eulerAngles.y, degreesPerSecond * Time.deltaTime);
-        }
-
-        /// <summary>
         /// Switches the live camera to the one named <paramref name="cameraName"/>; the rig blends to it.
         /// </summary>
-        public void SwitchCamera(string cameraName) => _rig?.Switch(cameraName);
+        public string SwitchCamera(string cameraName) => _rig?.Switch(cameraName);
 
         /// <summary>
         /// Destroys the runtime pivot this controller created. Call from the owner's OnDestroy.

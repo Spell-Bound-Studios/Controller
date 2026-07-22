@@ -9,7 +9,8 @@ namespace Spellbound.Controller.Samples {
     /// </summary>
     [CreateAssetMenu(fileName = "ReadyStateExample", menuName = "Spellbound/StateMachine/ReadyStateExample")]
     public class ReadyStateExample : BaseActionStateExample {
-        protected override void EnterStateLogic() { }
+        protected override void EnterStateLogic() =>
+                Ctx.ExampleInput.OnCinematicTogglePressed += HandleCinematicTogglePressed;
 
         protected override void UpdateStateLogic() {
             if (Ctx.ExampleInput.IsAiming)
@@ -18,6 +19,9 @@ namespace Spellbound.Controller.Samples {
 
         protected override void FixedUpdateStateLogic() { }
 
-        protected override void ExitStateLogic() { }
+        protected override void ExitStateLogic() =>
+                Ctx.ExampleInput.OnCinematicTogglePressed -= HandleCinematicTogglePressed;
+
+        private void HandleCinematicTogglePressed() => Ctx.ActionStateMachine.ChangeState(ActionStateTypes.Cinematic);
     }
 }

@@ -6,6 +6,7 @@ namespace Spellbound.Controller.Samples {
     /// </summary>
     public enum ActionStateTypes {
         Ready,
-        Aiming
+        Aiming,
+        Cinematic
     }
 }

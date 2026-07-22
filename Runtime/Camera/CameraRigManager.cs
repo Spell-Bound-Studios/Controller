@@ -1,7 +1,9 @@
 // Copyright 2025 Spellbound Studio Inc.
 
+using System;
 using System.Collections.Generic;
 using Spellbound.Core.Logging;
+using Spellbound.Core.Tooling;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -12,8 +14,6 @@ namespace Spellbound.Controller {
     /// <see cref="CinemachineCameraManagerBase"/> must live on the rig GameObject. Drive it via <see cref="ICameraRig"/>.
     /// </summary>
     public class CameraRigManager : CinemachineCameraManagerBase, ICameraRig {
-        public static CameraRigManager Instance;
-
         [SerializeField,
          Tooltip("Camera made live on start (by name). Falls back to the first entry in Cameras when empty/unmatched.")]
         private string defaultCamera;
@@ -24,10 +24,9 @@ namespace Spellbound.Controller {
         private readonly Dictionary<string, CinemachineCamera> _byName = new();
 
         private CinemachineCamera _currentCamera;
+        private string _currentName;
 
-        public string Current => _currentCamera != null
-                ? _currentCamera.name
-                : null;
+        public string Current => _currentName;
 
         public Transform CurrentCameraTransform => _currentCamera != null
                 ? _currentCamera.transform
@@ -38,15 +37,24 @@ namespace Spellbound.Controller {
         /// </summary>
         public IReadOnlyList<string> CameraNames { get; private set; } = new List<string>();
 
+        public event Action<string, string> CurrentChanged;
+
         private void Awake() {
-            if (Instance != null && Instance != this) {
+            if (SingletonManager.TryGetSingletonInstance<ICameraRig>(out var existing) && !ReferenceEquals(existing, this)) {
                 Destroy(gameObject);
 
                 return;
             }
 
-            Instance = this;
+            SingletonManager.RegisterSingleton<ICameraRig>(this);
             BuildIndex();
+        }
+
+        protected override void OnDestroy() {
+            if (SingletonManager.TryGetSingletonInstance<ICameraRig>(out var registered) && ReferenceEquals(registered, this))
+                SingletonManager.UnregisterSingleton<ICameraRig>();
+
+            base.OnDestroy();
         }
 
         protected override void Start() {
@@ -69,14 +77,23 @@ namespace Spellbound.Controller {
         /// </summary>
         public void SetFollowTarget(Transform target) => DefaultTarget.Target.TrackingTarget = target;
 
-        public void Switch(string cameraName) {
+        public string Switch(string cameraName) {
+            var previous = Current;
+
             if (string.IsNullOrEmpty(cameraName) || !_byName.TryGetValue(cameraName, out var camera)) {
                 Log.Warn($"[CameraRigManager] No camera named '{cameraName}'.");
 
-                return;
+                return previous;
             }
 
+            if (camera == _currentCamera)
+                return previous;
+
             _currentCamera = camera;
+            _currentName = cameraName;
+            CurrentChanged?.Invoke(previous, cameraName);
+
+            return previous;
         }
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace Spellbound.Controller.Samples {
 
         [SerializeField] private Vector3 cameraOffset;
         private CameraController _camera;
-        private CameraRigManager _cameraRig;
+        private ICameraRig _cameraRig;
         private CinemachineBrain _brain;
 
         private Transform _tr;
@@ -109,12 +109,9 @@ namespace Spellbound.Controller.Samples {
         // What direction is up from the player?
         public Vector3 PlanarUp { get; private set; }
 
-        /// <summary>
-        /// The live camera's transform — the basis states use for camera-relative movement.
-        /// </summary>
-        public Transform ReferenceTransform => _cameraRig != null
-                ? _cameraRig.CurrentCameraTransform
-                : null;
+        public Transform ReferenceTransform => _camera?.Pivot;
+
+        public CameraController CameraController => _camera;
 
         private void Awake() {
             _tr = transform;
@@ -186,9 +183,7 @@ namespace Spellbound.Controller.Samples {
         /// camera logic beyond feeding input — swap the rig or the controller to change camera behaviour entirely.
         /// </summary>
         private void InitCamera() {
-            _cameraRig = CameraRigManager.Instance;
-
-            if (_cameraRig == null) {
+            if (!SingletonManager.TryGetSingletonInstance<ICameraRig>(out _cameraRig)) {
                 Log.Error("CameraRigManager is missing from the scene.");
                 return;
             }

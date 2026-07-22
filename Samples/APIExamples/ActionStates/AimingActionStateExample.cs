@@ -28,13 +28,7 @@ namespace Spellbound.Controller.Samples {
             Ctx.Animation?.CrossFade(_aimHash, PlayerControllerExample.ActionLayer);
             Ctx.FadeActionLayer(1f);
 
-            var rig = CameraRigManager.Instance;
-
-            if (rig == null)
-                return;
-
-            _restore = rig.Current;
-            rig.Switch(aimCameraName);
+            _restore = Ctx.CameraController?.SwitchCamera(aimCameraName);
         }
 
         protected override void UpdateStateLogic() {
@@ -48,7 +42,7 @@ namespace Spellbound.Controller.Samples {
             Ctx.FadeActionLayer(0f);
 
             if (!string.IsNullOrEmpty(_restore))
-                CameraRigManager.Instance.Switch(_restore);
+                Ctx.CameraController?.SwitchCamera(_restore);
         }
     }
 }
