@@ -8,11 +8,6 @@ using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Spellbound.Controller {
-    /// <summary>
-    /// The central store for camera operations: holds the rig's Cinemachine cameras and blends to the live one,
-    /// switched by name. This is the only camera MonoBehaviour — Cinemachine's
-    /// <see cref="CinemachineCameraManagerBase"/> must live on the rig GameObject. Drive it via <see cref="ICameraRig"/>.
-    /// </summary>
     public class CameraRigManager : CinemachineCameraManagerBase, ICameraRig {
         [SerializeField,
          Tooltip("Camera made live on start (by name). Falls back to the first entry in Cameras when empty/unmatched.")]
@@ -41,16 +36,10 @@ namespace Spellbound.Controller {
                 ? _currentCamera.transform
                 : null;
 
-        /// <summary>
-        /// The names of every camera on the rig, in declaration order.
-        /// </summary>
         public IReadOnlyList<string> CameraNames => _names;
 
         public event Action<string, string> CurrentChanged;
 
-        /// <summary>
-        /// Near clip plane shared by every rig camera; setting it reapplies to all of them.
-        /// </summary>
         public float NearClipPlane {
             get => nearClipPlane;
             set {
@@ -59,9 +48,6 @@ namespace Spellbound.Controller {
             }
         }
 
-        /// <summary>
-        /// Far clip plane shared by every rig camera; setting it reapplies to all of them.
-        /// </summary>
         public float FarClipPlane {
             get => farClipPlane;
             set {
@@ -100,9 +86,6 @@ namespace Spellbound.Controller {
                 Log.Error("[CameraRigManager] No cameras configured.");
         }
 
-        /// <summary>
-        /// Points the rig's default target at the consumer's runtime pivot; every child camera tracks it.
-        /// </summary>
         public void SetFollowTarget(Transform target) => DefaultTarget.Target.TrackingTarget = target;
 
         public string Switch(string cameraName) {
@@ -124,11 +107,6 @@ namespace Spellbound.Controller {
             return previous;
         }
 
-        /// <summary>
-        /// Adds a camera to the rig at runtime, keyed by its GameObject name. Reparents it under the rig (the
-        /// Cinemachine manager only controls child cameras) and applies the rig's clip planes. Returns whether it
-        /// was added.
-        /// </summary>
         public bool Register(CinemachineCamera camera) {
             if (camera == null) {
                 Log.Error("[CameraRigManager] Cannot register a null camera.");
@@ -152,11 +130,6 @@ namespace Spellbound.Controller {
             return true;
         }
 
-        /// <summary>
-        /// Removes the camera named <paramref name="cameraName"/> from the rig. If it was live, the rig switches
-        /// back to the default (or first remaining) camera. The camera GameObject itself is untouched — the caller
-        /// owns its lifecycle. Returns whether a camera was removed.
-        /// </summary>
         public bool Unregister(string cameraName) {
             if (string.IsNullOrEmpty(cameraName) || !_byName.TryGetValue(cameraName, out var camera))
                 return false;
@@ -181,9 +154,6 @@ namespace Spellbound.Controller {
             return true;
         }
 
-        /// <summary>
-        /// The live Cinemachine camera (e.g. for world-space UI / billboards that need it directly).
-        /// </summary>
         public CinemachineCamera GetCurrentCamera() => _currentCamera;
 
         protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) =>
