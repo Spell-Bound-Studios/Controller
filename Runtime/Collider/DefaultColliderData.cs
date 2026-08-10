@@ -1,33 +1,38 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
 using System;
+using Spellbound.Core.Logging;
 using UnityEngine;
 
 namespace Spellbound.Controller {
     [Serializable]
     public class DefaultColliderData {
         [Header("Collider Configuration")]
-        [field: SerializeField]
+        [field: SerializeField,
+         Tooltip("Capsule height. Auto-measured from the mesh unless Override Height is on; drives ride height and the ceiling probe.")]
         public float Height { get; private set; }
 
-        public float CenterY { get; private set; }
-        [field: SerializeField] public float Radius { get; private set; }
+        [field: SerializeField,
+         Tooltip("Capsule radius. Auto-measured from the mesh unless Override Radius is on. Wider = fatter body that fits through fewer gaps.")]
+        public float Radius { get; private set; }
 
         // If the user doesn't want to automatically calculate based on mesh bounds then set to true.
         [Header("Override Settings")]
-        [field: SerializeField]
+        [field: SerializeField,
+         Tooltip("Use the manual Height above instead of auto-measuring it from the mesh.")]
         public bool OverrideHeight { get; private set; }
 
-        [field: SerializeField] public bool OverrideRadius { get; private set; }
+        [field: SerializeField,
+         Tooltip("Use the manual Radius above instead of auto-measuring it from the mesh.")]
+        public bool OverrideRadius { get; private set; }
 
         private const float FallbackHeight = 1.8f;
         private const float FallbackRadius = 0.3f;
 
         [Header("Log Suppression")]
-        [field: SerializeField]
-        public bool SuppressWarnings { get; private set; }
-
-        [field: SerializeField] public bool SuppressConsole { get; private set; } = true;
+        [field: SerializeField,
+         Tooltip("Silence console logs about collider auto-sizing. On by default to keep the console clean.")]
+        public bool SuppressConsole { get; private set; } = true;
 
         public void Initialize(GameObject go) {
             Bounds bounds = default;
@@ -71,7 +76,7 @@ namespace Spellbound.Controller {
 
             if (!foundMesh) {
                 if (!SuppressConsole) {
-                    Debug.LogWarning($"No mesh found on {go.name} or its children. " +
+                    Log.Warn($"No mesh found on {go.name} or its children. " +
                                      $"Using fallback values for non-overridden values.");
                 }
 
@@ -81,7 +86,7 @@ namespace Spellbound.Controller {
             }
 
             if (!SuppressConsole)
-                Debug.Log($"Using mesh bounds from {meshSource} on {go.name}");
+                Log.Info($"Using mesh bounds from {meshSource} on {go.name}");
 
             if (!OverrideHeight) {
                 Height = bounds.size.y;
@@ -93,8 +98,6 @@ namespace Spellbound.Controller {
                 Radius = meshRadius;
                 ValidateAndClampRadius();
             }
-
-            CenterY = Height * 0.5f;
 
             ValidateConfiguration();
         }
@@ -109,13 +112,11 @@ namespace Spellbound.Controller {
                 Radius = FallbackRadius;
                 ValidateAndClampRadius();
             }
-
-            CenterY = Height * 0.5f;
         }
 
         private void ValidateAndClampHeight() {
             if (Height <= 0f) {
-                Debug.LogWarning($"Calculated height {Height} is invalid. Using fallback height {FallbackHeight}.");
+                Log.Warn($"Calculated height {Height} is invalid. Using fallback height {FallbackHeight}.");
                 Height = FallbackHeight;
             }
 
@@ -125,7 +126,7 @@ namespace Spellbound.Controller {
 
         private void ValidateAndClampRadius() {
             if (Radius <= 0f) {
-                Debug.LogWarning($"Calculated radius {Radius} is invalid. Using fallback radius {FallbackRadius}.");
+                Log.Warn($"Calculated radius {Radius} is invalid. Using fallback radius {FallbackRadius}.");
                 Radius = FallbackRadius;
             }
 
@@ -133,29 +134,14 @@ namespace Spellbound.Controller {
         }
 
         private void ValidateConfiguration() {
-            if (CenterY > Height) {
-                Debug.LogWarning($"CenterY ({CenterY}) cannot be higher than Height ({Height}). Clamping to height.");
-                CenterY = Height;
-            }
-
-            if (CenterY < 0f) {
-                Debug.LogWarning($"CenterY ({CenterY}) cannot be negative. Setting to 0.");
-                CenterY = 0f;
-            }
-
-            if (!SuppressConsole) {
-                Debug.Log(
-                    $"DefaultColliderData initialized: Height={Height:F2}, CenterY={CenterY:F2}, Radius={Radius:F2}");
-            }
+            if (!SuppressConsole)
+                Log.Info($"DefaultColliderData initialized: Height={Height:F2}, Radius={Radius:F2}");
         }
 
         /// <summary>
         /// Call this when values are changed in inspector to re-validate
         /// </summary>
         public void HandleValidation() {
-            if (Height > 0)
-                CenterY = Height * 0.5f;
-
             ValidateAndClampHeight();
             ValidateAndClampRadius();
             ValidateConfiguration();

@@ -1,7 +1,7 @@
 {
   "name": "com.spellboundstudios.controller",
-  "version": "1.0.8",
-  "displayName": "Controller",
+  "version": "1.1.0",
+  "displayName": "Spellbound.Controller",
   "description": "This is a player controller library that offers modular states and and state machines to give your character the flexibility to do anything you want in your game world.",
   "unity": "6000.0",
   "author": {

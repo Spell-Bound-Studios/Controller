@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Spellbound.Core.Logging;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,8 +46,7 @@ namespace Spellbound.Controller {
             Instance = this;
 
             if (!profile) {
-                Debug.LogError("Profile object is missing. Please locate in prefab folder and drag and drop.",
-                    this);
+                Log.Error("Profile object is missing. Please locate in prefab folder and drag and drop.");
             }
 
             CreateCanvas();
@@ -264,7 +264,7 @@ namespace Spellbound.Controller {
 
 #if UNITY_EDITOR
             _profileDirty = true;
-            Debug.Log($"[DebugHUD] Removed {removedCount} stale debug field(s) from profile");
+            Log.Info($"[DebugHUD] Removed {removedCount} stale debug field(s) from profile");
 #endif
         }
 
