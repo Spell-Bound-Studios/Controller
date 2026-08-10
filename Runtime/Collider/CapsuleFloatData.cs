@@ -58,12 +58,16 @@ namespace Spellbound.Controller {
                  "overhangs; lower = only very low ceilings stop the float pop.")]
         public float CeilingClearance { get; set; } = 0.15f;
 
+        [Header("Step")]
+        [field: SerializeField, Range(0f, 1f),
+         Tooltip("Fraction of character height treated as step height; raises the collider center so small steps " +
+                 "are climbable. Higher = steps over taller ledges; lower = trips on small steps.")]
+        public float StepHeightPercentage { get; private set; } = 0.25f;
+
         public float RideHeight =>
                 OverrideCalculatedDistance
                         ? DesiredFloatDistance
                         : CalculatedFloatDistance;
-
-        public bool IsWithinGroundedRange(float distance) => distance <= RideHeight + GroundedTolerance;
 
         public void SetCalculatedFloatDistance(float distance) => CalculatedFloatDistance = distance;
     }

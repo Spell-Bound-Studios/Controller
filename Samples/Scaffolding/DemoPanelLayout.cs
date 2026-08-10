@@ -27,6 +27,7 @@ namespace Spellbound.Controller.Samples {
             if (scroll == null) {
                 scroll = new ScrollView(ScrollViewMode.Vertical) {
                     name = ScrollName,
+                    focusable = false,
                     style = {
                         position = Position.Absolute,
                         top = 10f,
@@ -35,6 +36,10 @@ namespace Spellbound.Controller.Samples {
                         maxHeight = Length.Percent(92f)
                     }
                 };
+
+                scroll.RegisterCallback<NavigationMoveEvent>(BlockNavigation, TrickleDown.TrickleDown);
+                scroll.RegisterCallback<NavigationSubmitEvent>(BlockNavigation, TrickleDown.TrickleDown);
+                scroll.RegisterCallback<NavigationCancelEvent>(BlockNavigation, TrickleDown.TrickleDown);
 
                 root.Add(scroll);
             }
@@ -55,5 +60,12 @@ namespace Spellbound.Controller.Samples {
                         backgroundColor = new Color(0f, 0f, 0f, 0.8f)
                     }
                 };
+
+        private static void BlockNavigation<TEvent>(TEvent evt) where TEvent : EventBase<TEvent>, new() {
+            evt.StopPropagation();
+
+            if (evt.target is VisualElement element)
+                element.focusController?.IgnoreEvent(evt);
+        }
     }
 }

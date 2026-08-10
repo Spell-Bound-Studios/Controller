@@ -25,6 +25,7 @@ namespace Spellbound.Controller.Samples {
 
         private readonly List<(Button button, string cameraName)> _camButtons = new();
         private Button _cinematicButton;
+        private bool _cinematicActive;
         private ICameraRig _rig;
         private UIDocument _document;
         private VisualElement _panel;
@@ -69,6 +70,14 @@ namespace Spellbound.Controller.Samples {
             if (controller != null && _rig != null) {
                 if (!_populated) {
                     Populate();
+                    RefreshHighlights();
+                }
+
+                var cinematic = controller.ActionStateMachine != null &&
+                                controller.ActionStateMachine.IsInState<CinematicActionStateExample>();
+
+                if (cinematic != _cinematicActive) {
+                    _cinematicActive = cinematic;
                     RefreshHighlights();
                 }
             }
@@ -203,6 +212,7 @@ namespace Spellbound.Controller.Samples {
 
         private static Slider MakeSlider(string label, float min, float max, float value, Action<float> onChange) {
             var slider = new Slider(label, min, max) { value = value };
+            slider.focusable = false;
             slider.style.marginBottom = 2f;
             slider.labelElement.style.color = Color.white;
             slider.labelElement.style.minWidth = 90f;
@@ -213,6 +223,7 @@ namespace Spellbound.Controller.Samples {
 
         private static Toggle MakeToggle(string label, bool value, Action<bool> onChange) {
             var toggle = new Toggle(label) { value = value };
+            toggle.focusable = false;
             toggle.style.marginBottom = 2f;
             toggle.labelElement.style.color = Color.white;
             toggle.labelElement.style.minWidth = 90f;
@@ -222,6 +233,7 @@ namespace Spellbound.Controller.Samples {
         }
 
         private static void StyleButton(Button button) {
+            button.focusable = false;
             button.style.marginRight = 4f;
             button.style.marginTop = 2f;
             button.style.paddingLeft = 6f;

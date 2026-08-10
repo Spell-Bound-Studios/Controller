@@ -12,8 +12,6 @@ namespace Spellbound.Controller {
          Tooltip("Capsule height. Auto-measured from the mesh unless Override Height is on; drives ride height and the ceiling probe.")]
         public float Height { get; private set; }
 
-        public float CenterY { get; private set; }
-
         [field: SerializeField,
          Tooltip("Capsule radius. Auto-measured from the mesh unless Override Radius is on. Wider = fatter body that fits through fewer gaps.")]
         public float Radius { get; private set; }
@@ -32,10 +30,6 @@ namespace Spellbound.Controller {
         private const float FallbackRadius = 0.3f;
 
         [Header("Log Suppression")]
-        [field: SerializeField,
-         Tooltip("Silence inspector warnings about a missing mesh / fallback sizing.")]
-        public bool SuppressWarnings { get; private set; }
-
         [field: SerializeField,
          Tooltip("Silence console logs about collider auto-sizing. On by default to keep the console clean.")]
         public bool SuppressConsole { get; private set; } = true;
@@ -105,8 +99,6 @@ namespace Spellbound.Controller {
                 ValidateAndClampRadius();
             }
 
-            CenterY = Height * 0.5f;
-
             ValidateConfiguration();
         }
 
@@ -120,8 +112,6 @@ namespace Spellbound.Controller {
                 Radius = FallbackRadius;
                 ValidateAndClampRadius();
             }
-
-            CenterY = Height * 0.5f;
         }
 
         private void ValidateAndClampHeight() {
@@ -144,29 +134,14 @@ namespace Spellbound.Controller {
         }
 
         private void ValidateConfiguration() {
-            if (CenterY > Height) {
-                Log.Warn($"CenterY ({CenterY}) cannot be higher than Height ({Height}). Clamping to height.");
-                CenterY = Height;
-            }
-
-            if (CenterY < 0f) {
-                Log.Warn($"CenterY ({CenterY}) cannot be negative. Setting to 0.");
-                CenterY = 0f;
-            }
-
-            if (!SuppressConsole) {
-                Log.Info(
-                    $"DefaultColliderData initialized: Height={Height:F2}, CenterY={CenterY:F2}, Radius={Radius:F2}");
-            }
+            if (!SuppressConsole)
+                Log.Info($"DefaultColliderData initialized: Height={Height:F2}, Radius={Radius:F2}");
         }
 
         /// <summary>
         /// Call this when values are changed in inspector to re-validate
         /// </summary>
         public void HandleValidation() {
-            if (Height > 0)
-                CenterY = Height * 0.5f;
-
             ValidateAndClampHeight();
             ValidateAndClampRadius();
             ValidateConfiguration();

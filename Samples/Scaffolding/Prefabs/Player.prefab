@@ -8415,12 +8415,7 @@ MonoBehaviour:
       <Radius>k__BackingField: 0.5
       <OverrideHeight>k__BackingField: 0
       <OverrideRadius>k__BackingField: 0
-      <SuppressWarnings>k__BackingField: 0
       <SuppressConsole>k__BackingField: 1
-    <SlopeData>k__BackingField:
-      <StepHeightPercentage>k__BackingField: 0.254
-      <RayDistance>k__BackingField: 1.5
-      <StepReachForce>k__BackingField: 25
     <CapsuleFloatData>k__BackingField:
       <DesiredFloatDistance>k__BackingField: 0
       <CalculatedFloatDistance>k__BackingField: 1.254
@@ -8432,6 +8427,7 @@ MonoBehaviour:
       <GroundProbeSpeedScale>k__BackingField: 0.1
       <WallProbeDistance>k__BackingField: 0.35
       <CeilingClearance>k__BackingField: 0.15
+      <StepHeightPercentage>k__BackingField: 0.254
   <LayerData>k__BackingField:
     <GroundLayer>k__BackingField:
       serializedVersion: 2
@@ -8453,7 +8449,16 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: -1
-        value: 0.25
+        value: 0.4
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: -0.5
+        value: 0.85
         inSlope: 0
         outSlope: 0
         tangentMode: 0

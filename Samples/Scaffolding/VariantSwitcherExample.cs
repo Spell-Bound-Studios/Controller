@@ -166,6 +166,7 @@ namespace Spellbound.Controller.Samples {
                 };
 
         private static void StyleButton(Button button) {
+            button.focusable = false;
             button.style.marginRight = 4f;
             button.style.marginTop = 2f;
             button.style.paddingLeft = 6f;

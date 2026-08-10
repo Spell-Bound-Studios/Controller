@@ -108,15 +108,40 @@ namespace Spellbound.Controller.Samples {
             if (horizontalForce.sqrMagnitude < 1e-6f)
                 return horizontalForce;
 
+            var firstWall = ProbeWall(horizontalForce);
+
+            if (!firstWall.HasHit)
+                return horizontalForce;
+
+            var adjusted = ControllerHelper.CancelIntoSurface(horizontalForce, firstWall.Normal);
+
+            if (adjusted.sqrMagnitude < 1e-6f)
+                return Vector3.zero;
+
+            var secondWall = ProbeWall(adjusted);
+
+            if (!secondWall.HasHit)
+                return adjusted;
+
+            adjusted = ControllerHelper.ProjectOntoCrease(adjusted, firstWall.Normal, secondWall.Normal);
+
+            if (adjusted.sqrMagnitude < 1e-6f)
+                return Vector3.zero;
+
+            return ProbeWall(adjusted).HasHit
+                    ? Vector3.zero
+                    : adjusted;
+        }
+
+        private GroundProbeResult ProbeWall(Vector3 push) {
             var wall = Ctx.ResizableCapsuleCollider.ProbeGround(
-                horizontalForce.normalized,
+                push.normalized,
                 Ctx.ResizableCapsuleCollider.CapsuleFloatData.WallProbeDistance,
                 Ctx.LayerData.GroundLayer);
 
-            if (!wall.HasHit || ControllerHelper.GetSlopeAngle(wall.Normal, Ctx.PlanarUp) <= Ctx.StatData.maxSlopeAngle)
-                return horizontalForce;
-
-            return ControllerHelper.CancelIntoSurface(horizontalForce, wall.Normal);
+            return wall.HasHit && ControllerHelper.GetSlopeAngle(wall.Normal, Ctx.PlanarUp) > Ctx.StatData.maxSlopeAngle
+                    ? wall
+                    : GroundProbeResult.Miss;
         }
 
         /// <summary>
@@ -145,12 +170,21 @@ namespace Spellbound.Controller.Samples {
         /// </summary>
         protected bool IsSlopeTooSteep() => CurrentSlopeAngle() > Ctx.StatData.maxSlopeAngle;
 
-        protected virtual void HandleCharacterRotation() =>
-                ControllerHelper.HandleCharacterRotation(
-                    Ctx.Rb,
-                    Ctx.PlanarUp,
-                    Ctx.RotationData.turnTowardsInputSpeed,
-                    Ctx.RotationData.RotationFallOffAngle,
-                    Time.fixedDeltaTime);
+        protected virtual void HandleCharacterRotation() {
+            var velocity = ControllerHelper.GetPlanarVelocity(Ctx.Rb, Ctx.PlanarUp);
+            var minSpeed = Ctx.RotationData.FaceVelocityMinSpeed;
+
+            var direction = velocity.sqrMagnitude >= minSpeed * minSpeed
+                    ? velocity
+                    : GetInputDirectionRelativeToCamera();
+
+            ControllerHelper.HandleCharacterRotation(
+                Ctx.Rb,
+                direction,
+                Ctx.PlanarUp,
+                Ctx.RotationData.turnTowardsInputSpeed,
+                Ctx.RotationData.RotationFallOffAngle,
+                Time.fixedDeltaTime);
+        }
     }
 }

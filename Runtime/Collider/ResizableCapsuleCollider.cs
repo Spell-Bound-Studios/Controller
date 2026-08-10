@@ -15,9 +15,6 @@ namespace Spellbound.Controller {
         /// <summary>The unmodified capsule dimensions derived from the player visual.</summary>
         [field: SerializeField] public DefaultColliderData DefaultColliderData { get; private set; } = new();
 
-        /// <summary>Step-height percentage, ground-ray distance, and step-reach force.</summary>
-        [field: SerializeField] public SlopeData SlopeData { get; private set; } = new();
-
         /// <summary>Ride height, float-spring, and ground-probe settings.</summary>
         [field: SerializeField] public CapsuleFloatData CapsuleFloatData { get; private set; } = new();
 
@@ -34,7 +31,8 @@ namespace Spellbound.Controller {
         /// </summary>
         public void CalculateCapsuleColliderDimensions() {
             collider.center =
-                    new Vector3(0f, DefaultColliderData.Height * (1f + SlopeData.StepHeightPercentage) * 0.5f, 0f);
+                    new Vector3(0f, DefaultColliderData.Height * (1f + CapsuleFloatData.StepHeightPercentage) * 0.5f,
+                        0f);
 
             SetCapsuleColliderRadius(DefaultColliderData.Radius);
             SetCapsuleColliderHeight((DefaultColliderData.Height - collider.center.y) * 2f);

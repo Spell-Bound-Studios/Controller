@@ -21,7 +21,16 @@ namespace Spellbound.Controller {
         [SerializeField, Tooltip("The rig's cameras; switched between by GameObject name.")]
         private List<CinemachineCamera> cameras = new();
 
+        [Header("Lens")]
+        [SerializeField, Tooltip("Near clip plane applied to every rig camera, so switching cameras never reverts it.")]
+        private float nearClipPlane = 0.3f;
+
+        [SerializeField, Tooltip("Far clip plane applied to every rig camera, so switching cameras never reverts it. " +
+                                 "Raise it for long view distances (distant terrain, ocean planes).")]
+        private float farClipPlane = 1000f;
+
         private readonly Dictionary<string, CinemachineCamera> _byName = new();
+        private readonly List<string> _names = new();
 
         private CinemachineCamera _currentCamera;
         private string _currentName;
@@ -35,9 +44,31 @@ namespace Spellbound.Controller {
         /// <summary>
         /// The names of every camera on the rig, in declaration order.
         /// </summary>
-        public IReadOnlyList<string> CameraNames { get; private set; } = new List<string>();
+        public IReadOnlyList<string> CameraNames => _names;
 
         public event Action<string, string> CurrentChanged;
+
+        /// <summary>
+        /// Near clip plane shared by every rig camera; setting it reapplies to all of them.
+        /// </summary>
+        public float NearClipPlane {
+            get => nearClipPlane;
+            set {
+                nearClipPlane = value;
+                ApplyClipPlanes();
+            }
+        }
+
+        /// <summary>
+        /// Far clip plane shared by every rig camera; setting it reapplies to all of them.
+        /// </summary>
+        public float FarClipPlane {
+            get => farClipPlane;
+            set {
+                farClipPlane = value;
+                ApplyClipPlanes();
+            }
+        }
 
         private void Awake() {
             if (SingletonManager.TryGetSingletonInstance<ICameraRig>(out var existing) && !ReferenceEquals(existing, this)) {
@@ -48,6 +79,7 @@ namespace Spellbound.Controller {
 
             SingletonManager.RegisterSingleton<ICameraRig>(this);
             BuildIndex();
+            ApplyClipPlanes();
         }
 
         protected override void OnDestroy() {
@@ -60,11 +92,7 @@ namespace Spellbound.Controller {
         protected override void Start() {
             base.Start();
 
-            var initial = !string.IsNullOrEmpty(defaultCamera) && _byName.ContainsKey(defaultCamera)
-                    ? defaultCamera
-                    : CameraNames.Count > 0
-                            ? CameraNames[0]
-                            : null;
+            var initial = ResolveDefaultName();
 
             if (initial != null)
                 Switch(initial);
@@ -97,6 +125,63 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
+        /// Adds a camera to the rig at runtime, keyed by its GameObject name. Reparents it under the rig (the
+        /// Cinemachine manager only controls child cameras) and applies the rig's clip planes. Returns whether it
+        /// was added.
+        /// </summary>
+        public bool Register(CinemachineCamera camera) {
+            if (camera == null) {
+                Log.Error("[CameraRigManager] Cannot register a null camera.");
+
+                return false;
+            }
+
+            if (!_byName.TryAdd(camera.name, camera)) {
+                Log.Error($"[CameraRigManager] Duplicate camera name '{camera.name}'.");
+
+                return false;
+            }
+
+            if (camera.transform.parent != transform)
+                camera.transform.SetParent(transform, true);
+
+            cameras.Add(camera);
+            _names.Add(camera.name);
+            ApplyClipPlanes();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Removes the camera named <paramref name="cameraName"/> from the rig. If it was live, the rig switches
+        /// back to the default (or first remaining) camera. The camera GameObject itself is untouched — the caller
+        /// owns its lifecycle. Returns whether a camera was removed.
+        /// </summary>
+        public bool Unregister(string cameraName) {
+            if (string.IsNullOrEmpty(cameraName) || !_byName.TryGetValue(cameraName, out var camera))
+                return false;
+
+            _byName.Remove(cameraName);
+            _names.Remove(cameraName);
+            cameras.Remove(camera);
+
+            if (_currentCamera != camera)
+                return true;
+
+            _currentCamera = null;
+            _currentName = null;
+
+            var fallback = ResolveDefaultName();
+
+            if (fallback != null)
+                Switch(fallback);
+            else
+                Log.Warn("[CameraRigManager] Unregistered the last camera; nothing is live.");
+
+            return true;
+        }
+
+        /// <summary>
         /// The live Cinemachine camera (e.g. for world-space UI / billboards that need it directly).
         /// </summary>
         public CinemachineCamera GetCurrentCamera() => _currentCamera;
@@ -104,8 +189,22 @@ namespace Spellbound.Controller {
         protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) =>
                 _currentCamera;
 
+        private void ApplyClipPlanes() {
+            nearClipPlane = Mathf.Max(nearClipPlane, 0.01f);
+            farClipPlane = Mathf.Max(farClipPlane, nearClipPlane + 0.001f);
+
+            foreach (var camera in cameras) {
+                if (camera == null)
+                    continue;
+
+                camera.Lens.NearClipPlane = nearClipPlane;
+                camera.Lens.FarClipPlane = farClipPlane;
+            }
+        }
+
         private void BuildIndex() {
-            var names = new List<string>();
+            _byName.Clear();
+            _names.Clear();
 
             foreach (var camera in cameras) {
                 if (camera == null) {
@@ -120,10 +219,15 @@ namespace Spellbound.Controller {
                     continue;
                 }
 
-                names.Add(camera.name);
+                _names.Add(camera.name);
             }
-
-            CameraNames = names;
         }
+
+        private string ResolveDefaultName() =>
+                !string.IsNullOrEmpty(defaultCamera) && _byName.ContainsKey(defaultCamera)
+                        ? defaultCamera
+                        : _names.Count > 0
+                                ? _names[0]
+                                : null;
     }
 }

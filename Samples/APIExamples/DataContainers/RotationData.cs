@@ -16,5 +16,8 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Heading error (degrees) at which the turn reaches full speed; below it the turn eases off. " +
                  "Higher = gentler, more gradual small corrections; lower = even tiny corrections snap to face the input.")]
         public float RotationFallOffAngle { get; set; } = 90f;
+
+        [field: SerializeField, Range(0f, 5f)]
+        public float FaceVelocityMinSpeed { get; set; } = 0.5f;
     }
 }

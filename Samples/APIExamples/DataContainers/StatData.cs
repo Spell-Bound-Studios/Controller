@@ -35,7 +35,7 @@ namespace Spellbound.Controller.Samples {
          Tooltip("Speed multiplier vs slope along your move direction. x: -1 full uphill, 0 flat/traverse, +1 full " +
                  "downhill. y: the multiplier (raise the uphill end to climb faster, the downhill end to descend faster).")]
         public AnimationCurve slopeSpeedCurve { get; set; } =
-                new(new Keyframe(-1f, 0.25f), new Keyframe(0f, 1f), new Keyframe(1f, 1.3f));
+                new(new Keyframe(-1f, 0.4f), new Keyframe(-0.5f, 0.85f), new Keyframe(0f, 1f), new Keyframe(1f, 1.3f));
 
         [Header("Slide")]
         [field: SerializeField, Range(0f, 100f),

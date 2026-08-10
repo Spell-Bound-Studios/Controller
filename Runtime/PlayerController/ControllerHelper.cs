@@ -1,6 +1,5 @@
 ﻿// Copyright 2025 Spellbound Studio Inc.
 
-using System;
 using UnityEngine;
 
 namespace Spellbound.Controller {
@@ -115,13 +114,19 @@ namespace Spellbound.Controller {
         /// This is the preferred rotation method for standard player-based character controllers.
         /// </summary>
         public static void HandleCharacterRotation(
-            Rigidbody rb, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle, float deltaTime) {
-            var planarVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, planarUp);
+            Rigidbody rb, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle, float deltaTime) =>
+                HandleCharacterRotation(rb, Vector3.ProjectOnPlane(rb.linearVelocity, planarUp), planarUp, turnSpeed,
+                    rotationFallOffAngle, deltaTime);
 
-            if (planarVelocity.sqrMagnitude < 1e-6f)
+        public static void HandleCharacterRotation(
+            Rigidbody rb, Vector3 direction, Vector3 planarUp, float turnSpeed, float rotationFallOffAngle,
+            float deltaTime) {
+            var planarDirection = Vector3.ProjectOnPlane(direction, planarUp);
+
+            if (planarDirection.sqrMagnitude < 1e-6f)
                 return;
 
-            var desiredDir = planarVelocity.normalized;
+            var desiredDir = planarDirection.normalized;
             var targetRotation = Quaternion.LookRotation(desiredDir, planarUp);
             var angleDiff = Quaternion.Angle(rb.rotation, targetRotation);
             var speedFactor = Mathf.InverseLerp(0f, rotationFallOffAngle, angleDiff);
@@ -146,19 +151,30 @@ namespace Spellbound.Controller {
         }
 
         /// <summary>
-        /// Applies a step-up force to help with ground adherence.
-        /// </summary>
-        public static void ApplyStepUpForce(Rigidbody rb, float stepForce, Vector3 upDirection, ForceMode forceMode) {
-            var upForce = upDirection * stepForce;
-            rb.AddForce(upForce, forceMode);
-        }
-
-        /// <summary>
         /// Removes the part of a vector that drives into a surface, leaving the component that slides along it.
         /// The surface normal points out of the surface (toward the mover).
         /// </summary>
         public static Vector3 CancelIntoSurface(Vector3 vector, Vector3 surfaceNormal) =>
                 vector - Mathf.Min(Vector3.Dot(vector, surfaceNormal), 0f) * surfaceNormal;
+
+        public static Vector3 GetDirectionTangentToSurface(Vector3 direction, Vector3 surfaceNormal, Vector3 up) {
+            var directionRight = Vector3.Cross(direction, up);
+
+            return directionRight.sqrMagnitude > 1e-8f
+                    ? Vector3.Cross(surfaceNormal, directionRight).normalized
+                    : Vector3.ProjectOnPlane(direction, surfaceNormal).normalized;
+        }
+
+        public static Vector3 ProjectOntoCrease(Vector3 vector, Vector3 normalA, Vector3 normalB) {
+            var crease = Vector3.Cross(normalA, normalB);
+
+            if (crease.sqrMagnitude < 1e-6f)
+                return CancelIntoSurface(vector, normalB);
+
+            crease.Normalize();
+
+            return Vector3.Dot(vector, crease) * crease;
+        }
 
         // #####################
         // GROUND PROBE & FLOAT
@@ -242,25 +258,6 @@ namespace Spellbound.Controller {
         /// </summary>
         public static bool CheckOverlapSphere(Vector3 position, float radius, LayerMask layers) =>
                 Physics.CheckSphere(position, radius, layers, QueryTriggerInteraction.Ignore);
-
-        /// <summary>
-        /// Returns all colliders overlapping with a sphere.
-        /// </summary>
-        public static Collider[] GetOverlappingColliders(
-            Vector3 position, float radius, LayerMask layers, int maxResults = 10) {
-            var results = new Collider[maxResults];
-
-            var count = Physics.OverlapSphereNonAlloc(position, radius, results, layers,
-                QueryTriggerInteraction.Ignore);
-
-            if (count == maxResults)
-                return results;
-
-            var trimmedResults = new Collider[count];
-            Array.Copy(results, trimmedResults, count);
-
-            return trimmedResults;
-        }
 
         // ####################
         // MATHEMATICAL HELPERS
