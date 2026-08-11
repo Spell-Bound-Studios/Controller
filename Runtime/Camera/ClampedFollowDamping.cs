@@ -13,7 +13,7 @@ namespace Spellbound.Controller {
         [SerializeField, Range(0f, 3f),
          Tooltip("Hard cap in meters on how far the camera may trail the follow target in any direction, so fast " +
                  "acceleration never leaves the character behind. 0 = no cap.")]
-        private float maxLag = 0.5f;
+        private float maxLag = 0.35f;
 
         private Vector3 _trackedPosition;
         private Vector3 _displacement;

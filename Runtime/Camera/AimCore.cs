@@ -29,8 +29,8 @@ namespace Spellbound.Controller {
 
         private void OnValidate() {
             HorizontalLook.Validate();
-            VerticalLook.Range.x = Mathf.Clamp(VerticalLook.Range.x, -90f, 90f);
-            VerticalLook.Range.y = Mathf.Clamp(VerticalLook.Range.y, -90f, 90f);
+            VerticalLook.Range.x = Mathf.Clamp(VerticalLook.Range.x, -89f, 89f);
+            VerticalLook.Range.y = Mathf.Clamp(VerticalLook.Range.y, -89f, 89f);
             VerticalLook.Validate();
         }
 

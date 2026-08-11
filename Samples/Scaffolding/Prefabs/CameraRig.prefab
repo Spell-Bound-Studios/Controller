@@ -239,7 +239,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   damping: 6
-  maxLag: 0.5
+  maxLag: 0.35
 --- !u!114 &6900000000000000309
 MonoBehaviour:
   m_ObjectHideFlags: 0
