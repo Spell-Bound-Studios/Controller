@@ -106,9 +106,15 @@ namespace Spellbound.Controller.Samples {
         // What direction is up from the player?
         public Vector3 PlanarUp { get; private set; }
 
-        public Transform ReferenceTransform => _cameraRig?.CurrentCameraTransform;
+        public Transform ReferenceTransform => _aimCore != null
+                ? _aimCore.transform
+                : null;
 
         public ICameraRig CameraRig => _cameraRig;
+
+        public AimCore AimCore => _aimCore;
+
+        private AimCore _aimCore;
 
         private void Awake() {
             _tr = transform;
@@ -165,8 +171,8 @@ namespace Spellbound.Controller.Samples {
 #endif
 
         /// <summary>
-        /// Hands this character to the rig as the follow target. The player owns no camera logic — the rig's
-        /// cameras and their input axes define the behaviour entirely; swap the rig to change the camera.
+        /// Hands this character's aim core to the rig as the follow target. The core owns the look rotation;
+        /// the rig's cameras attach to it, so every camera agrees on where the player is looking.
         /// </summary>
         private void InitCamera() {
             if (!SingletonManager.TryGetSingletonInstance<ICameraRig>(out _cameraRig)) {
@@ -174,11 +180,18 @@ namespace Spellbound.Controller.Samples {
                 return;
             }
 
+            _aimCore = GetComponentInChildren<AimCore>();
+
+            if (_aimCore == null) {
+                Log.Error("Player has no AimCore child; the rig has nothing to follow.");
+                return;
+            }
+
             Cursor.lockState = lockCursorOnStart
                     ? CursorLockMode.Locked
                     : CursorLockMode.None;
 
-            _cameraRig.SetFollowTarget(_tr);
+            _cameraRig.SetFollowTarget(_aimCore.transform);
         }
 
         public void SetCameraFollowMouse(bool follow) {

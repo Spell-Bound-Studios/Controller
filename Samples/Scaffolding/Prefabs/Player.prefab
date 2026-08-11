@@ -8303,6 +8303,7 @@ GameObject:
   - component: {fileID: 4235120299701147794}
   - component: {fileID: 1900024906980112349}
   - component: {fileID: 5320208621824808184}
+  - component: {fileID: 5320208621824808203}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -8322,6 +8323,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5320208621824808201}
   - {fileID: 6845938572013642121}
   - {fileID: 6451511091116448452}
   - {fileID: 9076885199120818175}
@@ -8544,6 +8546,105 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   hideDistance: 0.5
   bodyCollider: {fileID: 7305499241619662692}
+--- !u!1 &5320208621824808200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5320208621824808201}
+  - component: {fileID: 5320208621824808202}
+  m_Layer: 3
+  m_Name: AimCore
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5320208621824808201
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5320208621824808200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 650058928350208361}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5320208621824808202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5320208621824808200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d81f6c2a95b4e07b3d8a1f79c250e64, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  HorizontalLook:
+    Value: 0
+    Center: 0
+    Range: {x: -180, y: 180}
+    Wrap: 1
+    Recentering:
+      Enabled: 0
+      Wait: 1
+      Time: 2
+  VerticalLook:
+    Value: 15
+    Center: 15
+    Range: {x: -89, y: 89}
+    Wrap: 0
+    Recentering:
+      Enabled: 0
+      Wait: 1
+      Time: 2
+--- !u!114 &5320208621824808203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8702816091274949866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d4a27f6c95e4b31a7d2f80c1e6b9a35, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  ScanRecursively: 1
+  SuppressInputWhileBlending: 1
+  IgnoreTimeScale: 0
+  m_ControllerManager:
+    Controllers:
+    - Name: Horizontal Look
+      Owner: {fileID: 5320208621824808202}
+      Enabled: 1
+      Input:
+        InputSource: 1
+        Gain: 0.5
+      InputValue: 0
+      Driver:
+        AccelTime: 0.05
+        DecelTime: 0.05
+    - Name: Vertical Look
+      Owner: {fileID: 5320208621824808202}
+      Enabled: 1
+      Input:
+        InputSource: 2
+        Gain: -0.5
+      InputValue: 0
+      Driver:
+        AccelTime: 0.05
+        DecelTime: 0.05
 --- !u!1 &8707547554009297974
 GameObject:
   m_ObjectHideFlags: 0

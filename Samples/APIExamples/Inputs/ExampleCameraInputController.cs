@@ -30,7 +30,7 @@ namespace Spellbound.Controller.Samples {
             var value = InputSource switch {
                 Source.LookX => _input.LookDirection.x,
                 Source.LookY => _input.LookDirection.y,
-                Source.Zoom => _input.MouseWheelValue,
+                Source.Zoom => Mathf.Clamp(_input.MouseWheelValue, -1f, 1f),
                 _ => 0f
             };
 
@@ -48,9 +48,9 @@ namespace Spellbound.Controller.Samples {
 
         protected override void InitializeControllerDefaultsForAxis(
             in IInputAxisOwner.AxisDescriptor axis, Controller controller) {
-            if (axis.Name.Contains("Scale")) {
+            if (axis.Name.Contains("Scale") || axis.Name.Contains("Zoom")) {
                 controller.Input.InputSource = ExampleCameraInputReader.Source.Zoom;
-                controller.Input.Gain = -0.002f;
+                controller.Input.Gain = -0.2f;
             }
             else if (axis.Hint == IInputAxisOwner.AxisDescriptor.Hints.X) {
                 controller.Input.InputSource = ExampleCameraInputReader.Source.LookX;

@@ -17,6 +17,7 @@ namespace Spellbound.Controller {
 
         private Vector3 _trackedPosition;
         private Vector3 _displacement;
+        private Quaternion _bodyOrientation;
         private bool _hasTrackedPosition;
 
         public float Damping {
@@ -44,6 +45,7 @@ namespace Spellbound.Controller {
 
         private void ApplyPositionLag(CinemachineVirtualCameraBase vcam, ref CameraState state, float deltaTime) {
             _displacement = Vector3.zero;
+            _bodyOrientation = state.RawOrientation;
 
             var target = vcam.Follow;
 
@@ -75,6 +77,9 @@ namespace Spellbound.Controller {
 
         private void CancelLagRotation(ref CameraState state) {
             if (_displacement.sqrMagnitude < 1e-8f || !state.HasLookAt())
+                return;
+
+            if (Quaternion.Angle(_bodyOrientation, state.RawOrientation) < 1e-3f)
                 return;
 
             var actualDirection = state.ReferenceLookAt - state.GetCorrectedPosition();

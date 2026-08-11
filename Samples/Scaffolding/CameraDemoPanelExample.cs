@@ -171,15 +171,9 @@ namespace Spellbound.Controller.Samples {
             _populated = true;
         }
 
-        private ExampleCameraInputController LiveInputController {
-            get {
-                var cameraTransform = _rig?.CurrentCameraTransform;
-
-                return cameraTransform != null
-                        ? cameraTransform.GetComponent<ExampleCameraInputController>()
-                        : null;
-            }
-        }
+        private ExampleCameraInputController LiveInputController => controller != null
+                ? controller.GetComponent<ExampleCameraInputController>()
+                : null;
 
         private static float GetGainMagnitude(ExampleCameraInputController input,
             ExampleCameraInputReader.Source source) {
