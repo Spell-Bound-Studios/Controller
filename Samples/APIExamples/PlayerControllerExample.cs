@@ -3,7 +3,6 @@
 using System;
 using Spellbound.Core.Logging;
 using Spellbound.Core.Tooling;
-using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
@@ -29,13 +28,11 @@ namespace Spellbound.Controller.Samples {
         public ExampleInputManager ExampleInput { get; private set; }
 
         [Header("Camera:")]
-        [field: SerializeField]
-        public CameraData CameraData { get; private set; }
+        [SerializeField,
+         Tooltip("Lock and hide the cursor on start for mouse-look. On = locked; off = free cursor.")]
+        private bool lockCursorOnStart = true;
 
-        [SerializeField] private Vector3 cameraOffset;
-        private CameraController _camera;
         private ICameraRig _cameraRig;
-        private CinemachineBrain _brain;
 
         private Transform _tr;
 
@@ -109,9 +106,9 @@ namespace Spellbound.Controller.Samples {
         // What direction is up from the player?
         public Vector3 PlanarUp { get; private set; }
 
-        public Transform ReferenceTransform => _camera?.Pivot;
+        public Transform ReferenceTransform => _cameraRig?.CurrentCameraTransform;
 
-        public CameraController CameraController => _camera;
+        public ICameraRig CameraRig => _cameraRig;
 
         private void Awake() {
             _tr = transform;
@@ -152,20 +149,9 @@ namespace Spellbound.Controller.Samples {
             ActionStateMachine.FixedUpdateStateMachine();
         }
         
-        private void LateUpdate() {
-            if (_camera == null)
-                return;
-
-            _camera.TrackTarget();
-
-            if (CameraData.FollowMouse)
-                _camera.ApplyLook(ExampleInput.LookDirection);
-        }
-
         private void OnDestroy() {
             LocoStateMachine?.Dispose();
             ActionStateMachine?.Dispose();
-            _camera?.Dispose();
         }
 
 #if UNITY_EDITOR
@@ -179,8 +165,8 @@ namespace Spellbound.Controller.Samples {
 #endif
 
         /// <summary>
-        /// Wires the standalone <see cref="CameraController"/> to the rig and starts driving it. The player owns no
-        /// camera logic beyond feeding input — swap the rig or the controller to change camera behaviour entirely.
+        /// Hands this character to the rig as the follow target. The player owns no camera logic — the rig's
+        /// cameras and their input axes define the behaviour entirely; swap the rig to change the camera.
         /// </summary>
         private void InitCamera() {
             if (!SingletonManager.TryGetSingletonInstance<ICameraRig>(out _cameraRig)) {
@@ -188,23 +174,28 @@ namespace Spellbound.Controller.Samples {
                 return;
             }
 
-            Cursor.lockState = CameraData.LockCursorOnStart
+            Cursor.lockState = lockCursorOnStart
                     ? CursorLockMode.Locked
                     : CursorLockMode.None;
 
-            _camera = new CameraController(_cameraRig, _tr, CameraData, cameraOffset);
-
-            if (!_brain && Camera.main)
-                Camera.main.TryGetComponent(out _brain);
-
-            if (!_brain)
-                _brain = FindAnyObjectByType<CinemachineBrain>();
-
-            if (_brain && _camera.Pivot != null)
-                _brain.WorldUpOverride = _camera.Pivot;
+            _cameraRig.SetFollowTarget(_tr);
         }
 
-        public void SetCameraFollowMouse(bool follow) => CameraData.FollowMouse = follow;
+        public void SetCameraFollowMouse(bool follow) {
+            if (ExampleInput != null)
+                ExampleInput.CameraInputSuppressed = !follow;
+        }
+
+        public string SwitchCamera(string cameraName) {
+            if (_cameraRig == null)
+                return null;
+
+            var previous = _cameraRig.Current;
+
+            return _cameraRig.Switch(cameraName)
+                    ? previous
+                    : null;
+        }
 
         /// <summary>
         /// Caches the parameter hashes states drive. The Animator itself owns the states, blend trees, layers, and

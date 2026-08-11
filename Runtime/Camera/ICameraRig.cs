@@ -31,7 +31,8 @@ namespace Spellbound.Controller {
 
         /// <summary>
         /// Makes the camera named <paramref name="cameraName"/> the live one; the backend blends to it.
+        /// Returns false when no camera has that name.
         /// </summary>
-        public string Switch(string cameraName);
+        public bool Switch(string cameraName);
     }
 }

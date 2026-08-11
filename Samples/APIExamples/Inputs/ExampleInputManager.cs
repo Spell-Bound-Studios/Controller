@@ -77,9 +77,17 @@ namespace Spellbound.Controller.Samples {
 
         #region PlayerInputs
 
+        public bool CameraInputSuppressed { get; set; }
+
         public Vector3 Direction => _inputActions.PlayerInput.Movement.ReadValue<Vector2>();
-        public Vector3 LookDirection => _inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
-        public float MouseWheelValue => _inputActions.PlayerInput.MouseWheel.ReadValue<float>();
+
+        public Vector3 LookDirection => CameraInputSuppressed
+                ? Vector3.zero
+                : (Vector3)_inputActions.PlayerInput.LookDirection.ReadValue<Vector2>();
+
+        public float MouseWheelValue => CameraInputSuppressed
+                ? 0f
+                : _inputActions.PlayerInput.MouseWheel.ReadValue<Vector2>().y;
 
         public bool IsAiming => Mouse.current != null && Mouse.current.rightButton.isPressed;
 

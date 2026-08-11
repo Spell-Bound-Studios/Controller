@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 namespace Spellbound.Controller.Samples {
     /// <summary>
     /// Runtime UIToolkit panel showcasing the camera API: switch the live camera by name (the rig's cameras) and
-    /// drive the live <see cref="ICameraSettings"/> (sensitivity, invert, smoothing, pitch) with sliders/toggles.
+    /// drive the live camera's input axes (sensitivity, invert) with sliders/toggles.
     /// Manages only its own sub-panel (never clears the root), so it coexists with the other demo panels on one
     /// shared UIDocument; add a <see cref="DemoCursorToggleExample"/> to free the cursor for clicks. Assign a Panel
     /// Settings, leave the Source Asset empty. Demo scaffolding.
@@ -18,7 +18,7 @@ namespace Spellbound.Controller.Samples {
     [RequireComponent(typeof(UIDocument))]
     public sealed class CameraDemoPanelExample : MonoBehaviour {
         [SerializeField,
-         Tooltip("Controller whose CameraData (ICameraSettings) the sliders drive. Auto-found if left empty.")]
+         Tooltip("Controller the cinematic toggle and state highlights read. Auto-found if left empty.")]
         private PlayerControllerExample controller;
 
         [SerializeField] private string stateDrivenCamera = "CinematicCamera";
@@ -95,7 +95,10 @@ namespace Spellbound.Controller.Samples {
                 _rig.CurrentChanged -= OnCurrentChanged;
         }
 
-        private void OnCurrentChanged(string previous, string current) => RefreshHighlights();
+        private void OnCurrentChanged(string previous, string current) {
+            _populated = false;
+            RefreshHighlights();
+        }
 
         private void EnsurePanelAttached() {
             var column = DemoPanelLayout.GetColumn(_document.rootVisualElement);
@@ -152,18 +155,80 @@ namespace Spellbound.Controller.Samples {
             StyleButton(_cinematicButton);
             stateRow.Add(_cinematicButton);
 
-            _content.Add(MakeLabel("Look", 12f, new Color(0.6f, 0.8f, 1f), false));
+            var input = LiveInputController;
 
-            var s = controller.CameraData;
-            _content.Add(MakeSlider("Sensitivity X", 0f, 5f, s.SensitivityX, v => s.SensitivityX = v));
-            _content.Add(MakeSlider("Sensitivity Y", 0f, 5f, s.SensitivityY, v => s.SensitivityY = v));
-            _content.Add(MakeToggle("Invert Y", s.InvertY, v => s.InvertY = v));
-            _content.Add(MakeToggle("Smooth Look", s.SmoothLook, v => s.SmoothLook = v));
-            _content.Add(MakeSlider("Smoothing", 1f, 50f, s.SmoothingFactor, v => s.SmoothingFactor = v));
-            _content.Add(MakeSlider("Min Pitch", -89f, 0f, s.MinPitch, v => s.MinPitch = v));
-            _content.Add(MakeSlider("Max Pitch", 0f, 89f, s.MaxPitch, v => s.MaxPitch = v));
+            if (input != null) {
+                _content.Add(MakeLabel("Look", 12f, new Color(0.6f, 0.8f, 1f), false));
+                _content.Add(MakeSlider("Sensitivity X", 0f, 5f,
+                    GetGainMagnitude(input, ExampleCameraInputReader.Source.LookX),
+                    v => SetGainMagnitude(ExampleCameraInputReader.Source.LookX, v)));
+                _content.Add(MakeSlider("Sensitivity Y", 0f, 5f,
+                    GetGainMagnitude(input, ExampleCameraInputReader.Source.LookY),
+                    v => SetGainMagnitude(ExampleCameraInputReader.Source.LookY, v)));
+                _content.Add(MakeToggle("Invert Y", IsYInverted(input), SetYInverted));
+            }
 
             _populated = true;
+        }
+
+        private ExampleCameraInputController LiveInputController {
+            get {
+                var cameraTransform = _rig?.CurrentCameraTransform;
+
+                return cameraTransform != null
+                        ? cameraTransform.GetComponent<ExampleCameraInputController>()
+                        : null;
+            }
+        }
+
+        private static float GetGainMagnitude(ExampleCameraInputController input,
+            ExampleCameraInputReader.Source source) {
+            foreach (var axis in input.Controllers) {
+                if (axis.Input.InputSource == source)
+                    return Mathf.Abs(axis.Input.Gain);
+            }
+
+            return 0f;
+        }
+
+        private void SetGainMagnitude(ExampleCameraInputReader.Source source, float magnitude) {
+            var input = LiveInputController;
+
+            if (input == null)
+                return;
+
+            foreach (var axis in input.Controllers) {
+                if (axis.Input.InputSource == source)
+                    axis.Input.Gain = axis.Input.Gain < 0f
+                            ? -magnitude
+                            : magnitude;
+            }
+        }
+
+        private static bool IsYInverted(ExampleCameraInputController input) {
+            foreach (var axis in input.Controllers) {
+                if (axis.Input.InputSource == ExampleCameraInputReader.Source.LookY)
+                    return axis.Input.Gain > 0f;
+            }
+
+            return false;
+        }
+
+        private void SetYInverted(bool inverted) {
+            var input = LiveInputController;
+
+            if (input == null)
+                return;
+
+            foreach (var axis in input.Controllers) {
+                if (axis.Input.InputSource != ExampleCameraInputReader.Source.LookY)
+                    continue;
+
+                var magnitude = Mathf.Abs(axis.Input.Gain);
+                axis.Input.Gain = inverted
+                        ? magnitude
+                        : -magnitude;
+            }
         }
 
         private void Switch(string cameraName) => _rig.Switch(cameraName);

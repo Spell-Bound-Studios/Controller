@@ -10,51 +10,38 @@ using UnityEngine;
 namespace Spellbound.Controller {
     public class CameraRigManager : CinemachineCameraManagerBase, ICameraRig {
         [SerializeField,
-         Tooltip("Camera made live on start (by name). Falls back to the first entry in Cameras when empty/unmatched.")]
+         Tooltip("Camera made live on start (by name). Falls back to the first child camera when empty/unmatched.")]
         private string defaultCamera;
 
-        [SerializeField, Tooltip("The rig's cameras; switched between by GameObject name.")]
-        private List<CinemachineCamera> cameras = new();
-
-        [Header("Lens")]
-        [SerializeField, Tooltip("Near clip plane applied to every rig camera, so switching cameras never reverts it.")]
-        private float nearClipPlane = 0.3f;
-
-        [SerializeField, Tooltip("Far clip plane applied to every rig camera, so switching cameras never reverts it. " +
-                                 "Raise it for long view distances (distant terrain, ocean planes).")]
-        private float farClipPlane = 1000f;
-
-        private readonly Dictionary<string, CinemachineCamera> _byName = new();
         private readonly List<string> _names = new();
 
-        private CinemachineCamera _currentCamera;
+        private CinemachineVirtualCameraBase _currentCamera;
         private string _currentName;
 
         public string Current => _currentName;
+
+        public CinemachineVirtualCameraBase CurrentCamera => _currentCamera;
 
         public Transform CurrentCameraTransform => _currentCamera != null
                 ? _currentCamera.transform
                 : null;
 
-        public IReadOnlyList<string> CameraNames => _names;
+        public IReadOnlyList<string> CameraNames {
+            get {
+                _names.Clear();
+
+                var children = ChildCameras;
+
+                for (var i = 0; i < children.Count; i++) {
+                    if (children[i] != null)
+                        _names.Add(children[i].Name);
+                }
+
+                return _names;
+            }
+        }
 
         public event Action<string, string> CurrentChanged;
-
-        public float NearClipPlane {
-            get => nearClipPlane;
-            set {
-                nearClipPlane = value;
-                ApplyClipPlanes();
-            }
-        }
-
-        public float FarClipPlane {
-            get => farClipPlane;
-            set {
-                farClipPlane = value;
-                ApplyClipPlanes();
-            }
-        }
 
         private void Awake() {
             if (SingletonManager.TryGetSingletonInstance<ICameraRig>(out var existing) && !ReferenceEquals(existing, this)) {
@@ -64,8 +51,6 @@ namespace Spellbound.Controller {
             }
 
             SingletonManager.RegisterSingleton<ICameraRig>(this);
-            BuildIndex();
-            ApplyClipPlanes();
         }
 
         protected override void OnDestroy() {
@@ -83,39 +68,43 @@ namespace Spellbound.Controller {
             if (initial != null)
                 Switch(initial);
             else
-                Log.Error("[CameraRigManager] No cameras configured.");
+                Log.Error("[CameraRigManager] No child cameras found.");
         }
 
-        public void SetFollowTarget(Transform target) => DefaultTarget.Target.TrackingTarget = target;
+        public void SetFollowTarget(Transform target) {
+            DefaultTarget.Enabled = true;
+            DefaultTarget.Target.TrackingTarget = target;
+        }
 
-        public string Switch(string cameraName) {
-            var previous = Current;
+        public bool Switch(string cameraName) {
+            var camera = FindByName(cameraName);
 
-            if (string.IsNullOrEmpty(cameraName) || !_byName.TryGetValue(cameraName, out var camera)) {
+            if (camera == null) {
                 Log.Warn($"[CameraRigManager] No camera named '{cameraName}'.");
 
-                return previous;
+                return false;
             }
 
             if (camera == _currentCamera)
-                return previous;
+                return true;
 
+            var previous = _currentName;
             _currentCamera = camera;
             _currentName = cameraName;
             CurrentChanged?.Invoke(previous, cameraName);
 
-            return previous;
+            return true;
         }
 
-        public bool Register(CinemachineCamera camera) {
+        public bool Register(CinemachineVirtualCameraBase camera) {
             if (camera == null) {
                 Log.Error("[CameraRigManager] Cannot register a null camera.");
 
                 return false;
             }
 
-            if (!_byName.TryAdd(camera.name, camera)) {
-                Log.Error($"[CameraRigManager] Duplicate camera name '{camera.name}'.");
+            if (FindByName(camera.Name) != null) {
+                Log.Error($"[CameraRigManager] Duplicate camera name '{camera.Name}'.");
 
                 return false;
             }
@@ -123,20 +112,19 @@ namespace Spellbound.Controller {
             if (camera.transform.parent != transform)
                 camera.transform.SetParent(transform, true);
 
-            cameras.Add(camera);
-            _names.Add(camera.name);
-            ApplyClipPlanes();
+            InvalidateCameraCache();
 
             return true;
         }
 
         public bool Unregister(string cameraName) {
-            if (string.IsNullOrEmpty(cameraName) || !_byName.TryGetValue(cameraName, out var camera))
+            var camera = FindByName(cameraName);
+
+            if (camera == null)
                 return false;
 
-            _byName.Remove(cameraName);
-            _names.Remove(cameraName);
-            cameras.Remove(camera);
+            camera.transform.SetParent(null, true);
+            InvalidateCameraCache();
 
             if (_currentCamera != camera)
                 return true;
@@ -154,50 +142,43 @@ namespace Spellbound.Controller {
             return true;
         }
 
-        public CinemachineCamera GetCurrentCamera() => _currentCamera;
+        protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) {
+            if (_currentCamera == null) {
+                var fallback = ResolveDefaultName();
 
-        protected override CinemachineVirtualCameraBase ChooseCurrentCamera(Vector3 worldUp, float deltaTime) =>
-                _currentCamera;
-
-        private void ApplyClipPlanes() {
-            nearClipPlane = Mathf.Max(nearClipPlane, 0.01f);
-            farClipPlane = Mathf.Max(farClipPlane, nearClipPlane + 0.001f);
-
-            foreach (var camera in cameras) {
-                if (camera == null)
-                    continue;
-
-                camera.Lens.NearClipPlane = nearClipPlane;
-                camera.Lens.FarClipPlane = farClipPlane;
+                if (fallback != null)
+                    Switch(fallback);
             }
+
+            return _currentCamera;
         }
 
-        private void BuildIndex() {
-            _byName.Clear();
-            _names.Clear();
+        private CinemachineVirtualCameraBase FindByName(string cameraName) {
+            if (string.IsNullOrEmpty(cameraName))
+                return null;
 
-            foreach (var camera in cameras) {
-                if (camera == null) {
-                    Log.Error("[CameraRigManager] A camera entry is unassigned.");
+            var children = ChildCameras;
 
-                    continue;
-                }
-
-                if (!_byName.TryAdd(camera.name, camera)) {
-                    Log.Error($"[CameraRigManager] Duplicate camera name '{camera.name}'.");
-
-                    continue;
-                }
-
-                _names.Add(camera.name);
+            for (var i = 0; i < children.Count; i++) {
+                if (children[i] != null && children[i].Name == cameraName)
+                    return children[i];
             }
+
+            return null;
         }
 
-        private string ResolveDefaultName() =>
-                !string.IsNullOrEmpty(defaultCamera) && _byName.ContainsKey(defaultCamera)
-                        ? defaultCamera
-                        : _names.Count > 0
-                                ? _names[0]
-                                : null;
+        private string ResolveDefaultName() {
+            if (FindByName(defaultCamera) != null)
+                return defaultCamera;
+
+            var children = ChildCameras;
+
+            for (var i = 0; i < children.Count; i++) {
+                if (children[i] != null)
+                    return children[i].Name;
+            }
+
+            return null;
+        }
     }
 }

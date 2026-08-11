@@ -23751,18 +23751,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2101536852901350639, guid: becf9ab14b4bc9446ac179e7716091d0, type: 3}
-      propertyPath: CameraDistance
-      value: 5.200001
-      objectReference: {fileID: 0}
-    - target: {fileID: 2101536852901350639, guid: becf9ab14b4bc9446ac179e7716091d0, type: 3}
-      propertyPath: AvoidObstacles.CameraRadius
-      value: 0.385
-      objectReference: {fileID: 0}
-    - target: {fileID: 2101536852901350639, guid: becf9ab14b4bc9446ac179e7716091d0, type: 3}
-      propertyPath: AvoidObstacles.DampingIntoCollision
-      value: 0.38
-      objectReference: {fileID: 0}
     - target: {fileID: 3723199353474497578, guid: becf9ab14b4bc9446ac179e7716091d0, type: 3}
       propertyPath: m_Name
       value: CameraRig

@@ -8302,10 +8302,10 @@ GameObject:
   - component: {fileID: 8915035600698087468}
   - component: {fileID: 4235120299701147794}
   - component: {fileID: 1900024906980112349}
-  - component: {fileID: 5320208621824808183}
+  - component: {fileID: 5320208621824808184}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8396,17 +8396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <ExampleInput>k__BackingField: {fileID: 0}
-  <CameraData>k__BackingField:
-    <SensitivityX>k__BackingField: 0.5
-    <SensitivityY>k__BackingField: 0.5
-    <InvertY>k__BackingField: 0
-    <SmoothLook>k__BackingField: 0
-    <SmoothingFactor>k__BackingField: 25
-    <MinPitch>k__BackingField: -89
-    <MaxPitch>k__BackingField: 89
-    <LockCursorOnStart>k__BackingField: 1
-    <FollowMouse>k__BackingField: 1
-  cameraOffset: {x: 0, y: 1.5, z: 0}
+  lockCursorOnStart: 1
   <Rb>k__BackingField: {fileID: 6752135915643218695}
   <ResizableCapsuleCollider>k__BackingField:
     collider: {fileID: 7305499241619662692}
@@ -8540,7 +8530,7 @@ MonoBehaviour:
     root: {fileID: 1355569392189218491}
     animator: {fileID: 0}
   defaultLabel: Knight
---- !u!114 &5320208621824808183
+--- !u!114 &5320208621824808184
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8549,11 +8539,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8702816091274949866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea1790518932b645f210c26a38c0ac68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spellbound.Controller.Samples.FirstPersonBodyHiderExample
-  firstPersonCameraName: FirstPersonCamera
-  visualSwitcher: {fileID: 1900024906980112349}
+  m_Script: {fileID: 11500000, guid: 9b6e1d4fa2c845e3b7f0a8d5c4e21b68, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  hideDistance: 0.5
+  bodyCollider: {fileID: 7305499241619662692}
 --- !u!1 &8707547554009297974
 GameObject:
   m_ObjectHideFlags: 0

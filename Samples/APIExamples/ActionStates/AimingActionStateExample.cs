@@ -4,23 +4,19 @@ using UnityEngine;
 
 namespace Spellbound.Controller.Samples {
     /// <summary>
-    /// Action state entered while aiming (bow/gun): on enter it switches the rig to the aiming camera (by name) —
-    /// Cinemachine blends your current view in to the zoomed one — and restores the prior camera on exit. This is
-    /// how a gameplay feature consumes the camera API: through a state, driven by the same machine that owns the
-    /// player, not a standalone component bolted onto the scene.
+    /// Action state entered while aiming (bow/gun): it eases the live camera in over the shoulder via
+    /// <see cref="AimZoomExample"/> and eases back out on exit. The view direction never changes — aiming
+    /// zooms in on exactly what the crosshair was on.
     /// </summary>
     [CreateAssetMenu(fileName = "AimingActionStateExample",
         menuName = "Spellbound/StateMachine/AimingActionStateExample")]
     public class AimingActionStateExample : BaseActionStateExample {
-        [SerializeField, Tooltip("Name of the camera switched to while aiming (the rig camera's GameObject name).")]
-        private string aimCameraName = "AimingCamera";
-
         [Header("Animation")]
         [SerializeField, Tooltip("Animator state on the masked action layer played while aiming.")]
         private string aimStateName = "Aiming";
         private int _aimHash;
 
-        private string _restore;
+        private AimZoomExample _zoom;
 
         protected override void OnStateInitialize() => _aimHash = Animator.StringToHash(aimStateName);
 
@@ -28,7 +24,10 @@ namespace Spellbound.Controller.Samples {
             Ctx.Animation?.CrossFade(_aimHash, PlayerControllerExample.ActionLayer);
             Ctx.FadeActionLayer(1f);
 
-            _restore = Ctx.CameraController?.SwitchCamera(aimCameraName);
+            _zoom = FindAimZoom();
+
+            if (_zoom != null)
+                _zoom.Aiming = true;
         }
 
         protected override void UpdateStateLogic() {
@@ -41,8 +40,18 @@ namespace Spellbound.Controller.Samples {
         protected override void ExitStateLogic() {
             Ctx.FadeActionLayer(0f);
 
-            if (!string.IsNullOrEmpty(_restore))
-                Ctx.CameraController?.SwitchCamera(_restore);
+            if (_zoom != null) {
+                _zoom.Aiming = false;
+                _zoom = null;
+            }
+        }
+
+        private AimZoomExample FindAimZoom() {
+            var cameraTransform = Ctx.CameraRig?.CurrentCameraTransform;
+
+            return cameraTransform != null
+                    ? cameraTransform.GetComponent<AimZoomExample>()
+                    : null;
         }
     }
 }

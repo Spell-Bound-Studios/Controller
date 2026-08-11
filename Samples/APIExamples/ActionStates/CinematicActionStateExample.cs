@@ -13,7 +13,7 @@ namespace Spellbound.Controller.Samples {
         protected override void EnterStateLogic() {
             Ctx.ExampleInput.OnCinematicTogglePressed += HandleCinematicTogglePressed;
             Ctx.ExampleInput.DisablePlayerInput();
-            _restore = Ctx.CameraController?.SwitchCamera(cinematicCameraName);
+            _restore = Ctx.SwitchCamera(cinematicCameraName);
         }
 
         protected override void UpdateStateLogic() { }
@@ -24,7 +24,7 @@ namespace Spellbound.Controller.Samples {
             Ctx.ExampleInput.OnCinematicTogglePressed -= HandleCinematicTogglePressed;
 
             if (!string.IsNullOrEmpty(_restore))
-                Ctx.CameraController?.SwitchCamera(_restore);
+                Ctx.SwitchCamera(_restore);
 
             Ctx.ExampleInput.EnablePlayerInput();
         }
