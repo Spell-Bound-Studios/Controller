@@ -1,6 +1,6 @@
 {
   "name": "com.spellboundstudios.controller",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "displayName": "Spellbound.Controller",
   "description": "This is a player controller library that offers modular states and and state machines to give your character the flexibility to do anything you want in your game world.",
   "unity": "6000.0",
@@ -23,12 +23,5 @@
     "state-machine",
     "player",
     "character"
-  ],
-  "samples": [
-    {
-      "displayName": "Example Scene",
-      "description": "A third person character controller example scene to show you the responsiveness and state flexibility and overrides you can perform with ease.",
-      "path": "Samples~/"
-    }
   ]
 }
